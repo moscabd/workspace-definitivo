@@ -416,11 +416,14 @@ html, body {
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-top:1px solid var(--border);z-index:50;
   padding:4px 0 calc(4px + env(safe-area-inset-bottom));
+  overflow-x: auto; scrollbar-width: none;
 }
+.mob-nav::-webkit-scrollbar { display: none; }
 .mob-nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  flex: 0 0 auto; min-width: 65px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
   font-size:10px;color:var(--text3);cursor:pointer;padding:5px 2px;
-  position:relative;transition:color 0.2s;min-width:0;
+  position:relative;transition:color 0.2s;
 }
 .mob-nav-item::before{
   content:'';position:absolute;inset:2px 4px;
