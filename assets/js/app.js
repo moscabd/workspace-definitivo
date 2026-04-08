@@ -757,8 +757,37 @@ document.querySelectorAll('.wp-day').forEach(d=>{
 })
 
 // ══════════════════════════════════════════
-//  GOOGLE AGENDA (Substituído por Iframe Direto)
+//  GOOGLE AGENDA — Abertura inteligente por plataforma
 // ══════════════════════════════════════════
+
+const isAndroid = /Android/i.test(navigator.userAgent)
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+const isMobile = isAndroid || isIOS
+
+function openCalendar(){
+  if(isAndroid){
+    // Android Intent URI: abre direto no app Google Calendar
+    window.location.href = 'intent://calendar.google.com/calendar/r#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=https%3A%2F%2Fcalendar.google.com%2Fcalendar%2Fr;end'
+  } else if(isIOS){
+    // iOS não tem intent URI, mas o Safari pergunta se quer abrir no app
+    window.open('https://calendar.google.com/calendar/r', '_blank')
+  } else {
+    // Desktop: abre em popup dentro do workspace
+    window.open('https://calendar.google.com/calendar/r', 'gcal_view', 'width=900,height=700,left=100,top=80,menubar=no,toolbar=no,location=no,scrollbars=yes')
+  }
+}
+
+function newCalendarEvent(){
+  if(isAndroid){
+    // Android Intent URI: abre tela de novo evento no app Google Calendar
+    window.location.href = 'intent://calendar.google.com/calendar/r/eventedit#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=https%3A%2F%2Fcalendar.google.com%2Fcalendar%2Fr%2Feventedit;end'
+  } else if(isIOS){
+    window.open('https://calendar.google.com/calendar/r/eventedit', '_blank')
+  } else {
+    // Desktop: abre popup de criação de evento
+    window.open('https://calendar.google.com/calendar/r/eventedit?src=otsuguarede%40gmail.com', 'gcal_new', 'width=820,height=720,left=200,top=80,menubar=no,toolbar=no,location=no,scrollbars=yes')
+  }
+}
 
 // ══════════════════════════════════════════
 //  TEMA CLARO / ESCURO
