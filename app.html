@@ -231,6 +231,16 @@
         </div>
       </div>
 
+      <!-- Gráfico de Gastos por Categoria -->
+      <div class="card" style="margin-bottom:14px" id="fn-chart-card">
+        <div class="card-title">Gastos por Categoria</div>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center">
+          <canvas id="fn-chart" style="flex-shrink:0"></canvas>
+          <div id="fn-chart-legend" style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+        <div id="fn-chart-empty" class="empty" style="display:none;padding:20px">Nenhuma saída registrada ainda</div>
+      </div>
+
       <div class="card">
         <div class="card-title">Lançamentos</div>
         <div id="fn-list"></div>

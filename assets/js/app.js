@@ -502,7 +502,126 @@ function renderFinancas(){
       <button class="wd-btn btn-danger btn-sm" style="margin-left:8px" onclick="deleteFinanca(${f.id})">✕</button>
     </div>`
   }).join('')
+
+  renderFinChart(list)
 }
+
+// ══════════════════════════════════════════
+//  GRÁFICO FINANCEIRO — Donut por Categoria
+// ══════════════════════════════════════════
+const chartPalette = {
+  'trabalho':    '#6c63ff',
+  'despesa-fixa':'#a78bfa',
+  'lazer':       '#e879f9',
+  'alimentacao': '#f5a623',
+  'saude':       '#38bdf8',
+  'investimento':'#3fcf8e',
+  'outro':       '#64748b'
+}
+const catLabels = {
+  'trabalho':'Trabalho','despesa-fixa':'Despesa Fixa',
+  'lazer':'Lazer','alimentacao':'Alimentação',
+  'saude':'Saúde','investimento':'Investimento','outro':'Outro'
+}
+
+function renderFinChart(list){
+  const canvas  = document.getElementById('fn-chart')
+  const legend  = document.getElementById('fn-chart-legend')
+  const empty   = document.getElementById('fn-chart-empty')
+  if(!canvas || !legend) return
+
+  const saidas = list.filter(f=>f.tipo==='saida')
+
+  if(!saidas.length){
+    canvas.style.display  = 'none'
+    legend.style.display  = 'none'
+    if(empty) empty.style.display = 'block'
+    return
+  }
+  canvas.style.display  = ''
+  legend.style.display  = 'flex'
+  if(empty) empty.style.display = 'none'
+
+  // Totais por categoria
+  const cats = {}
+  saidas.forEach(f=>{ cats[f.cat] = (cats[f.cat]||0) + f.val })
+  const total = Object.values(cats).reduce((a,b)=>a+b,0)
+  const entries = Object.entries(cats).sort((a,b)=>b[1]-a[1])
+
+  // Tamanho responsivo
+  const dpr  = window.devicePixelRatio || 1
+  const size = Math.min((canvas.parentElement?.clientWidth||280) * 0.42, 200)
+  canvas.width  = size * dpr
+  canvas.height = size * dpr
+  canvas.style.width  = size + 'px'
+  canvas.style.height = size + 'px'
+
+  const ctx = canvas.getContext('2d')
+  ctx.scale(dpr, dpr)
+  ctx.clearRect(0, 0, size, size)
+
+  const cx = size/2, cy = size/2
+  const outerR = size * 0.44
+  const innerR = size * 0.27
+  const gap = 0.03  // gap entre fatias em radianos
+
+  // Detecta tema claro
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light'
+  const textColor    = isLight ? '#1a1d2e' : '#e8e9ee'
+  const subtextColor = isLight ? '#8a90ad' : '#454857'
+
+  // Sombra geral do canvas
+  ctx.shadowColor   = 'rgba(0,0,0,0.25)'
+  ctx.shadowBlur    = 12
+
+  let angle = -Math.PI / 2
+  entries.forEach(([cat, val])=>{
+    const slice = (val / total) * 2 * Math.PI - gap
+    const color = chartPalette[cat] || '#64748b'
+
+    ctx.beginPath()
+    ctx.moveTo(cx, cy)
+    ctx.arc(cx, cy, outerR, angle + gap/2, angle + gap/2 + slice)
+    ctx.arc(cx, cy, innerR, angle + gap/2 + slice, angle + gap/2, true)
+    ctx.closePath()
+    ctx.fillStyle = color
+    ctx.fill()
+    angle += slice + gap
+  })
+
+  // Buraco central limpo
+  ctx.shadowBlur = 0
+  ctx.beginPath()
+  ctx.arc(cx, cy, innerR - 1, 0, 2*Math.PI)
+  ctx.fillStyle = isLight ? '#f8f9fc' : '#111318'
+  ctx.fill()
+
+  // Texto central
+  const fmtBRL = v => 'R$' + v.toLocaleString('pt-BR',{minimumFractionDigits:0})
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = textColor
+  ctx.font = `bold ${Math.round(size*0.13)}px Inter,sans-serif`
+  ctx.fillText(fmtBRL(total), cx, cy - size*0.05)
+  ctx.fillStyle = subtextColor
+  ctx.font = `${Math.round(size*0.08)}px Inter,sans-serif`
+  ctx.fillText('em gastos', cx, cy + size*0.1)
+
+  // Legenda HTML
+  legend.innerHTML = entries.map(([cat, val])=>{
+    const pct = ((val/total)*100).toFixed(1)
+    const color = chartPalette[cat] || '#64748b'
+    const label = catLabels[cat] || cat
+    return `
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:${color};box-shadow:0 0 6px ${color}88"></div>
+        <div style="flex:1;color:var(--text2)">${label}</div>
+        <div style="font-weight:600;color:var(--text1)">${fmtBRL(val)}</div>
+        <div style="color:var(--text3);min-width:38px;text-align:right">${pct}%</div>
+      </div>`
+  }).join('')
+}
+
 
 // ══════════════════════════════════════════
 //  PROJETOS
