@@ -901,7 +901,7 @@ async function deriveKey(password, salt) {
   );
   return crypto.subtle.deriveKey(
     { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
-    keyMaterial, "AES-GCM", true, ["encrypt", "decrypt"]
+    keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
   );
 }
 
