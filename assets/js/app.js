@@ -140,9 +140,53 @@ function today(){return new Date().toISOString().split('T')[0]}
 // ══════════════════════════════════════════
 //  HÁBITOS
 // ══════════════════════════════════════════
-function addHabito(){
+function openHabitModal(id = null){
+  const nomeEl = document.getElementById('bh-nome')
+  const durEl = document.getElementById('bh-duracao')
+  const horaEl = document.getElementById('bh-hora')
+  const tipoEl = document.getElementById('bh-tipo')
+  const idEl = document.getElementById('bh-id')
+  const btnEl = document.getElementById('mh-btn')
+  const titleEl = document.getElementById('mh-title')
+  
+  document.querySelectorAll('.wp-day').forEach(d=>d.classList.remove('active'))
+  
+  if(id){
+    const h = S.get('habitos').find(x=>x.id==id)
+    if(h){
+      titleEl.textContent = 'Editar Hábito'
+      btnEl.textContent = 'Salvar Alterações'
+      idEl.value = h.id
+      nomeEl.value = h.nome || ''
+      durEl.value = h.duracao || ''
+      horaEl.value = h.hora || ''
+      tipoEl.value = h.tipo || 'rec'
+      
+      const dias = h.dias || [0,1,2,3,4,5,6]
+      document.querySelectorAll('.wp-day').forEach(d=>{
+        if(dias.includes(parseInt(d.dataset.val))) d.classList.add('active')
+      })
+    }
+  } else {
+    titleEl.textContent = 'Novo Hábito'
+    btnEl.textContent = 'Criar Hábito'
+    idEl.value = ''
+    nomeEl.value = ''
+    durEl.value = ''
+    horaEl.value = ''
+    tipoEl.value = 'rec'
+    document.querySelectorAll('.wp-day').forEach(d=>d.classList.add('active'))
+  }
+  
+  document.getElementById('bh-dias-wrap').style.display = tipoEl.value==='rec'?'block':'none'
+  openModal('modal-habito')
+}
+
+function saveHabito(){
+  const idVal = document.getElementById('bh-id').value
   const nome = cleanInput(document.getElementById('bh-nome').value, 100)
   const duracao = cleanInput(document.getElementById('bh-duracao').value, 50)
+  const hora = document.getElementById('bh-hora').value
   const tipo = document.getElementById('bh-tipo').value
   const dias = []
   if(tipo==='rec'){
@@ -151,11 +195,23 @@ function addHabito(){
   
   if(!nome) return
   const list = S.get('habitos')
-  list.push({id:Date.now(),nome,tipo,duracao,dias,done:[],createdAt:today()})
-  S.set('habitos',list)
   
-  document.getElementById('bh-nome').value=''
-  document.getElementById('bh-duracao').value=''
+  if(idVal){
+    // Update
+    const h = list.find(x=>x.id == idVal)
+    if(h){
+      h.nome = nome
+      h.duracao = duracao
+      h.hora = hora
+      h.tipo = tipo
+      h.dias = dias
+    }
+  } else {
+    // Add
+    list.push({id:Date.now(),nome,tipo,duracao,hora,dias,done:[],createdAt:today()})
+  }
+  
+  S.set('habitos',list)
   closeModal('modal-habito')
   
   renderHabitos()
@@ -217,10 +273,14 @@ function renderHabitos(){
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id})"></div>
-          <div class="habit-name ${done?'done':''}" style="font-size:16px">${h.nome}</div>
+          <div>
+            <div class="habit-name ${done?'done':''}" style="font-size:16px">${h.nome}</div>
+            ${h.hora?`<div style="font-size:13px;color:var(--text3);margin-top:2px">⏰ ${h.hora}</div>`:''}
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           ${h.duracao?`<span class="hb-dur">${h.duracao}</span>`:''}
+          <button class="wd-btn btn-ghost btn-sm" onclick="openHabitModal(${h.id})">Editar</button>
           <button class="wd-btn btn-danger btn-sm" onclick="deleteHabito(${h.id})">✕</button>
         </div>
       </div>
@@ -593,7 +653,9 @@ function renderDashboard(){
         return `<div class="habit-item">
           <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id});renderDashboard()"></div>
           <div class="habit-name ${done?'done':''}">
-             ${h.nome} ${h.duracao?`<span style="color:var(--text3);font-size:13px;margin-left:4px">(${h.duracao})</span>`:''}
+             ${h.nome} 
+             ${h.duracao?`<span style="color:var(--text3);font-size:13px;margin-left:4px">(${h.duracao})</span>`:''}
+             ${h.hora?`<span style="color:var(--accent2);font-size:13px;margin-left:4px">⏰ ${h.hora}</span>`:''}
           </div>
         </div>`
       }).join('')

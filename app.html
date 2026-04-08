@@ -123,7 +123,7 @@
     <!-- ═══ HÁBITOS ═══ -->
     <div class="page" id="page-habitos">
       <div style="display:flex;gap:10px;margin-bottom:20px">
-        <button class="wd-btn btn-primary" onclick="openModal('modal-habito')">+ Novo Hábito</button>
+        <button class="wd-btn btn-primary" onclick="openHabitModal()">+ Novo Hábito</button>
       </div>
 
       <div class="grid2">
@@ -373,14 +373,21 @@
 <!-- MODAL HÁBITO -->
 <div class="modal-overlay" id="modal-habito">
   <div class="modal">
-    <div class="modal-title">Novo Hábito</div>
+    <div class="modal-title" id="mh-title">Novo Hábito</div>
+    <input type="hidden" id="bh-id">
     <div class="form-group">
       <label class="form-label">Nome do hábito</label>
       <input class="wd-input" id="bh-nome" placeholder="Ex: Academia, Leitura, Meditação" style="width:100%">
     </div>
-    <div class="form-group">
-      <label class="form-label">Duração / Meta</label>
-      <input class="wd-input" id="bh-duracao" placeholder="Ex: 1 hora e meia, 12 min" style="width:100%">
+    <div style="display:flex;gap:10px">
+      <div class="form-group" style="flex:1">
+        <label class="form-label">Duração / Meta</label>
+        <input class="wd-input" id="bh-duracao" placeholder="Ex: 1 hora e meia, 12 min" style="width:100%">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label class="form-label">Horário (Opcional)</label>
+        <input class="wd-input" id="bh-hora" type="time" style="width:100%">
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Tipo</label>
@@ -403,7 +410,7 @@
     </div>
     <div class="modal-actions">
       <button class="wd-btn btn-ghost" onclick="closeModal('modal-habito')">Cancelar</button>
-      <button class="wd-btn btn-primary" onclick="addHabito()">Criar Hábito</button>
+      <button class="wd-btn btn-primary" onclick="saveHabito()" id="mh-btn">Criar Hábito</button>
     </div>
   </div>
 </div>
