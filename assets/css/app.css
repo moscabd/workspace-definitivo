@@ -180,7 +180,9 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Inte
 .page.active{display:block}
 
 /* ── HELPERS ── */
-.gcal-card { padding: 0; overflow: hidden; border-radius: var(--r2); border: 1px solid var(--border); height: 600px; }
+.iframe-mob { display: none; width: 100%; height: 100%; border: 0; }
+.iframe-desk { display: block; width: 100%; height: 100%; border: 0; }
+.gcal-card { padding: 0; overflow: hidden; border-radius: var(--r2); border: 1px solid var(--border); height: 600px; display: flex; flex-direction: column; }
 .action-row { margin-top: 20px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
 
 /* ── ANIM ── */
@@ -203,11 +205,16 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Inte
   .input-row .wd-btn{width:100%}
   .modal-actions{flex-direction:column}
   .modal-actions .wd-btn{width:100%}
-  .gcal-card{height: 450px;}
+  .gcal-card{height: 480px;}
+  .iframe-desk{display: none;}
+  .iframe-mob{display: block;}
   .action-row{flex-direction:column;gap:10px;}
   .mob-nav{display:flex!important}
   .card{padding:14px}
   .modal{padding:18px}
+  .sc-value{font-size: 26px;}
+  .fsum-val{font-size: 21px;}
+  .page-title{font-size: 19px;}
 }
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--border);z-index:50;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
 .mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;color:var(--text3);cursor:pointer;padding:6px 0}
