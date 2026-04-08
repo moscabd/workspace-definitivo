@@ -757,71 +757,8 @@ document.querySelectorAll('.wp-day').forEach(d=>{
 })
 
 // ══════════════════════════════════════════
-//  GOOGLE AGENDA
+//  GOOGLE AGENDA (Substituído por Iframe Direto)
 // ══════════════════════════════════════════
-function saveGcal(){
-  const url = document.getElementById('gcal-url').value.trim()
-  if(!url){document.getElementById('gcal-status').textContent='Cole o link primeiro!';return}
-  localStorage.setItem('wd_gcal_url',url)
-  document.getElementById('gcal-status').style.color='var(--accent2)'
-  document.getElementById('gcal-status').textContent='✓ Link salvo! Use os botões abaixo para ver sua agenda.'
-  loadGcalUrl() // Redesenha os botões
-}
-
-function getGcalEmail(url){
-  if(!url) return null;
-  const match = url.match(/ical\/(.*?)\/private/);
-  if(match && match[1]) return decodeURIComponent(match[1]);
-  return null;
-}
-
-function openGcal(){
-  const url = localStorage.getItem('wd_gcal_url') || ''
-  if(url.includes('.ics')){
-    // Se for um link ICS, não queremos baixar o arquivo. Abrimos a visualização web do Calendar
-    window.open('https://calendar.google.com/calendar/r', '_blank')
-  } else if(url){
-    window.open(url, '_blank')
-  } else {
-    window.open('https://calendar.google.com/calendar/r', '_blank')
-  }
-}
-
-function toggleGcalEmbed(){
-  const container = document.getElementById('gcal-embed-container')
-  const iframe = document.getElementById('gcal-iframe')
-  const btn = document.getElementById('btn-embedGcal')
-  
-  if(container.style.display === 'none'){
-    const url = localStorage.getItem('wd_gcal_url')
-    const email = getGcalEmail(url)
-    if(email){
-      iframe.src = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(email)}&ctz=America/Sao_Paulo&bgcolor=%23ffffff&showPrint=0&showTabs=1&showCalendars=0`
-      container.style.display = 'block'
-      btn.textContent = '🙈 Ocultar Agenda'
-    } else {
-      alert("Não foi possível extrair o e-mail do link para exibir a agenda. Tente o botão 'Abrir Google Agenda'.")
-    }
-  } else {
-    container.style.display = 'none'
-    iframe.src = ''
-    btn.textContent = '👀 Ver dentro do App'
-  }
-}
-
-function loadGcalUrl(){
-  const url = localStorage.getItem('wd_gcal_url')
-  if(url && document.getElementById('gcal-url')){
-    document.getElementById('gcal-url').value=url
-    document.getElementById('gcal-status').textContent='Link já salvo ✓'
-    document.getElementById('gcal-status').style.color='var(--accent2)'
-    
-    // Verifica se dá pra embutir (se tiver email na URL)
-    if(getGcalEmail(url)){
-      document.getElementById('btn-embedGcal').style.display = 'inline-flex'
-    }
-  }
-}
 
 // ══════════════════════════════════════════
 //  INIT

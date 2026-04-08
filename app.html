@@ -262,55 +262,20 @@
 
     <!-- ═══ GOOGLE AGENDA ═══ -->
     <div class="page" id="page-agenda">
-      <div class="agenda-banner">
+      <div class="agenda-banner" style="margin-bottom: 20px">
         <div style="font-size:35px;margin-bottom:12px">📅</div>
         <div style="font-size:18px;color:var(--text2);font-weight:500;margin-bottom:10px">Integração com Google Agenda</div>
         <div style="color:var(--text3);line-height:1.9;max-width:500px;margin:0 auto">
-          Esta parte precisa de uma configuração rápida (só uma vez).<br>
-          Siga o <strong style="color:var(--text2)">Tutorial Completo</strong> abaixo — é fácil, prometo! 🙂
+          Seus compromissos e agenda sincronizados e exibidos diretamente no seu Workspace.
         </div>
       </div>
 
-      <div class="card" style="margin-top:20px">
-        <div class="card-title">📖 Tutorial passo a passo — Google Agenda</div>
-        <div style="line-height:2;color:var(--text2);font-size:16px">
-
-          <div style="margin-bottom:16px;padding:12px;background:var(--bg3);border-radius:var(--r2);border-left:3px solid var(--accent)">
-            <strong style="color:var(--text1)">O que vamos fazer:</strong> Você vai gerar um link especial da sua agenda do Google. Cole esse link aqui e seus eventos aparecerão automaticamente.
-          </div>
-
-          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-right:8px">1</span><strong style="color:var(--text1)">Abra o Google Agenda</strong> no computador:<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;→ <a href="https://calendar.google.com" target="_blank" style="color:var(--accent)">calendar.google.com</a></div>
-
-          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-right:8px">2</span><strong style="color:var(--text1)">No lado esquerdo</strong>, procure o nome da sua agenda (geralmente seu nome ou e-mail). Passe o mouse por cima e clique nos <strong>3 pontinhos (...)</strong> que aparecem.</div>
-
-          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-right:8px">3</span>Clique em <strong style="color:var(--text1)">"Configurações e compartilhamento"</strong></div>
-
-          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-right:8px">4</span>Role a página até ver <strong style="color:var(--text1)">"Endereço secreto no formato iCal"</strong>. Clique em <strong>copiar</strong> (ícone de copiar do lado).</div>
-
-          <div style="margin-bottom:16px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-right:8px">5</span>Cole o link abaixo e clique em <strong style="color:var(--text1)">Salvar</strong>:</div>
-
-          <div class="input-row">
-            <input class="wd-input" id="gcal-url" placeholder="Cole aqui o link da agenda (começa com https://calendar.google.com/calendar/ical/...)">
-            <button class="wd-btn btn-primary" onclick="saveGcal()">Salvar</button>
-          </div>
-
-          <div id="gcal-status" style="margin-top:8px;font-size:15px;color:var(--text3)"></div>
-
-          <div style="margin-top:16px;padding:12px;background:var(--bg3);border-radius:var(--r2);border-left:3px solid var(--accent3)">
-            <strong style="color:var(--accent3)">⚠️ Limitação atual:</strong> <span style="color:var(--text3)">Por segurança do navegador, a leitura automática do Google Agenda exige um pequeno servidor. Mas com o link salvo, você já pode acessar sua agenda clicando no botão abaixo. Em breve posso adicionar um servidor local simples para sincronização automática.</span>
-          </div>
-
-          <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
-            <button class="wd-btn btn-primary" onclick="openGcal()">📅 Abrir Google Agenda</button>
-            <button class="wd-btn btn-ghost" onclick="toggleGcalEmbed()" id="btn-embedGcal" style="display:none">👀 Ver dentro do App</button>
-          </div>
-
-          <!-- Container do iframe (escondido por padrão) -->
-          <div id="gcal-embed-container" style="margin-top: 20px; display: none; height: 500px; border-radius: var(--r2); overflow: hidden; border: 1px solid var(--border);">
-            <iframe id="gcal-iframe" style="border: 0; width: 100%; height: 100%;" frameborder="0" scrolling="no"></iframe>
-          </div>
-        </div>
+      <div class="card" style="padding: 0; overflow: hidden; border-radius: var(--r2); border: 1px solid var(--border); height: 600px;">
+        <iframe src="https://calendar.google.com/calendar/embed?src=otsuguarede%40gmail.com&ctz=America%2FSao_Paulo" style="border: 0; width: 100%; height: 100%;" frameborder="0" scrolling="no"></iframe>
+      </div>
+      
+      <div style="margin-top: 20px; display: flex; justify-content: center;">
+        <button class="wd-btn btn-primary" onclick="window.open('https://calendar.google.com/', '_blank')">Acessar Google Agenda Completo</button>
       </div>
     </div>
 
