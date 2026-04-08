@@ -979,10 +979,16 @@ function lockVault() {
 
 function renderSenhas() {
   const conf = S.getSingle('vault_conf', null);
+  const btn = document.querySelector('#vault-locked button');
+  const sub = document.getElementById('vault-lock-sub');
   if(!conf) {
     document.getElementById('vault-create-hint').style.display = 'block';
+    if(btn) btn.innerHTML = '✨ Criar Senha Mestre';
+    if(sub) sub.innerHTML = 'Bem-vindo(a) ao cofre protegido. Crie a sua chave única abaixo:';
   } else {
     document.getElementById('vault-create-hint').style.display = 'none';
+    if(btn) btn.innerHTML = '🔓 Desbloquear Cofre';
+    if(sub) sub.innerHTML = 'Digite a senha mestre para acessar seu cofre';
   }
 }
 
