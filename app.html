@@ -1226,11 +1226,30 @@ function loadGcalUrl(){
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  DEV MODE — localhost pula login
+// ══════════════════════════════════════════
+const IS_DEV = ['localhost','127.0.0.1'].includes(window.location.hostname)
+
 async function init(){
-  const {data:{session}}=await db.auth.getSession()
-  if(!session){window.location.href='/';return}
-  currentUser=session.user
-  try{await loadAllData()}catch(e){console.error('Load error',e)}
+  if(IS_DEV){
+    // Modo preview local: usa localStorage, sem login
+    currentUser={id:'local-dev',user_metadata:{full_name:'Preview Local',avatar_url:''}}
+    // Reverte S para localStorage em modo dev
+    S.get = k=>{try{return JSON.parse(localStorage.getItem('wd_'+k))||[]}catch{return[]}}
+    S.set = (k,v)=>{localStorage.setItem('wd_'+k,JSON.stringify(v))}
+    S.getSingle = (k,d)=>{try{return JSON.parse(localStorage.getItem('wd_'+k))||d}catch{return d}}
+    // Badge visual indicando modo dev
+    const badge=document.createElement('span')
+    badge.textContent='⚡ DEV LOCAL'
+    badge.style.cssText='font-size:10px;padding:3px 10px;border-radius:20px;background:#1a1420;color:#c084fc;font-weight:700;letter-spacing:.08em'
+    document.querySelector('.topbar-right').prepend(badge)
+  } else {
+    const {data:{session}}=await db.auth.getSession()
+    if(!session){window.location.href='/';return}
+    currentUser=session.user
+    try{await loadAllData()}catch(e){console.error('Load error',e)}
+  }
   initDate()
   renderDashboard()
   loadGcalUrl()
