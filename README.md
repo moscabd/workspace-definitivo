@@ -1,192 +1,172 @@
-# Workspace Definitivo v2.0 - Sistema de Vida Integral
+# 🗂️ Workspace Definitivo
 
-Um sistema completo de organização, planejamento e autossuperação com **IA integrada**.
+> Seu espaço pessoal de organização — tudo em um lugar só.
 
-## 🚀 Funcionalidades Principais
-
-### Propósito & Visão
-- **🎯 Ikigai** - Encontre a interseção entre paixão, talento, necessidade e retorno
-  - Visualização 4 quadrantes
-  - Sugestões com IA (Groq)
-  
-- **🌟 Visão de Vida** - Defina sua missão, valores e objetivos
-  - Missão pessoal refinada com IA
-  - Valores core
-  - Pilares de vida (Saúde, Família, Trabalho, etc)
-  - Objetivos por horizonte (1, 5, 10 anos)
-
-### Núcleo Produtivo
-- **✅ Hábitos** - Rastreie hábitos diários e progresso semanal
-- **📋 Tarefas** - Organize tarefas com prioridade e prazos
-- **🚀 Projetos** - Acompanhe projetos com barra de progresso
-
-### Conhecimento & Recursos
-- **🧠 Segundo Cérebro** - Capture ideias, insights, referências
-  - Análise inteligente com IA
-  - Tags por categoria
-  - Timeline de descobertas
-
-- **💪 Bem-Estar** - Rastreie energia, humor, saúde
-- **💰 Finanças** - Gerencie entradas, saídas, categorias
-- **🛒 Compras** - Lista de compras organizada
-
-### Integração
-- **📅 Google Agenda** - Sincronize com sua agenda
+Sistema web completo de produtividade pessoal com autenticação, sincronização em nuvem via Supabase, tema claro/escuro, design glassmorphism e suporte total a mobile (PWA).
 
 ---
 
-## 🤖 IA Integrada (Groq API)
+## ✨ Funcionalidades
 
-Botões "IA" em vários módulos:
+### 📊 Painel Geral (Dashboard)
+- Visão consolidada de hábitos, tarefas, projetos e finanças do dia
+- Cards com contagem de hábitos concluídos hoje vs. esperados
+- Últimas tarefas pendentes e projetos em andamento
+- Saldo financeiro do mês exibido de forma discreta no cartão de Finanças
 
-- **Ikigai**: ✨ Sugestões com IA → Gera 3-5 caminhos profissionais baseado no seu Ikigai
-- **Visão**: ✨ Refinar com IA → Melhora sua missão pessoal com base em valores e objetivos
-- **Segundo Cérebro**: 🤖 Análise com IA → Identifica padrões e conexões entre suas ideias
+### ✅ Hábitos
+- Criação de hábitos **recorrentes** (dias específicos da semana) e **ocasionais/flexíveis**
+- Definição de **duração/meta** e **horário** por hábito
+- Seletor visual de dias da semana com toggle interativo
+- Mini streak dos últimos 7 dias por hábito
+- Barra de progresso semanal completa (dias OK / dias esperados)
+- Edição e exclusão de hábitos já criados
+- Toggle de conclusão por dia diretamente na listagem
+
+### 📋 Tarefas
+- Criação com **descrição**, **prioridade** (Alta / Média / Baixa) e **prazo**
+- Separação visual entre tarefas **Pendentes** e **Concluídas**
+- Toggle de conclusão com animação
+- Exclusão individual de tarefas
+
+### 🛒 Lista de Compras
+- Itens organizados por categoria: **Trabalho/Ferramentas** e **Pessoal/Casa/Outros**
+- Categorias disponíveis: Trabalho, Pessoal, Casa, Roupas/Calçados, Mercado, Outro
+- Toggle visual de "comprado" com riscado
+- Exclusão por item
+
+### 💰 Finanças
+- Lançamentos de **Entradas** e **Saídas** com descrição, valor e categoria
+- Categorias: Trabalho, Despesa Fixa, Lazer, Alimentação, Saúde, Investimento, Outro
+- Painel de resumo com **Total entradas**, **Total saídas** e **Saldo**
+- Histórico de lançamentos em ordem cronológica reversa
+- Saldo com cor dinâmica (verde positivo / vermelho negativo)
+
+### 🚀 Projetos
+- Criação com nome, descrição, categoria e progresso inicial
+- Barra de progresso visual por projeto
+- Atualização de progresso a qualquer momento via modal
+- Categorias: Trabalho, Pessoal, Estudo, Financeiro
+
+### 🧠 Segundo Cérebro
+- Capture ideias, pensamentos, insights e referências livremente
+- Tags por tipo: 💡 Ideia, 🚀 Projeto, 📚 Aprendizado, 🔮 Reflexão, 🔗 Referência, 📌 Outro
+- Timeline de notas em ordem reversa com data de registro
+
+### 📅 Google Agenda
+- **Desktop:** Agenda incorporada (iframe) diretamente na tela do sistema
+- **Desktop:** Botão para criar novo evento abre em popup elegante
+- **Android:** Botões abrem o **app nativo Google Calendar** via Android Intent URI
+- **iOS:** Redireciona para o Google Agenda no navegador
+- Fallback automático para a versão web se o app não estiver instalado
 
 ---
 
-## 📂 Estrutura do Projeto
+## 🎨 Design & Experiência
+
+- **Tema Escuro / Claro** — botão 🌙/☀️ na topbar; preferência salva no navegador
+- **Glassmorphism** — sidebar, topbar, cards e nav mobile com efeito vidro fosco (`backdrop-filter: blur`)
+- **Efeito de seleção na nav** — item ativo com fundo roxo translúcido + barra lateral brilhante e transição suave
+- **Animações profissionais** — todas as transições usam `cubic-bezier` para feel premium
+- **Responsivo total** — layout completamente adaptado para celular, tablet e desktop sem quebrar o visual original
+
+---
+
+## 📱 Suporte Mobile (PWA)
+
+- Pode ser **instalado na tela inicial** do Android e iOS como app nativo
+- Navegação inferior (bottom nav) com os 7 módulos: Painel, Hábitos, Tarefas, Finanças, Projetos, Cérebro, Agenda
+- Layout completamente refeito para telas menores
+- Fontes e espaçamentos escalados corretamente para celular
+- Google Agenda abre o app Android nativo via Intent URI
+
+---
+
+## 🔐 Autenticação & Dados
+
+- **Login com Google** via Supabase Auth
+- Dados sincronizados em nuvem por usuário (Supabase PostgreSQL)
+- Tabelas: `habitos`, `tarefas`, `compras`, `financas`, `projetos`, `brain`
+- **Modo Dev local** (localhost): pula autenticação e usa `localStorage` para testes
+- Sanitização de inputs contra XSS em todos os campos
+
+---
+
+## 🏗️ Estrutura do Projeto
 
 ```
 workspace-definitivo/
-├── index.html              # Entry point
+├── app.html              # Aplicativo principal (SPA)
+├── index.html            # Entry point / redirect
+├── manifest.json         # PWA manifest
+├── vercel.json           # Configuração de deploy (Vercel)
+├── supabase-setup.sql    # Script SQL para criar as tabelas
 ├── assets/
 │   ├── css/
-│   │   ├── core.css        # Variables, reset, typography
-│   │   ├── layout.css      # Sidebar, topbar, grid
-│   │   ├── components.css  # Cards, buttons, inputs
-│   │   └── pages.css       # Estilos específicos
-│   └── js/
-│       ├── core/
-│       │   ├── storage.js      # LocalStorage abstraction
-│       │   ├── utils.js        # Helpers
-│       │   ├── events.js       # Event bus
-│       │   └── groq.js         # Groq API integration
-│       ├── modules/
-│       │   ├── ikigai.js
-│       │   ├── vision.js
-│       │   ├── segundo-cerebro.js
-│       │   ├── tarefas.js
-│       │   ├── habitos.js
-│       │   ├── projetos.js
-│       │   ├── financas.js
-│       │   ├── bem-estar.js
-│       │   ├── compras.js
-│       │   └── dashboard.js
-│       └── ui/
-│           ├── nav.js      # Navigation
-│           └── modals.js   # Modal handling
+│   │   └── app.css       # Todo o CSS: temas, glassmorphism, responsivo
+│   ├── js/
+│   │   └── app.js        # Toda a lógica: auth, CRUD, render, agenda, tema
+│   └── img/
+│       └── icon.png      # Ícone do app (PWA)
 └── README.md
 ```
 
 ---
 
-## 🛠️ Como Usar
+## 🚀 Como Usar
 
-### 1. Abrir a Aplicação
-Abra `index.html` no navegador. Tudo é offline-first com LocalStorage.
+### Acessar Online
+Abra o link do deploy (Vercel) no navegador ou celular.
 
-### 2. Começar com Propósito
-1. Vá para **Ikigai** e preencha os 4 quadrantes
-2. Use ✨ **Sugestões com IA** para ideias
-3. Vá para **Visão de Vida** e defina sua missão
-4. Use ✨ **Refinar com IA** para melhorar sua missão
+### Instalar no Celular (Android/iOS)
+1. Abra o site no Chrome (Android) ou Safari (iOS)
+2. Toque no menu → **"Adicionar à tela inicial"**
+3. O app aparece como ícone nativo no celular
 
-### 3. Organizar-se
-1. Configure seus **Hábitos** diários
-2. Adicione **Tarefas** com prioridade
-3. Crie **Projetos** para metas maiores
-4. Capture ideias no **Segundo Cérebro**
+### Configurar localmente
+```bash
+# Clone o repositório
+git clone https://github.com/moscabd/workspace-definitivo.git
 
-### 4. Refletir
-Volte regularmente para:
-- Ver progresso no Dashboard
-- Analisar ideias com IA
-- Ajustar objetivos conforme necessário
-
----
-
-## 🔐 Segurança
-
-- **IA Local**: Chave Groq armazenada no código (frontend)
-  - ⚠️ Para produção, usar backend API
-- **Dados Locais**: Tudo salvo em LocalStorage
-  - Nenhum dado enviado a servidor
-  - Backup manual: exporte dados em JSON
-
----
-
-## 📊 Fases de Desenvolvimento
-
-### ✅ Fase 1 (Concluído)
-- [x] Arquitetura modularizada
-- [x] Módulo Ikigai com 4 quadrantes
-- [x] Módulo Visão de Vida completo
-- [x] Segundo Cérebro básico
-- [x] Integração Groq
-
-### 🚧 Fase 2 (Em Progresso)
-- [ ] Hábitos, Tarefas, Projetos full
-- [ ] Dashboard Executivo com KPIs
-- [ ] Sistema de Alinhamento (Tarefas → Objetivos → Ikigai)
-
-### 📋 Fase 3 (Planejado)
-- [ ] Bem-Estar com tracking
-- [ ] Analytics & Insights
-- [ ] Relatórios (semanal/mensal)
-
-### 🎨 Fase 4 (Planejado)
-- [ ] Temas customizáveis
-- [ ] Exportar/Importar dados
-- [ ] Sincronização com backend (opcional)
-
----
-
-## 📝 Notas de Desenvolvimento
-
-### Adicionar Novo Módulo
-1. Criar arquivo `assets/js/modules/novo-modulo.js`
-2. Implementar estrutura:
-   ```javascript
-   const NovoModulo = {
-     init() { /* init */ },
-     render(containerId) { /* render */ },
-     // ... métodos
-   };
-   ```
-3. Adicionar no `index.html`: `<script src="assets/js/modules/novo-modulo.js"></script>`
-4. Adicionar rota em `assets/js/ui/nav.js`
-
-### Usar GroqAPI
-```javascript
-// Chamada simples
-const response = await GroqAPI.chat([
-  { role: 'user', content: 'Sua pergunta aqui' }
-]);
-
-// Ou usar helpers prontos
-await GroqAPI.suggestIkigai(passion, talent, need, returnValue);
-await GroqAPI.refineMission(mission, values, objectives);
-await GroqAPI.analyzeIdeas(ideas);
+# Abra com um servidor local (ex: Live Server no VS Code)
+# OU abra app.html direto no navegador (funciona em modo dev)
 ```
 
 ---
 
-## 🤝 Contribuir
+## ⚙️ Configuração Supabase
 
-Ideias de melhorias:
-1. Integração com Google Calendar
-2. Modo dark/light toggle
-3. Exportar em PDF/Excel
-4. Sincronização com backend
-5. Versão mobile app
+1. Crie um projeto em [supabase.com](https://supabase.com)
+2. Execute o `supabase-setup.sql` no SQL Editor do Supabase
+3. Copie sua `SUPABASE_URL` e `SUPABASE_ANON_KEY`
+4. Substitua as constantes no início de `assets/js/app.js`:
+```javascript
+const SUPABASE_URL = 'https://SEU-PROJETO.supabase.co'
+const SUPABASE_KEY = 'sua-anon-key-aqui'
+```
+5. Ative o **Google OAuth** em Authentication → Providers → Google
+
+---
+
+## 🛠️ Tecnologias
+
+| Tecnologia | Uso |
+|---|---|
+| HTML5 + CSS3 | Estrutura e estilos (sem frameworks) |
+| JavaScript (Vanilla) | Toda a lógica do app |
+| Supabase | Auth (Google OAuth) + banco de dados PostgreSQL |
+| Google Calendar Embed | Integração da agenda no desktop |
+| Android Intent URI | Deep link para app nativo no Android |
+| PWA / Web App Manifest | Instalação como app no celular |
+| Vercel | Hospedagem e deploy contínuo |
+| Google Fonts (Inter + Syne) | Tipografia |
 
 ---
 
 ## 📄 Licença
 
-MIT - Livre para usar e modificar
+MIT — livre para usar, modificar e distribuir.
 
 ---
 
-**Criado com ❤️ para organização de vida integral**
+**Feito com ❤️ para organização de vida pessoal e profissional.**
