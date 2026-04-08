@@ -141,13 +141,23 @@ function today(){return new Date().toISOString().split('T')[0]}
 //  HÁBITOS
 // ══════════════════════════════════════════
 function addHabito(){
-  const nome = cleanInput(document.getElementById('hb-input').value, 100)
-  const tipo = document.getElementById('hb-tipo').value
+  const nome = cleanInput(document.getElementById('bh-nome').value, 100)
+  const duracao = cleanInput(document.getElementById('bh-duracao').value, 50)
+  const tipo = document.getElementById('bh-tipo').value
+  const dias = []
+  if(tipo==='rec'){
+    document.querySelectorAll('.wp-day.active').forEach(el=>dias.push(parseInt(el.dataset.val)))
+  }
+  
   if(!nome) return
   const list = S.get('habitos')
-  list.push({id:Date.now(),nome,tipo,done:[],createdAt:today()})
+  list.push({id:Date.now(),nome,tipo,duracao,dias,done:[],createdAt:today()})
   S.set('habitos',list)
-  document.getElementById('hb-input').value=''
+  
+  document.getElementById('bh-nome').value=''
+  document.getElementById('bh-duracao').value=''
+  closeModal('modal-habito')
+  
   renderHabitos()
   updateStats()
 }
@@ -177,13 +187,44 @@ function renderHabitos(){
   const rec = list.filter(h=>h.tipo==='rec')
   const occ = list.filter(h=>h.tipo==='occ')
 
+  function getMiniStreakHTML(h){
+    if(h.tipo==='occ') return ''
+    const diasSet = new Set(h.dias||[0,1,2,3,4,5,6])
+    const today_d = new Date()
+    let h_html = '<div class="hb-mini-streak">'
+    let expected = 0; let done = 0;
+    for(let i=6;i>=0;i--){
+      const dd = new Date(today_d); dd.setDate(dd.getDate()-i)
+      const ds = dd.toISOString().split('T')[0]
+      const dNum = dd.getDay()
+      if(!diasSet.has(dNum)) {
+        h_html+=`<div class="hmini-dot skip" title="${ds}">·</div>`
+      } else {
+        expected++
+        const d_done = h.done.includes(ds)
+        if(d_done) done++
+        h_html+=`<div class="hmini-dot ${d_done?'ok':'miss'}" title="${ds}"></div>`
+      }
+    }
+    h_html+='</div>'
+    h_html+=`<div style="font-size:12px;color:var(--text3);margin-left:6px">${done}/${expected} essa semana</div>`
+    return `<div class="hb-stats">${h_html}</div>`
+  }
+
   function makeItem(h){
     const done = h.done.includes(t)
-    return `<div class="habit-item">
-      <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id})"></div>
-      <div class="habit-name ${done?'done':''}">${h.nome}</div>
-      <span class="hbadge ${h.tipo==='rec'?'hb-rec':'hb-occ'}">${h.tipo==='rec'?'recorrente':'ocasional'}</span>
-      <button class="wd-btn btn-danger btn-sm" style="margin-left:6px" onclick="deleteHabito(${h.id})">✕</button>
+    return `<div class="card" style="margin-bottom:14px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id})"></div>
+          <div class="habit-name ${done?'done':''}" style="font-size:16px">${h.nome}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${h.duracao?`<span class="hb-dur">${h.duracao}</span>`:''}
+          <button class="wd-btn btn-danger btn-sm" onclick="deleteHabito(${h.id})">✕</button>
+        </div>
+      </div>
+      ${h.tipo==='rec'?getMiniStreakHTML(h):''}
     </div>`
   }
 
@@ -201,8 +242,20 @@ function renderHabitos(){
     const ds = dd.toISOString().split('T')[0]
     const dayName = days[dd.getDay()]
     const isToday = i===0
-    const anyDone = list.some(h=>h.done.includes(ds))
-    const cls = isToday?'sd-today':anyDone?'sd-ok':'sd-no'
+    
+    let expectedH = 0
+    let doneH = 0
+    list.forEach(h=>{
+      if(h.tipo==='rec'){
+        if((h.dias||[0,1,2,3,4,5,6]).includes(dd.getDay())){ expectedH++; if(h.done.includes(ds)) doneH++ }
+      }
+    })
+    
+    let isOk = false
+    if(expectedH>0 && doneH===expectedH) isOk = true
+    if(expectedH===0 && list.some(h=>h.tipo==='occ' && h.done.includes(ds))) isOk = true
+
+    const cls = isToday?'sd-today':isOk?'sd-ok':'sd-no'
     streak+=`<div class="sday ${cls}" title="${ds}">${dayName}</div>`
   }
   const sEl = document.getElementById('streak-full')
@@ -528,13 +581,20 @@ function renderDashboard(){
   // hábitos mini
   const dhEl = document.getElementById('dash-habitos-list')
   if(dhEl){
-    if(!habitos.length){dhEl.innerHTML='<div class="empty">Nenhum hábito</div>'}
+    const dHoje = new Date().getDay()
+    const scheduled = habitos.filter(h=>h.tipo==='rec' && (h.dias||[0,1,2,3,4,5,6]).includes(dHoje))
+    const occDone = habitos.filter(h=>h.tipo==='occ' && h.done.includes(t))
+    const toShow = [...scheduled, ...occDone]
+    
+    if(!toShow.length){dhEl.innerHTML='<div class="empty">Nenhum hábito para hoje</div>'}
     else {
-      dhEl.innerHTML = habitos.slice(0,5).map(h=>{
+      dhEl.innerHTML = toShow.slice(0,5).map(h=>{
         const done = h.done.includes(t)
         return `<div class="habit-item">
           <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id});renderDashboard()"></div>
-          <div class="habit-name ${done?'done':''}">${h.nome}</div>
+          <div class="habit-name ${done?'done':''}">
+             ${h.nome} ${h.duracao?`<span style="color:var(--text3);font-size:13px;margin-left:4px">(${h.duracao})</span>`:''}
+          </div>
         </div>`
       }).join('')
     }
@@ -591,12 +651,16 @@ function renderDashboard(){
 
 function updateStats(){
   const t = today()
+  const dHoje = new Date().getDay()
   const habitos = S.get('habitos')
   const tarefas = S.get('tarefas')
   const financas = S.get('financas')
 
-  const total = habitos.length
-  const done = habitos.filter(h=>h.done.includes(t)).length
+  const expectedHabits = habitos.filter(h=>h.tipo==='rec' && (h.dias||[0,1,2,3,4,5,6]).includes(dHoje))
+  const occDoneToday = habitos.filter(h=>h.tipo==='occ' && h.done.includes(t)).length
+  
+  const total = expectedHabits.length
+  const done = expectedHabits.filter(h=>h.done.includes(t)).length + occDoneToday
   const totalIn = financas.filter(f=>f.tipo==='entrada').reduce((a,f)=>a+f.val,0)
   const totalOut = financas.filter(f=>f.tipo==='saida').reduce((a,f)=>a+f.val,0)
   const saldo = totalIn - totalOut
@@ -623,6 +687,11 @@ function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})
+})
+
+// listeners extras
+document.querySelectorAll('.wp-day').forEach(d=>{
+  d.addEventListener('click',()=>d.classList.toggle('active'))
 })
 
 // ══════════════════════════════════════════

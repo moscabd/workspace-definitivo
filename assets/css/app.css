@@ -74,6 +74,16 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Inte
 .sd-ok{background:var(--accent);color:#fff}
 .sd-no{background:var(--bg3);color:var(--text3)}
 .sd-today{background:#2a2460;color:#a09cf5}
+.week-picker{display:flex;gap:6px;margin-top:4px}
+.wp-day{width:34px;height:34px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:15px;font-weight:600;cursor:pointer;transition:all 0.15s;user-select:none}
+.wp-day.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.hb-stats{display:flex;align-items:center;gap:10px;margin-top:10px}
+.hb-dur{font-size:14px;color:var(--text2);background:var(--bg3);padding:3px 10px;border-radius:12px}
+.hb-mini-streak{display:flex;gap:4px}
+.hmini-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;background:var(--bg3);color:var(--border)}
+.hmini-dot.ok{background:var(--accent2);color:#fff}
+.hmini-dot.miss{background:var(--border);color:var(--text3)}
+.hmini-dot.skip{background:transparent;border:1px dashed var(--border2);color:transparent}
 
 /* ── TASKS ── */
 .task-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
