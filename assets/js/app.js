@@ -761,6 +761,35 @@ document.querySelectorAll('.wp-day').forEach(d=>{
 // ══════════════════════════════════════════
 
 // ══════════════════════════════════════════
+//  TEMA CLARO / ESCURO
+// ══════════════════════════════════════════
+function toggleTheme(){
+  const html = document.documentElement
+  const btn = document.getElementById('themeBtn')
+  const isLight = html.getAttribute('data-theme') === 'light'
+  if(isLight){
+    html.removeAttribute('data-theme')
+    localStorage.setItem('wd_theme','dark')
+    if(btn) btn.textContent = '🌙'
+  } else {
+    html.setAttribute('data-theme','light')
+    localStorage.setItem('wd_theme','light')
+    if(btn) btn.textContent = '☀️'
+  }
+}
+
+function initTheme(){
+  const saved = localStorage.getItem('wd_theme')
+  const btn = document.getElementById('themeBtn')
+  if(saved === 'light'){
+    document.documentElement.setAttribute('data-theme','light')
+    if(btn) btn.textContent = '☀️'
+  } else {
+    if(btn) btn.textContent = '🌙'
+  }
+}
+
+// ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
 // ══════════════════════════════════════════
@@ -788,8 +817,8 @@ async function init(){
     try{await loadAllData()}catch(e){console.error('Load error',e)}
   }
   initDate()
+  initTheme()
   renderDashboard()
-  loadGcalUrl()
   showUserInfo()
 }
 init()
