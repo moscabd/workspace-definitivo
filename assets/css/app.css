@@ -180,46 +180,92 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Inte
 .page.active{display:block}
 
 /* ── HELPERS ── */
-.iframe-mob { display: none; width: 100%; height: 100%; border: 0; }
-.iframe-desk { display: block; width: 100%; height: 100%; border: 0; }
 .gcal-card { padding: 0; overflow: hidden; border-radius: var(--r2); border: 1px solid var(--border); height: 600px; display: flex; flex-direction: column; }
+.gcal-mob-cta { display: none; }
 .action-row { margin-top: 20px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
 
 /* ── ANIM ── */
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page.active{animation:fadeIn .2s ease}
 
-/* ── RESPONSIVE ── */
+/* ── RESPONSIVE — MOBILE FIRST ── */
 @media(max-width:768px){
-  .sidebar{display:none}
-  .topbar{padding:12px 14px}
-  .topbar-date{display:none}
-  .tag-pill{display:none}
-  .content{padding:14px 12px}
-  .dash-grid{grid-template-columns:1fr}
-  .span2,.span3{grid-column:span 1}
-  .grid2,.grid3{grid-template-columns:1fr}
-  .fin-summary{grid-template-columns:1fr}
-  .input-row{flex-direction:column}
-  .wd-input,.wd-select{width:100%;flex:unset}
-  .input-row .wd-btn{width:100%}
-  .modal-actions{flex-direction:column}
-  .modal-actions .wd-btn{width:100%}
-  .gcal-card{height: 480px;}
-  .iframe-desk{display: none;}
-  .iframe-mob{display: block;}
-  .action-row{flex-direction:column;gap:10px;}
-  .mob-nav{display:flex!important}
-  .card{padding:14px}
-  .modal{padding:18px}
-  .sc-value{font-size: 26px;}
-  .fsum-val{font-size: 21px;}
-  .page-title{font-size: 19px;}
+  /* Base font — mobile precisa ser menor */
+  html, body { font-size: 15px; }
+
+  /* Layout */
+  .app { overflow: auto; }
+  .sidebar { display: none; }
+  .main { overflow: auto; min-height: 100vh; }
+  .content { flex: unset; overflow: visible; padding: 12px 12px 90px; }
+  .topbar { padding: 10px 14px; }
+  .topbar-date { display: none; }
+  .tag-pill { display: none; }
+  .page-title { font-size: 17px; }
+
+  /* Cards */
+  .card { padding: 12px; }
+  .card-title { font-size: 11px; margin-bottom: 10px; }
+
+  /* Grid */
+  .dash-grid { grid-template-columns: 1fr; gap: 10px; }
+  .span2, .span3 { grid-column: span 1; }
+  .grid2, .grid3 { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Stats */
+  .stat-chip { padding: 10px 12px; }
+  .sc-value { font-size: 22px; }
+  .sc-label { font-size: 11px; }
+
+  /* Finance */
+  .fin-summary { grid-template-columns: 1fr; }
+  .fsum-val { font-size: 20px; }
+  .fin-origin { font-size: 15px; }
+  .fin-val { font-size: 15px; }
+
+  /* Tasks & Habits */
+  .habit-name { font-size: 15px; }
+  .task-name { font-size: 15px; }
+  .brain-note-text { font-size: 15px; }
+
+  /* Forms */
+  .input-row { flex-direction: column; }
+  .wd-input { width: 100%; flex: unset; font-size: 16px; }
+  .wd-select { width: 100%; font-size: 15px; }
+  .input-row .wd-btn { width: 100%; }
+  .wd-btn { font-size: 15px; }
+
+  /* Modals */
+  .modal { padding: 16px; }
+  .modal-actions { flex-direction: column; }
+  .modal-actions .wd-btn { width: 100%; }
+  .week-picker { gap: 4px; }
+  .wp-day { width: 38px; height: 38px; font-size: 14px; }
+
+  /* Google Agenda — iframe é inutilizável no mobile, substituímos por botões */
+  .gcal-card { display: none; }
+  .action-row { display: none; }
+  .gcal-mob-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 24px 16px;
+    text-align: center;
+    align-items: center;
+  }
+
+  /* Nav mobile */
+  .mob-nav { display: flex !important; }
 }
+
+/* ── NAV MOBILE ── */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--border);z-index:50;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
-.mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;color:var(--text3);cursor:pointer;padding:6px 0}
+.mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--text3);cursor:pointer;padding:6px 0}
 .mob-nav-item.active{color:var(--accent)}
-.mob-nav-icon{font-size:25px}
+.mob-nav-icon{font-size:22px}
 
 /* empty state */
-.empty{text-align:center;padding:36px;color:var(--text3);font-size:16px}
+.empty{text-align:center;padding:36px;color:var(--text3);font-size:15px}
