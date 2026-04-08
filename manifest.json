@@ -1,0 +1,16 @@
+{
+  "name": "Workspace Definitivo",
+  "short_name": "WD",
+  "description": "Seu espaço pessoal de organização",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#08090b",
+  "theme_color": "#08090b",
+  "icons": [
+    {
+      "src": "assets/img/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
