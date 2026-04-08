@@ -142,6 +142,7 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Inte
 .wd-select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;color:var(--text1);font-size:16px;font-family:inherit;outline:none;cursor:pointer}
 .wd-select:focus{border-color:var(--accent)}
 .wd-btn{padding:10px 18px;border-radius:var(--r2);border:none;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-block{width:100%;display:block}
 .btn-primary{background:var(--accent);color:#fff}
 .btn-primary:hover{background:#5a52e0}
 .btn-sm{padding:6px 13px;font-size:15px}
@@ -178,6 +179,10 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Inte
 .page{display:none}
 .page.active{display:block}
 
+/* ── HELPERS ── */
+.gcal-card { padding: 0; overflow: hidden; border-radius: var(--r2); border: 1px solid var(--border); height: 600px; }
+.action-row { margin-top: 20px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
 /* ── ANIM ── */
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page.active{animation:fadeIn .2s ease}
@@ -192,9 +197,14 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Inte
   .dash-grid{grid-template-columns:1fr}
   .span2,.span3{grid-column:span 1}
   .grid2,.grid3{grid-template-columns:1fr}
-  .fin-summary{grid-template-columns:1fr 1fr 1fr}
+  .fin-summary{grid-template-columns:1fr}
   .input-row{flex-direction:column}
-  .wd-input,.wd-select,.wd-btn{width:100%;flex:unset}
+  .wd-input,.wd-select{width:100%;flex:unset}
+  .input-row .wd-btn{width:100%}
+  .modal-actions{flex-direction:column}
+  .modal-actions .wd-btn{width:100%}
+  .gcal-card{height: 450px;}
+  .action-row{flex-direction:column;gap:10px;}
   .mob-nav{display:flex!important}
   .card{padding:14px}
   .modal{padding:18px}
