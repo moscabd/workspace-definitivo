@@ -435,6 +435,21 @@ html, body {
 .mob-nav-item.active .mob-nav-icon{transform:scale(1.15)}
 
 /* ════════════════════════════════════════
+   COFRE DE SENHAS & GERADOR
+════════════════════════════════════════ */
+.text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pwd-gen-result { 
+  font-family: monospace; font-size: 20px; font-weight: 600; 
+  padding: 16px; background: var(--bg2); border-radius: var(--r2); 
+  text-align: center; margin-bottom: 12px; word-break: break-all; 
+}
+.strength-bar { height: 4px; background: var(--bg2); flex: 1; border-radius: 2px; overflow: hidden }
+.strength-fill { height: 100%; transition: 0.3s; width: 0; background: var(--accent) }
+.gen-check { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; cursor: pointer }
+
+
+
+/* ════════════════════════════════════════
    EMPTY / MISC
 ════════════════════════════════════════ */
 .empty{text-align:center;padding:32px;color:var(--text3);font-size:14px}

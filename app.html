@@ -50,6 +50,9 @@
   <div class="nav-item" onclick="nav('cerebro',this)">
     <div class="nav-ic">🧠</div> Segundo Cérebro
   </div>
+  <div class="nav-item" onclick="nav('senhas',this)">
+    <div class="nav-ic">🔑</div> Cofre de Senhas
+  </div>
 
   <div style="flex:1"></div>
   <div class="nav-group-label">Integração</div>
@@ -274,6 +277,64 @@
       <div id="brain-list"></div>
     </div>
 
+    <!-- ═══ COFRE DE SENHAS ═══ -->
+    <div class="page" id="page-senhas">
+
+      <!-- TELA BLOQUEADA -->
+      <div id="vault-locked" style="display:flex;flex-direction:column;align-items:center;gap:14px;max-width:380px;margin:40px auto 0">
+        <div style="font-size:56px;line-height:1">🔐</div>
+        <div id="vault-lock-title" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text1)">Cofre de Senhas</div>
+        <div id="vault-lock-sub" style="font-size:14px;color:var(--text3);text-align:center">Digite a senha mestre para acessar seu cofre</div>
+        <input type="password" class="wd-input" id="vault-master-input" placeholder="Senha mestre..." style="width:100%;text-align:center;font-size:18px;letter-spacing:4px" onkeydown="if(event.key==='Enter')submitVaultMaster()">
+        <div id="vault-lock-error" style="color:var(--accent4);font-size:13px;display:none;text-align:center">Senha incorreta. Tente novamente.</div>
+        <button class="wd-btn btn-primary" style="width:100%;padding:13px" onclick="submitVaultMaster()">🔓 Desbloquear Cofre</button>
+        <div id="vault-create-hint" style="font-size:12px;color:var(--text3);text-align:center;display:none">
+          ⚠️ Esta será sua <strong>senha mestre</strong>. Ela não pode ser recuperada. Guarde bem.
+        </div>
+      </div>
+
+      <!-- COFRE DESBLOQUEADO -->
+      <div id="vault-unlocked" style="display:none">
+
+        <!-- Barra de ações -->
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+          <input class="wd-input" id="pwd-search" placeholder="🔍 Buscar..." style="max-width:240px" oninput="renderSenhasList()">
+          <button class="wd-btn btn-primary" onclick="openSenhaModal()">+ Nova Senha</button>
+          <button class="wd-btn btn-ghost" onclick="toggleGenerator()">🔑 Gerador</button>
+          <button class="wd-btn btn-ghost btn-sm" onclick="lockVault()" style="margin-left:auto">🔒 Travar</button>
+        </div>
+
+        <!-- Gerador (colapsável) -->
+        <div class="card" id="pwd-generator" style="margin-bottom:14px;display:none">
+          <div class="card-title">🔑 Gerador de Senha Segura</div>
+          <div class="pwd-gen-result" id="gen-result">Clique em &quot;Gerar&quot;</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div class="strength-bar"><div class="strength-fill" id="gen-strength-fill"></div></div>
+            <span class="strength-label" id="gen-strength-label" style="font-size:13px;color:var(--text3);min-width:80px">—</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div>
+              <label class="form-label">Comprimento: <strong id="gen-len-label">16</strong></label>
+              <input type="range" min="8" max="64" value="16" id="gen-len" style="width:100%;accent-color:var(--accent)" oninput="document.getElementById('gen-len-label').textContent=this.value;generatePassword()">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;padding-top:4px">
+              <label class="gen-check"><input type="checkbox" id="gen-upper" checked onchange="generatePassword()"> Maiúsculas A–Z</label>
+              <label class="gen-check"><input type="checkbox" id="gen-lower" checked onchange="generatePassword()"> Minúsculas a–z</label>
+              <label class="gen-check"><input type="checkbox" id="gen-nums" checked onchange="generatePassword()"> Números 0–9</label>
+              <label class="gen-check"><input type="checkbox" id="gen-syms" checked onchange="generatePassword()"> Símbolos !@#...</label>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="wd-btn btn-primary" style="flex:1" onclick="generatePassword()">⟳ Gerar Nova</button>
+            <button class="wd-btn btn-ghost" onclick="copyGenerated()">📋 Copiar</button>
+          </div>
+        </div>
+
+        <!-- Lista de senhas -->
+        <div id="pwd-list"></div>
+      </div>
+    </div>
+
     <!-- ═══ GOOGLE AGENDA ═══ -->
     <div class="page" id="page-agenda">
       <div class="agenda-banner" style="margin-bottom: 20px">
@@ -324,6 +385,7 @@
   <div class="mob-nav-item" onclick="nav('financas',this,'mob')"><div class="mob-nav-icon">💰</div>Finanças</div>
   <div class="mob-nav-item" onclick="nav('projetos',this,'mob')"><div class="mob-nav-icon">🚀</div>Projetos</div>
   <div class="mob-nav-item" onclick="nav('cerebro',this,'mob')"><div class="mob-nav-icon">🧠</div>Cérebro</div>
+  <div class="mob-nav-item" onclick="nav('senhas',this,'mob')"><div class="mob-nav-icon">🔑</div>Senhas</div>
   <div class="mob-nav-item" onclick="nav('agenda',this,'mob')"><div class="mob-nav-icon">📅</div>Agenda</div>
 </div>
 
@@ -416,6 +478,42 @@
     <div class="modal-actions">
       <button class="wd-btn btn-ghost" onclick="closeModal('modal-habito')">Cancelar</button>
       <button class="wd-btn btn-primary" onclick="saveHabito()" id="mh-btn">Criar Hábito</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVA/EDITAR SENHA -->
+<div class="modal-overlay" id="modal-senha">
+  <div class="modal">
+    <div class="modal-title" id="ms-title">Nova Senha</div>
+    <input type="hidden" id="ms-id">
+    <div class="form-group">
+      <label class="form-label">Site / Aplicativo *</label>
+      <input class="wd-input" id="ms-site" placeholder="Ex: Google, Instagram, Nubank" style="width:100%">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Usuário / E-mail</label>
+      <input class="wd-input" id="ms-user" placeholder="seu@email.com" style="width:100%" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha *</label>
+      <div style="display:flex;gap:8px">
+        <input class="wd-input" id="ms-pwd" type="password" placeholder="••••••••" style="flex:1;font-family:monospace;letter-spacing:2px" autocomplete="new-password">
+        <button class="wd-btn btn-ghost btn-sm" onclick="toggleMsPwd()" title="Mostrar/Ocultar">👁</button>
+        <button class="wd-btn btn-ghost btn-sm" onclick="fillFromGenerator()" title="Usar senha gerada">🔑</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">URL (opcional)</label>
+      <input class="wd-input" id="ms-url" placeholder="https://site.com" style="width:100%">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notas (opcional)</label>
+      <textarea class="wd-input" id="ms-nota" rows="2" placeholder="Observações..." style="width:100%;resize:vertical"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="wd-btn btn-ghost" onclick="closeModal('modal-senha')">Cancelar</button>
+      <button class="wd-btn btn-primary" onclick="saveSenha()" id="ms-btn">Salvar</button>
     </div>
   </div>
 </div>

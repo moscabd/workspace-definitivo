@@ -100,7 +100,7 @@ async function logout(){
 const pageNames = {
   dashboard:'Painel Geral',habitos:'Hábitos',tarefas:'Tarefas',
   compras:'Lista de Compras',financas:'Finanças',projetos:'Projetos',
-  cerebro:'Segundo Cérebro',agenda:'Google Agenda'
+  cerebro:'Segundo Cérebro',senhas:'Cofre de Senhas',agenda:'Google Agenda'
 }
 function nav(page, el, mode){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
@@ -125,6 +125,7 @@ function renderPage(p){
   else if(p==='financas') renderFinancas()
   else if(p==='projetos') renderProjetos()
   else if(p==='cerebro') renderCerebro()
+  else if(p==='senhas') renderSenhas()
 }
 
 // ══════════════════════════════════════════
@@ -876,6 +877,277 @@ document.querySelectorAll('.wp-day').forEach(d=>{
 })
 
 // ══════════════════════════════════════════
+//  COFRE DE SENHAS (AES-256-GCM)
+// ══════════════════════════════════════════
+let vaultKey = null;
+
+// Geração de chave a partir da senha mestre (PBKDF2)
+async function deriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw", enc.encode(password), "PBKDF2", false, ["deriveBits", "deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+    keyMaterial, "AES-GCM", true, ["encrypt", "decrypt"]
+  );
+}
+
+async function encryptData(text, key) {
+  const enc = new TextEncoder();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: iv }, key, enc.encode(text)
+  );
+  const ivArr = Array.from(iv);
+  const cArr = Array.from(new Uint8Array(ciphertext));
+  return btoa(JSON.stringify({iv: ivArr, data: cArr}));
+}
+
+async function decryptData(encStr, key) {
+  const dec = JSON.parse(atob(encStr));
+  const iv = new Uint8Array(dec.iv);
+  const ciphertext = new Uint8Array(dec.data);
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: iv }, key, ciphertext
+  );
+  return new TextDecoder().decode(decrypted);
+}
+
+async function getVaultData() {
+  const enc = S.getSingle('senhas_enc', null);
+  if(!enc) return [];
+  try {
+    const dec = await decryptData(enc, vaultKey);
+    return JSON.parse(dec);
+  } catch(e) {
+    return [];
+  }
+}
+
+async function saveVaultData(list) {
+  const enc = await encryptData(JSON.stringify(list), vaultKey);
+  S.set('senhas_enc', enc);
+}
+
+// Acesso ao cofre
+async function submitVaultMaster() {
+  const errorEl = document.getElementById('vault-lock-error');
+  const input = document.getElementById('vault-master-input');
+  const pwd = input.value;
+  if(!pwd) return;
+
+  const vaultConf = S.getSingle('vault_conf', null);
+  
+  if(!vaultConf) {
+    // Primeira vez: cria
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    vaultKey = await deriveKey(pwd, salt);
+    // Cria um check de verificação criptografando string conhecida
+    const checkStr = await encryptData('WD_VAULT_OK', vaultKey);
+    S.set('vault_conf', { salt: Array.from(salt), check: checkStr });
+    unlockVaultUI();
+  } else {
+    // Desbloquear
+    const salt = new Uint8Array(vaultConf.salt);
+    const key = await deriveKey(pwd, salt);
+    try {
+      const check = await decryptData(vaultConf.check, key);
+      if(check === 'WD_VAULT_OK') {
+        vaultKey = key;
+        unlockVaultUI();
+      } else { throw new Error(); }
+    } catch(e) {
+      errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+    }
+  }
+  input.value = '';
+}
+
+function unlockVaultUI() {
+  document.getElementById('vault-locked').style.display = 'none';
+  document.getElementById('vault-unlocked').style.display = 'block';
+  renderSenhasList();
+}
+
+function lockVault() {
+  vaultKey = null;
+  document.getElementById('vault-unlocked').style.display = 'none';
+  document.getElementById('vault-locked').style.display = 'flex';
+}
+
+function renderSenhas() {
+  const conf = S.getSingle('vault_conf', null);
+  if(!conf) {
+    document.getElementById('vault-create-hint').style.display = 'block';
+  } else {
+    document.getElementById('vault-create-hint').style.display = 'none';
+  }
+}
+
+// CRUD de senhas
+async function renderSenhasList() {
+  const listEl = document.getElementById('pwd-list');
+  const term = document.getElementById('pwd-search').value.toLowerCase();
+  
+  if(!vaultKey) return;
+  const list = await getVaultData();
+  
+  const filtered = list.filter(p => p.site.toLowerCase().includes(term) || p.user.toLowerCase().includes(term));
+  if(!filtered.length) {
+    listEl.innerHTML = '<div class="empty">Nenhuma senha cadastrada ou encontrada.</div>';
+    return;
+  }
+  
+  listEl.innerHTML = filtered.map(p => `
+    <div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:12px;padding:12px 18px">
+      <div style="font-size:24px;width:36px;text-align:center">🌐</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:16px;font-weight:600;color:var(--text1);margin-bottom:2px" class="text-truncate">${esc(p.site)}</div>
+        <div style="font-size:13px;color:var(--text3)" class="text-truncate">${esc(p.user)}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="wd-btn btn-ghost btn-sm" onclick="copyToClipboard('${esc(p.pwd)}')">📋 Copiar</button>
+        <button class="wd-btn btn-ghost btn-sm" onclick="editSenha(${p.id})">✏️</button>
+        <button class="wd-btn btn-danger btn-sm" onclick="deleteSenha(${p.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openSenhaModal() {
+  document.getElementById('ms-title').textContent = 'Nova Senha';
+  document.getElementById('ms-id').value = '';
+  document.getElementById('ms-site').value = '';
+  document.getElementById('ms-user').value = '';
+  document.getElementById('ms-pwd').value = '';
+  document.getElementById('ms-url').value = '';
+  document.getElementById('ms-nota').value = '';
+  openModal('modal-senha');
+}
+
+async function editSenha(id) {
+  const list = await getVaultData();
+  const s = list.find(x => x.id == id);
+  if(!s) return;
+  document.getElementById('ms-title').textContent = 'Editar Senha';
+  document.getElementById('ms-id').value = s.id;
+  document.getElementById('ms-site').value = s.site;
+  document.getElementById('ms-user').value = s.user;
+  document.getElementById('ms-pwd').value = s.pwd;
+  document.getElementById('ms-url').value = s.url || '';
+  document.getElementById('ms-nota').value = s.nota || '';
+  openModal('modal-senha');
+}
+
+async function saveSenha() {
+  const idStr = document.getElementById('ms-id').value;
+  const site = document.getElementById('ms-site').value.trim();
+  const user = document.getElementById('ms-user').value.trim();
+  const pwd = document.getElementById('ms-pwd').value;
+  const url = document.getElementById('ms-url').value.trim();
+  const nota = document.getElementById('ms-nota').value.trim();
+  
+  if(!site || !pwd) return;
+  
+  const list = await getVaultData();
+  if(idStr) {
+    const idx = list.findIndex(x => x.id == idStr);
+    if(idx > -1) list[idx] = { ...list[idx], site, user, pwd, url, nota };
+  } else {
+    list.push({ id: Date.now(), site, user, pwd, url, nota });
+  }
+  
+  await saveVaultData(list);
+  closeModal('modal-senha');
+  renderSenhasList();
+}
+
+async function deleteSenha(id) {
+  if(!confirm('Tem certeza que deseja excluir esta senha?')) return;
+  const list = await getVaultData();
+  await saveVaultData(list.filter(x => x.id != id));
+  renderSenhasList();
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text);
+  // feedback visual breve
+  const btn = event.currentTarget;
+  const oldText = btn.textContent;
+  btn.textContent = '✔️ Copiado';
+  setTimeout(()=>btn.textContent=oldText, 1500);
+}
+
+function toggleMsPwd() {
+  const i = document.getElementById('ms-pwd');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+// ── Gerador de Senha ──
+function toggleGenerator() {
+  const g = document.getElementById('pwd-generator');
+  g.style.display = g.style.display === 'none' ? 'block' : 'none';
+  if(g.style.display === 'block') generatePassword();
+}
+
+function generatePassword() {
+  const len = parseInt(document.getElementById('gen-len').value);
+  const up = document.getElementById('gen-upper').checked;
+  const low = document.getElementById('gen-lower').checked;
+  const num = document.getElementById('gen-nums').checked;
+  const sym = document.getElementById('gen-syms').checked;
+  
+  let chars = '';
+  if(up) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(low) chars += 'abcdefghijklmnopqrstuvwxyz';
+  if(num) chars += '0123456789';
+  if(sym) chars += '!@#$%^&*()_+~|}{[]:;?><,./-=';
+  
+  if(!chars) {
+    document.getElementById('gen-result').textContent = 'Selecione ao menos um tipo';
+    return;
+  }
+  
+  let pwd = '';
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  for(let i=0; i<len; i++) pwd += chars[arr[i] % chars.length];
+  
+  document.getElementById('gen-result').textContent = pwd;
+  
+  // calc strength
+  let s = 0;
+  if(len > 8) s++;
+  if(len >= 12) s++;
+  if(len >= 16) s++;
+  if(up&&low) s++;
+  if(num) s++;
+  if(sym) s++;
+  
+  const fill = document.getElementById('gen-strength-fill');
+  const lbl = document.getElementById('gen-strength-label');
+  fill.style.width = Math.min(100, (s/6)*100) + '%';
+  fill.style.background = s < 3 ? 'var(--accent4)' : (s < 5 ? 'var(--accent3)' : 'var(--accent2)');
+  lbl.textContent = s < 3 ? 'Fraca' : (s < 5 ? 'Boa 💪' : 'Forte 🛡️');
+}
+
+function copyGenerated() {
+  const pwd = document.getElementById('gen-result').textContent;
+  if(pwd && pwd !== 'Selecione ao menos um tipo') copyToClipboard(pwd);
+}
+
+function fillFromGenerator() {
+  const cur = document.getElementById('ms-pwd');
+  const gen = document.getElementById('gen-result').textContent;
+  if(gen && gen !== 'Clique em "Gerar"' && gen !== 'Selecione ao menos um tipo') {
+    cur.value = gen;
+    cur.type = 'text'; 
+  }
+}
+
+
 //  GOOGLE AGENDA — Abertura inteligente por plataforma
 // ══════════════════════════════════════════
 
