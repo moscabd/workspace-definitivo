@@ -32,7 +32,7 @@ html, body {
   background: var(--bg0);
   color: var(--text1);
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.5;
 }
 
@@ -56,12 +56,12 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
 }
 
-h1 { font-size: 28px; }
-h2 { font-size: 22px; }
-h3 { font-size: 18px; }
-h4 { font-size: 16px; }
-h5 { font-size: 14px; }
-h6 { font-size: 12px; }
+h1 { font-size: 31px; }
+h2 { font-size: 25px; }
+h3 { font-size: 21px; }
+h4 { font-size: 19px; }
+h5 { font-size: 17px; }
+h6 { font-size: 15px; }
 
 a {
   color: var(--accent);
