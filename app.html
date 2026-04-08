@@ -84,13 +84,9 @@
           <div class="sc-label">Hábitos hoje</div>
           <div class="sc-value" id="ds-habitos" style="color:var(--accent)">0/0</div>
         </div>
-        <div class="stat-chip">
+        <div class="stat-chip span2">
           <div class="sc-label">Tarefas pendentes</div>
           <div class="sc-value" id="ds-tarefas" style="color:var(--accent3)">0</div>
-        </div>
-        <div class="stat-chip">
-          <div class="sc-label">Saldo do mês</div>
-          <div class="sc-value" id="ds-saldo" style="color:var(--accent2)">R$0</div>
         </div>
 
         <!-- Hábitos mini -->
@@ -111,9 +107,16 @@
           <div id="dash-proj-list"></div>
         </div>
 
-        <!-- Finanças mini -->
+        <!-- Finanças mini c/ Saldo -->
         <div class="card">
-          <div class="card-title">Últimos lançamentos</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border)">
+            <div>
+              <div class="sc-label" style="font-size:11px">Saldo Total</div>
+              <div class="sc-value" id="ds-saldo" style="font-size:26px; color:var(--accent2)">R$0</div>
+            </div>
+            <div class="card-title" style="margin-bottom:0">Finanças</div>
+          </div>
+          <div class="card-title" style="font-size:11px; margin-bottom:10px">Últimos lançamentos</div>
           <div id="dash-fin-list"></div>
         </div>
 
