@@ -72,8 +72,20 @@ async function syncTable(key,data){
 // ══════════════════════════════════════════
 const S = {
   get(k){return cache[k]||[]},
-  set(k,v){cache[k]=v;syncTable(k,v)},
-  getSingle(k,d){return cache[k]!==undefined?cache[k]:d}
+  set(k,v){
+    cache[k]=v;
+    if(k==='vault_conf' || k==='senhas_enc'){
+      localStorage.setItem('wd_local_'+k, JSON.stringify(v));
+      return;
+    }
+    syncTable(k,v);
+  },
+  getSingle(k,d){
+    if(k==='vault_conf' || k==='senhas_enc'){
+      try{ return JSON.parse(localStorage.getItem('wd_local_'+k))||d; }catch{ return d; }
+    }
+    return cache[k]!==undefined?cache[k]:d;
+  }
 }
 
 // ══════════════════════════════════════════
@@ -939,30 +951,43 @@ async function submitVaultMaster() {
 
   const vaultConf = S.getSingle('vault_conf', null);
   
-  if(!vaultConf) {
-    // Primeira vez: cria
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    vaultKey = await deriveKey(pwd, salt);
-    // Cria um check de verificação criptografando string conhecida
-    const checkStr = await encryptData('WD_VAULT_OK', vaultKey);
-    S.set('vault_conf', { salt: Array.from(salt), check: checkStr });
-    unlockVaultUI();
-  } else {
-    // Desbloquear
-    const salt = new Uint8Array(vaultConf.salt);
-    const key = await deriveKey(pwd, salt);
-    try {
-      const check = await decryptData(vaultConf.check, key);
-      if(check === 'WD_VAULT_OK') {
-        vaultKey = key;
-        unlockVaultUI();
-      } else { throw new Error(); }
-    } catch(e) {
-      errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
+  try {
+    if(!window.crypto || !window.crypto.subtle) {
+      throw new Error("Seu navegador não suporta criptografia (Web Crypto API). Tente usar HTTPS.");
     }
+    
+    if(!vaultConf) {
+      // Primeira vez: cria
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      vaultKey = await deriveKey(pwd, salt);
+      // Cria um check de verificação criptografando string conhecida
+      const checkStr = await encryptData('WD_VAULT_OK', vaultKey);
+      S.set('vault_conf', { salt: Array.from(salt), check: checkStr });
+      unlockVaultUI();
+    } else {
+      // Desbloquear
+      const salt = new Uint8Array(vaultConf.salt);
+      const key = await deriveKey(pwd, salt);
+      try {
+        const check = await decryptData(vaultConf.check, key);
+        if(check === 'WD_VAULT_OK') {
+          vaultKey = key;
+          unlockVaultUI();
+        } else { throw new Error("Check failed"); }
+      } catch(decErr) {
+        throw new Error("wrong_pass");
+      }
+    }
+    input.value = '';
+  } catch(e) {
+    if(e.message === 'wrong_pass') {
+      errorEl.textContent = 'Senha incorreta. Tente novamente.';
+    } else {
+      errorEl.textContent = 'Erro de segurança: ' + e.message;
+    }
+    errorEl.style.display = 'block';
+    setTimeout(() => errorEl.style.display = 'none', 4500);
   }
-  input.value = '';
 }
 
 function unlockVaultUI() {
