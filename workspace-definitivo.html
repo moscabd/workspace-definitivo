@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<title>Workspace Definitivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #08090b;
+  --bg1: #0d0e11;
+  --bg2: #111318;
+  --bg3: #171920;
+  --border: #1e2028;
+  --border2: #252830;
+  --text1: #e8e9ee;
+  --text2: #8a8d9a;
+  --text3: #454857;
+  --accent: #6c63ff;
+  --accent2: #3fcf8e;
+  --accent3: #f5a623;
+  --accent4: #ff5f5f;
+  --accent5: #38bdf8;
+  --r: 10px;
+  --r2: 7px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:210px;min-width:210px;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 10px;gap:2px;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--bg1);flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px 22px}
+
+/* ── SIDEBAR ── */
+.brand{display:flex;align-items:center;gap:8px;padding:4px 8px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.brand-dots{display:flex;gap:4px}
+.bd{width:6px;height:6px;border-radius:50%}
+.brand-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text1)}
+.nav-group-label{font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;padding:10px 8px 4px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r2);font-size:12.5px;color:var(--text2);cursor:pointer;transition:all .15s;user-select:none}
+.nav-item:hover{background:var(--bg3);color:var(--text1)}
+.nav-item.active{background:var(--bg3);color:var(--text1)}
+.nav-item.active .nav-ic{opacity:1}
+.nav-ic{width:16px;height:16px;border-radius:4px;opacity:.5;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+
+/* ── TOPBAR ── */
+.page-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-date{font-size:11px;color:var(--text3)}
+.tag-pill{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:500}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.card-title{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* ── DASHBOARD GRID ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto auto;gap:14px}
+.span2{grid-column:span 2}
+.span3{grid-column:span 3}
+
+/* ── HABITS ── */
+.habit-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.habit-item:last-child{border:none;padding-bottom:0}
+.hcheck{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.hcheck.done{background:var(--accent);border-color:var(--accent)}
+.hcheck.done::after{content:'✓';font-size:10px;color:#fff;font-weight:700}
+.habit-name{flex:1;font-size:13px}
+.habit-name.done{text-decoration:line-through;color:var(--text3)}
+.hbadge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600}
+.hb-rec{background:#1a1835;color:var(--accent)}
+.hb-occ{background:#0f2318;color:var(--accent2)}
+.streak-bar{display:flex;gap:3px;margin-top:12px}
+.sday{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600}
+.sd-ok{background:var(--accent);color:#fff}
+.sd-no{background:var(--bg3);color:var(--text3)}
+.sd-today{background:#2a2460;color:#a09cf5}
+
+/* ── TASKS ── */
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.task-item:last-child{border:none;padding-bottom:0}
+.task-check{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;transition:all .15s;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.task-check.done{background:var(--accent2);border-color:var(--accent2)}
+.task-check.done::after{content:'✓';font-size:9px;color:#fff;font-weight:700}
+.task-body{flex:1}
+.task-name{font-size:13px;line-height:1.4}
+.task-name.done{text-decoration:line-through;color:var(--text3)}
+.task-meta{font-size:10px;color:var(--text3);margin-top:2px}
+.task-prio{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0}
+
+/* ── FINANCE ── */
+.fin-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.fin-item:last-child{border:none;padding-bottom:0}
+.fin-info{flex:1}
+.fin-origin{font-size:13px}
+.fin-cat-badge{display:inline-block;font-size:9px;padding:1px 7px;border-radius:10px;margin-top:3px;font-weight:600}
+.fin-val{font-size:14px;font-weight:500}
+.v-in{color:var(--accent2)}
+.v-out{color:var(--accent4)}
+.fin-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:var(--r);overflow:hidden;margin-top:14px}
+.fsum-cell{background:var(--bg2);padding:12px 14px}
+.fsum-label{font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.fsum-val{font-size:18px;font-weight:500}
+
+/* ── PROJECTS ── */
+.proj-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.proj-item:last-child{border:none;padding-bottom:0}
+.proj-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.proj-name{font-size:13px}
+.proj-pct{font-size:12px;font-weight:600;color:var(--accent)}
+.prog-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .5s}
+.proj-tags{display:flex;gap:5px;margin-top:6px}
+.ptag{font-size:9px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text2)}
+
+/* ── BRAIN ── */
+.brain-note{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-bottom:8px;cursor:pointer}
+.brain-note:hover{border-color:var(--border2)}
+.brain-note-text{font-size:13px;color:var(--text2);line-height:1.6}
+.brain-note-date{font-size:10px;color:var(--text3);margin-top:6px}
+
+/* ── SHOP LIST ── */
+.shop-tag{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text2);margin:3px;cursor:pointer;transition:all .15s}
+.shop-tag:hover{border-color:var(--border2);color:var(--text1)}
+.shop-tag.bought{text-decoration:line-through;opacity:.4}
+.shop-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* ── INPUTS / FORMS ── */
+.input-row{display:flex;gap:8px;margin-bottom:14px}
+.wd-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:8px 12px;color:var(--text1);font-size:13px;font-family:inherit;outline:none;transition:border .15s}
+.wd-input:focus{border-color:var(--accent)}
+.wd-input::placeholder{color:var(--text3)}
+.wd-select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:8px 10px;color:var(--text1);font-size:12px;font-family:inherit;outline:none;cursor:pointer}
+.wd-select:focus{border-color:var(--accent)}
+.wd-btn{padding:8px 16px;border-radius:var(--r2);border:none;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#5a52e0}
+.btn-sm{padding:5px 12px;font-size:11px}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:transparent;border:1px solid var(--border2);color:var(--accent4)}
+.btn-danger:hover{background:var(--accent4);color:#fff}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:22px;width:440px;max-width:95vw}
+.modal-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.form-label{font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;display:block}
+.form-group{margin-bottom:12px}
+
+/* ── STAT CHIPS ── */
+.stat-chip{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.sc-label{font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.sc-value{font-size:20px;font-weight:500;font-family:'Syne',sans-serif}
+
+/* ── AGENDA BANNER ── */
+.agenda-banner{background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:14px 16px;text-align:center;color:var(--text3);font-size:12px;line-height:1.7}
+.agenda-banner a{color:var(--accent);text-decoration:none}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── ANIM ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page.active{animation:fadeIn .2s ease}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .dash-grid{grid-template-columns:1fr}
+  .span2,.span3{grid-column:span 1}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .fin-summary{grid-template-columns:1fr 1fr 1fr}
+  .mob-nav{display:flex!important}
+}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--border);z-index:50;padding:8px 0}
+.mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;color:var(--text3);cursor:pointer;padding:4px 0}
+.mob-nav-item.active{color:var(--accent)}
+.mob-nav-icon{font-size:18px}
+
+/* empty state */
+.empty{text-align:center;padding:30px;color:var(--text3);font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-dots">
+      <div class="bd" style="background:var(--accent)"></div>
+      <div class="bd" style="background:var(--accent2);opacity:.7"></div>
+    </div>
+    <div class="brand-name">Workspace<br>Definitivo</div>
+  </div>
+
+  <div class="nav-group-label">Principal</div>
+  <div class="nav-item active" onclick="nav('dashboard',this)">
+    <div class="nav-ic">📊</div> Painel Geral
+  </div>
+  <div class="nav-item" onclick="nav('habitos',this)">
+    <div class="nav-ic">✅</div> Hábitos
+  </div>
+  <div class="nav-item" onclick="nav('tarefas',this)">
+    <div class="nav-ic">📋</div> Tarefas
+  </div>
+  <div class="nav-item" onclick="nav('compras',this)">
+    <div class="nav-ic">🛒</div> Lista de Compras
+  </div>
+  <div class="nav-item" onclick="nav('financas',this)">
+    <div class="nav-ic">💰</div> Finanças
+  </div>
+  <div class="nav-item" onclick="nav('projetos',this)">
+    <div class="nav-ic">🚀</div> Projetos
+  </div>
+  <div class="nav-item" onclick="nav('cerebro',this)">
+    <div class="nav-ic">🧠</div> Segundo Cérebro
+  </div>
+
+  <div style="flex:1"></div>
+  <div class="nav-group-label">Integração</div>
+  <div class="nav-item" onclick="nav('agenda',this)">
+    <div class="nav-ic">📅</div> Google Agenda
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">Painel Geral</div>
+    <div class="topbar-right">
+      <span class="topbar-date" id="topDate"></span>
+      <span class="tag-pill" style="background:#1a1835;color:var(--accent)" id="todayHabitsLabel">— hábitos hoje</span>
+    </div>
+  </div>
+
+  <div class="content" id="mainContent" style="padding-bottom:70px">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-grid">
+
+        <!-- Stat chips -->
+        <div class="stat-chip">
+          <div class="sc-label">Hábitos hoje</div>
+          <div class="sc-value" id="ds-habitos" style="color:var(--accent)">0/0</div>
+        </div>
+        <div class="stat-chip">
+          <div class="sc-label">Tarefas pendentes</div>
+          <div class="sc-value" id="ds-tarefas" style="color:var(--accent3)">0</div>
+        </div>
+        <div class="stat-chip">
+          <div class="sc-label">Saldo do mês</div>
+          <div class="sc-value" id="ds-saldo" style="color:var(--accent2)">R$0</div>
+        </div>
+
+        <!-- Hábitos mini -->
+        <div class="card">
+          <div class="card-title">Hábitos de hoje</div>
+          <div id="dash-habitos-list"></div>
+        </div>
+
+        <!-- Tarefas mini -->
+        <div class="card span2">
+          <div class="card-title">Próximas tarefas</div>
+          <div id="dash-tarefas-list"></div>
+        </div>
+
+        <!-- Projetos mini -->
+        <div class="card span2">
+          <div class="card-title">Projetos em andamento</div>
+          <div id="dash-proj-list"></div>
+        </div>
+
+        <!-- Finanças mini -->
+        <div class="card">
+          <div class="card-title">Últimos lançamentos</div>
+          <div id="dash-fin-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ HÁBITOS ═══ -->
+    <div class="page" id="page-habitos">
+      <div class="input-row" style="margin-bottom:20px">
+        <input class="wd-input" id="hb-input" placeholder="Nome do hábito..." maxlength="100">
+        <select class="wd-select" id="hb-tipo">
+          <option value="rec">Recorrente</option>
+          <option value="occ">Ocasional</option>
+        </select>
+        <button class="wd-btn btn-primary" onclick="addHabito()">+ Adicionar</button>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Recorrentes</div>
+          <div id="hb-rec-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Ocasionais / Dia específico</div>
+          <div id="hb-occ-list"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-title">Progresso da semana</div>
+        <div class="streak-bar" id="streak-full"></div>
+      </div>
+    </div>
+
+    <!-- ═══ TAREFAS ═══ -->
+    <div class="page" id="page-tarefas">
+      <div class="input-row">
+        <input class="wd-input" id="tk-input" placeholder="Descreva a tarefa..." maxlength="300">
+        <select class="wd-select" id="tk-prio">
+          <option value="alta">🔴 Alta</option>
+          <option value="media">🟡 Média</option>
+          <option value="baixa">🟢 Baixa</option>
+        </select>
+        <input class="wd-input" id="tk-prazo" type="date" style="flex:0 0 140px">
+        <button class="wd-btn btn-primary" onclick="addTarefa()">+ Adicionar</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Pendentes</div>
+        <div id="tk-list"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="card-title">Concluídas</div>
+        <div id="tk-done-list"></div>
+      </div>
+    </div>
+
+    <!-- ═══ COMPRAS ═══ -->
+    <div class="page" id="page-compras">
+      <div class="input-row">
+        <input class="wd-input" id="cp-input" placeholder="Item para comprar..." maxlength="150">
+        <select class="wd-select" id="cp-cat">
+          <option value="trabalho">Trabalho / Ferramenta</option>
+          <option value="pessoal">Pessoal</option>
+          <option value="casa">Casa</option>
+          <option value="roupa">Roupas / Calçados</option>
+          <option value="mercado">Mercado</option>
+          <option value="outro">Outro</option>
+        </select>
+        <button class="wd-btn btn-primary" onclick="addCompra()">+ Adicionar</button>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Trabalho / Ferramentas</div>
+          <div id="cp-trabalho"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Pessoal / Casa / Outros</div>
+          <div id="cp-pessoal"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FINANÇAS ═══ -->
+    <div class="page" id="page-financas">
+      <div class="input-row">
+        <input class="wd-input" id="fn-desc" placeholder="Descrição / origem..." maxlength="200">
+        <input class="wd-input" id="fn-val" type="number" placeholder="Valor R$" style="flex:0 0 120px" min="0" step="0.01">
+        <select class="wd-select" id="fn-tipo">
+          <option value="entrada">📈 Entrada</option>
+          <option value="saida">📉 Saída</option>
+        </select>
+        <select class="wd-select" id="fn-cat">
+          <option value="trabalho">Trabalho</option>
+          <option value="despesa-fixa">Despesa Fixa</option>
+          <option value="lazer">Lazer</option>
+          <option value="alimentacao">Alimentação</option>
+          <option value="saude">Saúde</option>
+          <option value="investimento">Investimento</option>
+          <option value="outro">Outro</option>
+        </select>
+        <button class="wd-btn btn-primary" onclick="addFinanca()">+ Lançar</button>
+      </div>
+
+      <div class="fin-summary" style="margin-bottom:14px">
+        <div class="fsum-cell">
+          <div class="fsum-label">Total entradas</div>
+          <div class="fsum-val v-in" id="fn-total-in">R$0,00</div>
+        </div>
+        <div class="fsum-cell">
+          <div class="fsum-label">Total saídas</div>
+          <div class="fsum-val v-out" id="fn-total-out">R$0,00</div>
+        </div>
+        <div class="fsum-cell">
+          <div class="fsum-label">Saldo</div>
+          <div class="fsum-val" id="fn-saldo" style="color:var(--accent)">R$0,00</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Lançamentos</div>
+        <div id="fn-list"></div>
+      </div>
+    </div>
+
+    <!-- ═══ PROJETOS ═══ -->
+    <div class="page" id="page-projetos">
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <button class="wd-btn btn-primary" onclick="openModal('modal-proj')">+ Novo Projeto</button>
+      </div>
+      <div id="proj-list-full"></div>
+    </div>
+
+    <!-- ═══ CÉREBRO ═══ -->
+    <div class="page" id="page-cerebro">
+      <div style="margin-bottom:20px">
+        <textarea class="wd-input" id="br-input" rows="3" placeholder="Jogue aqui uma ideia, pensamento, insight, referência... qualquer coisa!" style="width:100%;resize:vertical" maxlength="1000"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <select class="wd-select" id="br-tag">
+            <option value="ideia">💡 Ideia</option>
+            <option value="projeto">🚀 Projeto</option>
+            <option value="aprendizado">📚 Aprendizado</option>
+            <option value="reflexao">🔮 Reflexão</option>
+            <option value="referencia">🔗 Referência</option>
+            <option value="outro">📌 Outro</option>
+          </select>
+          <button class="wd-btn btn-primary" onclick="addNota()">+ Salvar nota</button>
+        </div>
+      </div>
+      <div id="brain-list"></div>
+    </div>
+
+    <!-- ═══ GOOGLE AGENDA ═══ -->
+    <div class="page" id="page-agenda">
+      <div class="agenda-banner">
+        <div style="font-size:32px;margin-bottom:12px">📅</div>
+        <div style="font-size:15px;color:var(--text2);font-weight:500;margin-bottom:10px">Integração com Google Agenda</div>
+        <div style="color:var(--text3);line-height:1.9;max-width:500px;margin:0 auto">
+          Esta parte precisa de uma configuração rápida (só uma vez).<br>
+          Siga o <strong style="color:var(--text2)">Tutorial Completo</strong> abaixo — é fácil, prometo! 🙂
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <div class="card-title">📖 Tutorial passo a passo — Google Agenda</div>
+        <div style="line-height:2;color:var(--text2);font-size:13px">
+
+          <div style="margin-bottom:16px;padding:12px;background:var(--bg3);border-radius:var(--r2);border-left:3px solid var(--accent)">
+            <strong style="color:var(--text1)">O que vamos fazer:</strong> Você vai gerar um link especial da sua agenda do Google. Cole esse link aqui e seus eventos aparecerão automaticamente.
+          </div>
+
+          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px">1</span><strong style="color:var(--text1)">Abra o Google Agenda</strong> no computador:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;→ <a href="https://calendar.google.com" target="_blank" style="color:var(--accent)">calendar.google.com</a></div>
+
+          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px">2</span><strong style="color:var(--text1)">No lado esquerdo</strong>, procure o nome da sua agenda (geralmente seu nome ou e-mail). Passe o mouse por cima e clique nos <strong>3 pontinhos (...)</strong> que aparecem.</div>
+
+          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px">3</span>Clique em <strong style="color:var(--text1)">"Configurações e compartilhamento"</strong></div>
+
+          <div style="margin-bottom:8px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px">4</span>Role a página até ver <strong style="color:var(--text1)">"Endereço secreto no formato iCal"</strong>. Clique em <strong>copiar</strong> (ícone de copiar do lado).</div>
+
+          <div style="margin-bottom:16px"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px">5</span>Cole o link abaixo e clique em <strong style="color:var(--text1)">Salvar</strong>:</div>
+
+          <div class="input-row">
+            <input class="wd-input" id="gcal-url" placeholder="Cole aqui o link da agenda (começa com https://calendar.google.com/calendar/ical/...)">
+            <button class="wd-btn btn-primary" onclick="saveGcal()">Salvar</button>
+          </div>
+
+          <div id="gcal-status" style="margin-top:8px;font-size:12px;color:var(--text3)"></div>
+
+          <div style="margin-top:16px;padding:12px;background:var(--bg3);border-radius:var(--r2);border-left:3px solid var(--accent3)">
+            <strong style="color:var(--accent3)">⚠️ Limitação atual:</strong> <span style="color:var(--text3)">Por segurança do navegador, a leitura automática do Google Agenda exige um pequeno servidor. Mas com o link salvo, você já pode acessar sua agenda clicando no botão abaixo. Em breve posso adicionar um servidor local simples para sincronização automática.</span>
+          </div>
+
+          <div style="margin-top:14px;display:flex;gap:10px">
+            <button class="wd-btn btn-ghost" onclick="openGcal()">📅 Abrir Google Agenda</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MOBILE NAV -->
+<div class="mob-nav" id="mobNav">
+  <div class="mob-nav-item active" onclick="nav('dashboard',this,'mob')"><div class="mob-nav-icon">📊</div>Painel</div>
+  <div class="mob-nav-item" onclick="nav('habitos',this,'mob')"><div class="mob-nav-icon">✅</div>Hábitos</div>
+  <div class="mob-nav-item" onclick="nav('tarefas',this,'mob')"><div class="mob-nav-icon">📋</div>Tarefas</div>
+  <div class="mob-nav-item" onclick="nav('financas',this,'mob')"><div class="mob-nav-icon">💰</div>Finanças</div>
+  <div class="mob-nav-item" onclick="nav('projetos',this,'mob')"><div class="mob-nav-icon">🚀</div>Projetos</div>
+  <div class="mob-nav-item" onclick="nav('cerebro',this,'mob')"><div class="mob-nav-icon">🧠</div>Cérebro</div>
+</div>
+
+<!-- MODAL PROJETO -->
+<div class="modal-overlay" id="modal-proj">
+  <div class="modal">
+    <div class="modal-title">Novo Projeto</div>
+    <div class="form-group">
+      <label class="form-label">Nome do projeto</label>
+      <input class="wd-input" id="pj-nome" placeholder="Ex: App Desktop Clientes" style="width:100%">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição / Objetivo</label>
+      <textarea class="wd-input" id="pj-desc" rows="2" placeholder="O que é esse projeto?" style="width:100%;resize:vertical"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoria</label>
+      <select class="wd-select" id="pj-cat" style="width:100%">
+        <option value="trabalho">Trabalho</option>
+        <option value="pessoal">Pessoal</option>
+        <option value="estudo">Estudo</option>
+        <option value="financeiro">Financeiro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Progresso inicial (%): <span id="pj-pct-lbl">0%</span></label>
+      <input type="range" min="0" max="100" value="0" id="pj-pct" style="width:100%" oninput="document.getElementById('pj-pct-lbl').textContent=this.value+'%'">
+    </div>
+    <div class="modal-actions">
+      <button class="wd-btn btn-ghost" onclick="closeModal('modal-proj')">Cancelar</button>
+      <button class="wd-btn btn-primary" onclick="addProjeto()">Criar Projeto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR PROGRESSO -->
+<div class="modal-overlay" id="modal-prog">
+  <div class="modal">
+    <div class="modal-title">Atualizar Progresso</div>
+    <input type="hidden" id="prog-id">
+    <div class="form-group">
+      <label class="form-label">Progresso (%): <span id="prog-pct-lbl">0%</span></label>
+      <input type="range" min="0" max="100" value="0" id="prog-pct" style="width:100%" oninput="document.getElementById('prog-pct-lbl').textContent=this.value+'%'">
+    </div>
+    <div class="modal-actions">
+      <button class="wd-btn btn-ghost" onclick="closeModal('modal-prog')">Cancelar</button>
+      <button class="wd-btn btn-primary" onclick="saveProgresso()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  SECURITY - Sanitização e Validação
+// ══════════════════════════════════════════
+function esc(str){
+  if(typeof str!=='string')return''
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')
+}
+function cleanInput(val,max){
+  if(typeof val!=='string')return''
+  return val.replace(/<[^>]*>/g,'').trim().substring(0,max||200)
+}
+function safeNum(val,min,max){
+  const n=parseFloat(val)
+  if(isNaN(n))return min||0
+  return Math.max(min||0,Math.min(max||Infinity,n))
+}
+if(window.self!==window.top){window.top.location=window.self.location}
+
+// ══════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════
+const S = {
+  get(k){try{return JSON.parse(localStorage.getItem('wd_'+k))||[]}catch{return[]}},
+  set(k,v){localStorage.setItem('wd_'+k,JSON.stringify(v))},
+  getSingle(k,d){try{return JSON.parse(localStorage.getItem('wd_'+k))||d}catch{return d}}
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+const pageNames = {
+  dashboard:'Painel Geral',habitos:'Hábitos',tarefas:'Tarefas',
+  compras:'Lista de Compras',financas:'Finanças',projetos:'Projetos',
+  cerebro:'Segundo Cérebro',agenda:'Google Agenda'
+}
+function nav(page, el, mode){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.getElementById('page-'+page).classList.add('active')
+  document.getElementById('pageTitle').textContent = pageNames[page]||page
+
+  if(mode==='mob'){
+    document.querySelectorAll('.mob-nav-item').forEach(i=>i.classList.remove('active'))
+  } else {
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'))
+  }
+  if(el) el.classList.add('active')
+
+  renderPage(page)
+}
+
+function renderPage(p){
+  if(p==='dashboard') renderDashboard()
+  else if(p==='habitos') renderHabitos()
+  else if(p==='tarefas') renderTarefas()
+  else if(p==='compras') renderCompras()
+  else if(p==='financas') renderFinancas()
+  else if(p==='projetos') renderProjetos()
+  else if(p==='cerebro') renderCerebro()
+}
+
+// ══════════════════════════════════════════
+//  DATE
+// ══════════════════════════════════════════
+function initDate(){
+  const d = new Date()
+  const ds = d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'short',year:'numeric'})
+  document.getElementById('topDate').textContent = ds
+}
+function today(){return new Date().toISOString().split('T')[0]}
+
+// ══════════════════════════════════════════
+//  HÁBITOS
+// ══════════════════════════════════════════
+function addHabito(){
+  const nome = cleanInput(document.getElementById('hb-input').value, 100)
+  const tipo = document.getElementById('hb-tipo').value
+  if(!nome) return
+  const list = S.get('habitos')
+  list.push({id:Date.now(),nome,tipo,done:[],createdAt:today()})
+  S.set('habitos',list)
+  document.getElementById('hb-input').value=''
+  renderHabitos()
+  updateStats()
+}
+
+function toggleHabito(id){
+  const list = S.get('habitos')
+  const h = list.find(x=>x.id==id)
+  if(!h) return
+  const t = today()
+  if(h.done.includes(t)) h.done = h.done.filter(d=>d!==t)
+  else h.done.push(t)
+  S.set('habitos',list)
+  renderHabitos()
+  renderDashboard()
+  updateStats()
+}
+
+function deleteHabito(id){
+  S.set('habitos',S.get('habitos').filter(h=>h.id!=id))
+  renderHabitos()
+  updateStats()
+}
+
+function renderHabitos(){
+  const list = S.get('habitos')
+  const t = today()
+  const rec = list.filter(h=>h.tipo==='rec')
+  const occ = list.filter(h=>h.tipo==='occ')
+
+  function makeItem(h){
+    const done = h.done.includes(t)
+    return `<div class="habit-item">
+      <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id})"></div>
+      <div class="habit-name ${done?'done':''}">${h.nome}</div>
+      <span class="hbadge ${h.tipo==='rec'?'hb-rec':'hb-occ'}">${h.tipo==='rec'?'recorrente':'ocasional'}</span>
+      <button class="wd-btn btn-danger btn-sm" style="margin-left:6px" onclick="deleteHabito(${h.id})">✕</button>
+    </div>`
+  }
+
+  const recEl = document.getElementById('hb-rec-list')
+  const occEl = document.getElementById('hb-occ-list')
+  if(recEl) recEl.innerHTML = rec.length ? rec.map(makeItem).join('') : '<div class="empty">Nenhum hábito recorrente ainda</div>'
+  if(occEl) occEl.innerHTML = occ.length ? occ.map(makeItem).join('') : '<div class="empty">Nenhum hábito ocasional ainda</div>'
+
+  // streak
+  const days = ['D','S','T','Q','Q','S','S']
+  const today_d = new Date()
+  let streak = ''
+  for(let i=6;i>=0;i--){
+    const dd = new Date(today_d); dd.setDate(dd.getDate()-i)
+    const ds = dd.toISOString().split('T')[0]
+    const dayName = days[dd.getDay()]
+    const isToday = i===0
+    const anyDone = list.some(h=>h.done.includes(ds))
+    const cls = isToday?'sd-today':anyDone?'sd-ok':'sd-no'
+    streak+=`<div class="sday ${cls}" title="${ds}">${dayName}</div>`
+  }
+  const sEl = document.getElementById('streak-full')
+  if(sEl) sEl.innerHTML = streak
+}
+
+// ══════════════════════════════════════════
+//  TAREFAS
+// ══════════════════════════════════════════
+const prioColors = {alta:'var(--accent4)',media:'var(--accent3)',baixa:'var(--accent2)'}
+
+function addTarefa(){
+  const nome = document.getElementById('tk-input').value.trim()
+  const prio = document.getElementById('tk-prio').value
+  const prazo = document.getElementById('tk-prazo').value
+  if(!nome) return
+  const list = S.get('tarefas')
+  list.push({id:Date.now(),nome,prio,prazo,done:false,createdAt:today()})
+  S.set('tarefas',list)
+  document.getElementById('tk-input').value=''
+  document.getElementById('tk-prazo').value=''
+  renderTarefas()
+  updateStats()
+}
+
+function toggleTarefa(id){
+  const list = S.get('tarefas')
+  const t = list.find(x=>x.id==id)
+  if(t) t.done = !t.done
+  S.set('tarefas',list)
+  renderTarefas()
+  renderDashboard()
+  updateStats()
+}
+
+function deleteTarefa(id){
+  S.set('tarefas',S.get('tarefas').filter(t=>t.id!=id))
+  renderTarefas()
+  updateStats()
+}
+
+function renderTarefas(){
+  const list = S.get('tarefas')
+  const pend = list.filter(t=>!t.done)
+  const done = list.filter(t=>t.done)
+
+  function makeItem(t){
+    return `<div class="task-item">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id})"></div>
+      <div class="task-prio" style="background:${prioColors[t.prio]}"></div>
+      <div class="task-body">
+        <div class="task-name ${t.done?'done':''}">${t.nome}</div>
+        <div class="task-meta">${t.prio} ${t.prazo?'· '+formatDate(t.prazo):''}</div>
+      </div>
+      <button class="wd-btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">✕</button>
+    </div>`
+  }
+
+  const pEl = document.getElementById('tk-list')
+  const dEl = document.getElementById('tk-done-list')
+  if(pEl) pEl.innerHTML = pend.length ? pend.map(makeItem).join('') : '<div class="empty">Nenhuma tarefa pendente 🎉</div>'
+  if(dEl) dEl.innerHTML = done.length ? done.map(makeItem).join('') : '<div class="empty">Nenhuma concluída ainda</div>'
+}
+
+function formatDate(d){
+  if(!d) return ''
+  const [y,m,dd] = d.split('-')
+  return `${dd}/${m}/${y}`
+}
+
+// ══════════════════════════════════════════
+//  COMPRAS
+// ══════════════════════════════════════════
+const cpColors = {trabalho:'var(--accent)',pessoal:'var(--accent2)',casa:'var(--accent3)',roupa:'#e879f9',mercado:'var(--accent5)',outro:'var(--text2)'}
+
+function addCompra(){
+  const nome = document.getElementById('cp-input').value.trim()
+  const cat = document.getElementById('cp-cat').value
+  if(!nome) return
+  const list = S.get('compras')
+  list.push({id:Date.now(),nome,cat,bought:false})
+  S.set('compras',list)
+  document.getElementById('cp-input').value=''
+  renderCompras()
+}
+
+function toggleCompra(id){
+  const list = S.get('compras')
+  const c = list.find(x=>x.id==id)
+  if(c) c.bought = !c.bought
+  S.set('compras',list)
+  renderCompras()
+}
+
+function deleteCompra(id){
+  S.set('compras',S.get('compras').filter(c=>c.id!=id))
+  renderCompras()
+}
+
+function renderCompras(){
+  const list = S.get('compras')
+  const trab = list.filter(c=>c.cat==='trabalho')
+  const outros = list.filter(c=>c.cat!=='trabalho')
+
+  function makeTag(c){
+    return `<span class="shop-tag ${c.bought?'bought':''}" onclick="toggleCompra(${c.id})">
+      <span class="shop-dot" style="background:${cpColors[c.cat]||'var(--text2)'}"></span>
+      ${c.nome}
+      <span onclick="event.stopPropagation();deleteCompra(${c.id})" style="margin-left:4px;color:var(--text3);font-size:10px">✕</span>
+    </span>`
+  }
+
+  const tEl = document.getElementById('cp-trabalho')
+  const pEl = document.getElementById('cp-pessoal')
+  if(tEl) tEl.innerHTML = trab.length ? trab.map(makeTag).join('') : '<div class="empty">Nenhuma ferramenta na lista</div>'
+  if(pEl) pEl.innerHTML = outros.length ? outros.map(makeTag).join('') : '<div class="empty">Nenhum item pessoal na lista</div>'
+}
+
+// ══════════════════════════════════════════
+//  FINANÇAS
+// ══════════════════════════════════════════
+const catColors = {
+  'trabalho':['#1a2810','var(--accent2)'],
+  'despesa-fixa':['#1a1835','var(--accent)'],
+  'lazer':['#1a1020','#e879f9'],
+  'alimentacao':['#2a1e10','var(--accent3)'],
+  'saude':['#101a2a','var(--accent5)'],
+  'investimento':['#0f2318','var(--accent2)'],
+  'outro':['#1a1a1a','var(--text2)']
+}
+
+function addFinanca(){
+  const desc = document.getElementById('fn-desc').value.trim()
+  const val = parseFloat(document.getElementById('fn-val').value)
+  const tipo = document.getElementById('fn-tipo').value
+  const cat = document.getElementById('fn-cat').value
+  if(!desc || isNaN(val) || val<=0) return
+  const list = S.get('financas')
+  list.push({id:Date.now(),desc,val,tipo,cat,date:today()})
+  S.set('financas',list)
+  document.getElementById('fn-desc').value=''
+  document.getElementById('fn-val').value=''
+  renderFinancas()
+  updateStats()
+}
+
+function deleteFinanca(id){
+  S.set('financas',S.get('financas').filter(f=>f.id!=id))
+  renderFinancas()
+  updateStats()
+}
+
+function renderFinancas(){
+  const list = S.get('financas')
+  const totalIn = list.filter(f=>f.tipo==='entrada').reduce((a,f)=>a+f.val,0)
+  const totalOut = list.filter(f=>f.tipo==='saida').reduce((a,f)=>a+f.val,0)
+  const saldo = totalIn - totalOut
+
+  const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
+
+  const tiEl = document.getElementById('fn-total-in')
+  const toEl = document.getElementById('fn-total-out')
+  const fsEl = document.getElementById('fn-saldo')
+  if(tiEl) tiEl.textContent = fmtBRL(totalIn)
+  if(toEl) toEl.textContent = fmtBRL(totalOut)
+  if(fsEl){
+    fsEl.textContent = fmtBRL(saldo)
+    fsEl.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
+  }
+
+  const lEl = document.getElementById('fn-list')
+  if(!lEl) return
+  if(!list.length){lEl.innerHTML='<div class="empty">Nenhum lançamento ainda</div>';return}
+
+  lEl.innerHTML = [...list].reverse().map(f=>{
+    const [bg,fg] = catColors[f.cat]||catColors.outro
+    return `<div class="fin-item">
+      <div class="fin-info">
+        <div class="fin-origin">${f.desc}</div>
+        <span class="fin-cat-badge" style="background:${bg};color:${fg}">${f.cat}</span>
+        <span style="font-size:10px;color:var(--text3);margin-left:6px">${formatDate(f.date)}</span>
+      </div>
+      <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2).replace('.',',')}</div>
+      <button class="wd-btn btn-danger btn-sm" style="margin-left:8px" onclick="deleteFinanca(${f.id})">✕</button>
+    </div>`
+  }).join('')
+}
+
+// ══════════════════════════════════════════
+//  PROJETOS
+// ══════════════════════════════════════════
+const projColors = {trabalho:'var(--accent)',pessoal:'var(--accent2)',estudo:'var(--accent3)',financeiro:'var(--accent5)'}
+
+function addProjeto(){
+  const nome = document.getElementById('pj-nome').value.trim()
+  const desc = document.getElementById('pj-desc').value.trim()
+  const cat = document.getElementById('pj-cat').value
+  const pct = parseInt(document.getElementById('pj-pct').value)
+  if(!nome) return
+  const list = S.get('projetos')
+  list.push({id:Date.now(),nome,desc,cat,pct,createdAt:today()})
+  S.set('projetos',list)
+  document.getElementById('pj-nome').value=''
+  document.getElementById('pj-desc').value=''
+  document.getElementById('pj-pct').value=0
+  document.getElementById('pj-pct-lbl').textContent='0%'
+  closeModal('modal-proj')
+  renderProjetos()
+}
+
+function openEditProg(id,pct){
+  document.getElementById('prog-id').value=id
+  document.getElementById('prog-pct').value=pct
+  document.getElementById('prog-pct-lbl').textContent=pct+'%'
+  openModal('modal-prog')
+}
+
+function saveProgresso(){
+  const id = parseInt(document.getElementById('prog-id').value)
+  const pct = parseInt(document.getElementById('prog-pct').value)
+  const list = S.get('projetos')
+  const p = list.find(x=>x.id==id)
+  if(p) p.pct=pct
+  S.set('projetos',list)
+  closeModal('modal-prog')
+  renderProjetos()
+}
+
+function deleteProjeto(id){
+  S.set('projetos',S.get('projetos').filter(p=>p.id!=id))
+  renderProjetos()
+}
+
+function renderProjetos(){
+  const list = S.get('projetos')
+  const el = document.getElementById('proj-list-full')
+  if(!el) return
+  if(!list.length){el.innerHTML='<div class="empty" style="padding:60px">Nenhum projeto ainda. Clique em "+ Novo Projeto" para começar.</div>';return}
+
+  el.innerHTML = list.map(p=>{
+    const color = projColors[p.cat]||'var(--accent)'
+    return `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text1)">${p.nome}</div>
+          ${p.desc?`<div style="font-size:12px;color:var(--text3);margin-top:4px">${p.desc}</div>`:''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="ptag">${p.cat}</span>
+          <button class="wd-btn btn-ghost btn-sm" onclick="openEditProg(${p.id},${p.pct})">Atualizar</button>
+          <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="prog-bar" style="flex:1">
+          <div class="prog-fill" style="width:${p.pct}%;background:${color}"></div>
+        </div>
+        <div style="font-size:14px;font-weight:600;color:${color};min-width:40px;text-align:right">${p.pct}%</div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">Criado em ${formatDate(p.createdAt)}</div>
+    </div>`
+  }).join('')
+}
+
+// ══════════════════════════════════════════
+//  SEGUNDO CÉREBRO
+// ══════════════════════════════════════════
+const tagColors = {
+  ideia:['#1e1a10','var(--accent3)'],
+  projeto:['#1a1835','var(--accent)'],
+  aprendizado:['#101a2a','var(--accent5)'],
+  reflexao:['#18102a','#c084fc'],
+  referencia:['#0f2318','var(--accent2)'],
+  outro:['#1a1a1a','var(--text2)']
+}
+const tagIcons = {ideia:'💡',projeto:'🚀',aprendizado:'📚',reflexao:'🔮',referencia:'🔗',outro:'📌'}
+
+function addNota(){
+  const texto = document.getElementById('br-input').value.trim()
+  const tag = document.getElementById('br-tag').value
+  if(!texto) return
+  const list = S.get('brain')
+  list.push({id:Date.now(),texto,tag,date:today()})
+  S.set('brain',list)
+  document.getElementById('br-input').value=''
+  renderCerebro()
+}
+
+function deleteNota(id){
+  S.set('brain',S.get('brain').filter(n=>n.id!=id))
+  renderCerebro()
+}
+
+function renderCerebro(){
+  const list = S.get('brain')
+  const el = document.getElementById('brain-list')
+  if(!el) return
+  if(!list.length){el.innerHTML='<div class="empty">Jogue sua primeira ideia aqui 💡</div>';return}
+
+  el.innerHTML = [...list].reverse().map(n=>{
+    const [bg,fg] = tagColors[n.tag]||tagColors.outro
+    return `<div class="brain-note">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="fin-cat-badge" style="background:${bg};color:${fg}">${tagIcons[n.tag]} ${n.tag}</span>
+        <button class="wd-btn btn-danger btn-sm" onclick="deleteNota(${n.id})">✕</button>
+      </div>
+      <div class="brain-note-text">${n.texto.replace(/\n/g,'<br>')}</div>
+      <div class="brain-note-date">${formatDate(n.date)}</div>
+    </div>`
+  }).join('')
+}
+
+// ══════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════
+function renderDashboard(){
+  const t = today()
+  const habitos = S.get('habitos')
+  const tarefas = S.get('tarefas')
+  const financas = S.get('financas')
+  const projetos = S.get('projetos')
+
+  // hábitos mini
+  const dhEl = document.getElementById('dash-habitos-list')
+  if(dhEl){
+    if(!habitos.length){dhEl.innerHTML='<div class="empty">Nenhum hábito</div>'}
+    else {
+      dhEl.innerHTML = habitos.slice(0,5).map(h=>{
+        const done = h.done.includes(t)
+        return `<div class="habit-item">
+          <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id});renderDashboard()"></div>
+          <div class="habit-name ${done?'done':''}">${h.nome}</div>
+        </div>`
+      }).join('')
+    }
+  }
+
+  // tarefas mini
+  const dtEl = document.getElementById('dash-tarefas-list')
+  if(dtEl){
+    const pend = tarefas.filter(t=>!t.done).slice(0,5)
+    if(!pend.length){dtEl.innerHTML='<div class="empty">Nenhuma tarefa pendente 🎉</div>'}
+    else {
+      dtEl.innerHTML = pend.map(t=>`<div class="task-item">
+        <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id})"></div>
+        <div class="task-prio" style="background:${prioColors[t.prio]}"></div>
+        <div class="task-body">
+          <div class="task-name">${t.nome}</div>
+          <div class="task-meta">${t.prio}${t.prazo?' · '+formatDate(t.prazo):''}</div>
+        </div>
+      </div>`).join('')
+    }
+  }
+
+  // projetos mini
+  const dpEl = document.getElementById('dash-proj-list')
+  if(dpEl){
+    if(!projetos.length){dpEl.innerHTML='<div class="empty">Nenhum projeto</div>'}
+    else{
+      dpEl.innerHTML = projetos.slice(0,4).map(p=>{
+        const color = projColors[p.cat]||'var(--accent)'
+        return `<div class="proj-item">
+          <div class="proj-header"><div class="proj-name">${p.nome}</div><div class="proj-pct" style="color:${color}">${p.pct}%</div></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${p.pct}%;background:${color}"></div></div>
+        </div>`
+      }).join('')
+    }
+  }
+
+  // finanças mini
+  const dfEl = document.getElementById('dash-fin-list')
+  if(dfEl){
+    if(!financas.length){dfEl.innerHTML='<div class="empty">Nenhum lançamento</div>'}
+    else{
+      dfEl.innerHTML = [...financas].reverse().slice(0,4).map(f=>{
+        return `<div class="fin-item">
+          <div class="fin-info"><div class="fin-origin" style="font-size:12px">${f.desc}</div></div>
+          <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}" style="font-size:12px">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2)}</div>
+        </div>`
+      }).join('')
+    }
+  }
+
+  updateStats()
+}
+
+function updateStats(){
+  const t = today()
+  const habitos = S.get('habitos')
+  const tarefas = S.get('tarefas')
+  const financas = S.get('financas')
+
+  const total = habitos.length
+  const done = habitos.filter(h=>h.done.includes(t)).length
+  const totalIn = financas.filter(f=>f.tipo==='entrada').reduce((a,f)=>a+f.val,0)
+  const totalOut = financas.filter(f=>f.tipo==='saida').reduce((a,f)=>a+f.val,0)
+  const saldo = totalIn - totalOut
+  const pendentes = tarefas.filter(t=>!t.done).length
+
+  const dsh = document.getElementById('ds-habitos')
+  const dst = document.getElementById('ds-tarefas')
+  const dss = document.getElementById('ds-saldo')
+  const thl = document.getElementById('todayHabitsLabel')
+
+  if(dsh) dsh.textContent = `${done}/${total}`
+  if(dst) dst.textContent = pendentes
+  if(dss){
+    dss.textContent = 'R$'+saldo.toLocaleString('pt-BR',{minimumFractionDigits:0})
+    dss.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
+  }
+  if(thl) thl.textContent = `${done}/${total} hábitos hoje`
+}
+
+// ══════════════════════════════════════════
+//  MODAIS
+// ══════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})
+})
+
+// ══════════════════════════════════════════
+//  GOOGLE AGENDA
+// ══════════════════════════════════════════
+function saveGcal(){
+  const url = document.getElementById('gcal-url').value.trim()
+  if(!url){document.getElementById('gcal-status').textContent='Cole o link primeiro!';return}
+  localStorage.setItem('wd_gcal_url',url)
+  document.getElementById('gcal-status').style.color='var(--accent2)'
+  document.getElementById('gcal-status').textContent='✓ Link salvo! Use o botão abaixo para abrir sua agenda.'
+}
+function openGcal(){
+  const url = localStorage.getItem('wd_gcal_url')
+  if(url) window.open(url,'_blank')
+  else window.open('https://calendar.google.com','_blank')
+}
+function loadGcalUrl(){
+  const url = localStorage.getItem('wd_gcal_url')
+  if(url && document.getElementById('gcal-url')){
+    document.getElementById('gcal-url').value=url
+    document.getElementById('gcal-status').textContent='Link já salvo ✓'
+    document.getElementById('gcal-status').style.color='var(--accent2)'
+  }
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+initDate()
+renderDashboard()
+loadGcalUrl()
+</script>
+</body>
+</html>

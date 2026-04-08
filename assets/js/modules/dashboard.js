@@ -1,0 +1,2 @@
+/* Stubs */
+const Dashboard = { render() { } };
