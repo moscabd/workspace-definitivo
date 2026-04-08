@@ -1,2 +1,0 @@
-/* Stubs */
-const Dashboard = { render() { } };

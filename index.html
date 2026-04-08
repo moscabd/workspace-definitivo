@@ -6,32 +6,7 @@
 <title>Workspace Definitivo — Login</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--bg0:#08090b;--bg1:#0d0e11;--bg2:#111318;--bg3:#171920;--border:#1e2028;--border2:#252830;--text1:#e8e9ee;--text2:#8a8d9a;--text3:#454857;--accent:#6c63ff;--accent2:#3fcf8e}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center}
-.wrap{width:100%;max-width:420px;padding:20px;animation:fadeIn .4s ease}
-.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:44px}
-.dots{display:flex;gap:5px}
-.dot{width:8px;height:8px;border-radius:50%}
-.brand-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:44px 36px;text-align:center}
-.title{font-family:'Syne',sans-serif;font-size:25px;font-weight:700;margin-bottom:10px}
-.subtitle{font-size:16px;color:var(--text3);line-height:1.7;margin-bottom:36px}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 20px;background:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:500;color:#1f1f1f;cursor:pointer;transition:all .15s}
-.google-btn:hover{box-shadow:0 4px 20px rgba(108,99,255,.25);transform:translateY(-1px)}
-.google-btn:active{transform:translateY(0)}
-.google-btn svg{width:18px;height:18px;flex-shrink:0}
-.divider{margin:22px 0;display:flex;align-items:center;gap:10px;color:var(--text3);font-size:14px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.status{margin-top:16px;font-size:15px;color:var(--text3);min-height:18px}
-.error{color:#ff5f5f}
-.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:16px auto;display:none}
-.note{margin-top:28px;font-size:14px;color:var(--text3);line-height:1.8;text-align:center}
-.note span{color:var(--accent2)}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-</style>
+<link rel="stylesheet" href="assets/css/index.css">
 </head>
 <body>
 <div class="wrap">
@@ -67,49 +42,6 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'DM S
   </div>
 </div>
 
-<script>
-// ─── CONFIGURAÇÃO ───────────────────────────────────────
-// Preencha com seus dados do Supabase após configurar
-const SUPABASE_URL = 'https://dpuqurchrhmibkzmskdr.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwdXF1cmNocmhtaWJrem1za2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTM4NTcsImV4cCI6MjA5MTIyOTg1N30.we9ui-K1_cXXD5UYYjtrc-Hrr1U2qKQwaO1qgUF-WX4'
-// ────────────────────────────────────────────────────────
-
-const { createClient } = supabase
-const db = createClient(SUPABASE_URL, SUPABASE_KEY)
-
-async function checkSession() {
-  try {
-    const { data: { session } } = await db.auth.getSession()
-    if (session) window.location.href = '/app.html'
-  } catch(e) {
-    console.log('Supabase not configured yet')
-  }
-}
-
-async function loginWithGoogle() {
-  const btn = document.getElementById('loginBtn')
-  const spin = document.getElementById('spinner')
-  const status = document.getElementById('status')
-
-  btn.disabled = true
-  spin.style.display = 'block'
-  status.textContent = 'Redirecionando para o Google...'
-  status.className = 'status'
-
-  const { error } = await db.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + '/app.html' }
-  })
-
-  if (error) {
-    spin.style.display = 'none'
-    btn.disabled = false
-    status.className = 'status error'
-    status.textContent = '✕ ' + error.message
-  }
-}
-
-checkSession()
-</script>
+<script src="assets/js/index.js"></script>
 </body>
 </html>

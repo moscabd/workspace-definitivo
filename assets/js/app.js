@@ -1,25 +1,684 @@
-/* ════════════════════════════════════════════════════════
-   APP INITIALIZATION
-   ════════════════════════════════════════════════════════ */
+// ══════════════════════════════════════════
+//  SUPABASE CONFIG — preencha após criar o projeto
+// ══════════════════════════════════════════
+const SUPABASE_URL = 'https://dpuqurchrhmibkzmskdr.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwdXF1cmNocmhtaWJrem1za2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTM4NTcsImV4cCI6MjA5MTIyOTg1N30.we9ui-K1_cXXD5UYYjtrc-Hrr1U2qKQwaO1qgUF-WX4'
+const { createClient } = supabase
+const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+let currentUser = null
+const cache = {}
 
-function initApp() {
-  // Inicializar data
-  const d = new Date();
-  const ds = d.toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
-  document.getElementById('topDate').textContent = ds;
+// ══════════════════════════════════════════
+//  SECURITY
+// ══════════════════════════════════════════
+function esc(str){
+  if(typeof str!=='string')return''
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')
+}
+function cleanInput(val,max){
+  if(typeof val!=='string')return''
+  return val.replace(/<[^>]*>/g,'').trim().substring(0,max||200)
+}
+function safeNum(val,min,max){
+  const n=parseFloat(val)
+  if(isNaN(n))return min||0
+  return Math.max(min||0,Math.min(max||Infinity,n))
+}
+if(window.self!==window.top){window.top.location=window.self.location}
 
-  // Carregar dashboard por padrão
-  nav('dashboard', document.querySelector('[onclick*="dashboard"]'));
+// ══════════════════════════════════════════
+//  DATA SYNC — Supabase
+// ══════════════════════════════════════════
+async function loadAllData(){
+  const uid = currentUser.id
+  const [h,t,c,f,p,b] = await Promise.all([
+    db.from('habitos').select('*').eq('user_id',uid),
+    db.from('tarefas').select('*').eq('user_id',uid),
+    db.from('compras').select('*').eq('user_id',uid),
+    db.from('financas').select('*').eq('user_id',uid),
+    db.from('projetos').select('*').eq('user_id',uid),
+    db.from('brain').select('*').eq('user_id',uid),
+  ])
+  cache.habitos=(h.data||[]).map(r=>({id:r.id,nome:r.nome,tipo:r.tipo,done:r.done||[],createdAt:r.created_at}))
+  cache.tarefas=(t.data||[]).map(r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,createdAt:r.created_at}))
+  cache.compras=(c.data||[]).map(r=>({id:r.id,nome:r.nome,cat:r.cat,bought:r.bought}))
+  cache.financas=(f.data||[]).map(r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date}))
+  cache.projetos=(p.data||[]).map(r=>({id:r.id,nome:r.nome,desc:r.descricao,cat:r.cat,pct:r.pct,createdAt:r.created_at}))
+  cache.brain=(b.data||[]).map(r=>({id:r.id,texto:r.texto,tag:r.tag,date:r.date}))
 }
 
-// Esperar DOM estar pronto
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
+const tableMappers = {
+  habitos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,tipo:r.tipo,done:r.done||[],created_at:r.createdAt}),
+  tarefas: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,prio:r.prio,prazo:r.prazo||null,done:r.done||false,created_at:r.createdAt}),
+  compras: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,cat:r.cat,bought:r.bought||false}),
+  financas: r=>({id:r.id,user_id:currentUser.id,descricao:r.desc,val:r.val,tipo:r.tipo,cat:r.cat,date:r.date}),
+  projetos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,descricao:r.desc||'',cat:r.cat,pct:r.pct||0,created_at:r.createdAt}),
+  brain: r=>({id:r.id,user_id:currentUser.id,texto:r.texto,tag:r.tag,date:r.date}),
 }
+
+async function syncTable(key,data){
+  if(!currentUser||!tableMappers[key])return
+  try{
+    await db.from(key).delete().eq('user_id',currentUser.id)
+    if(data.length>0){
+      const {error}=await db.from(key).insert(data.map(tableMappers[key]))
+      if(error)console.error('Sync['+key+']',error)
+    }
+  }catch(e){console.error('Sync error',e)}
+}
+
+// ══════════════════════════════════════════
+//  STORAGE (cache + Supabase)
+// ══════════════════════════════════════════
+const S = {
+  get(k){return cache[k]||[]},
+  set(k,v){cache[k]=v;syncTable(k,v)},
+  getSingle(k,d){return cache[k]!==undefined?cache[k]:d}
+}
+
+// ══════════════════════════════════════════
+//  USER
+// ══════════════════════════════════════════
+function showUserInfo(){
+  const meta=currentUser.user_metadata||{}
+  const name=(meta.full_name||meta.name||currentUser.email||'').split(' ')[0]
+  const avatar=meta.avatar_url||meta.picture||''
+  const nameEl=document.getElementById('userName')
+  const avatarEl=document.getElementById('userAvatar')
+  if(nameEl)nameEl.textContent=name
+  if(avatarEl&&avatar){avatarEl.src=avatar;avatarEl.style.display='block'}
+}
+
+async function logout(){
+  await db.auth.signOut()
+  window.location.href='/'
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+const pageNames = {
+  dashboard:'Painel Geral',habitos:'Hábitos',tarefas:'Tarefas',
+  compras:'Lista de Compras',financas:'Finanças',projetos:'Projetos',
+  cerebro:'Segundo Cérebro',agenda:'Google Agenda'
+}
+function nav(page, el, mode){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.getElementById('page-'+page).classList.add('active')
+  document.getElementById('pageTitle').textContent = pageNames[page]||page
+
+  if(mode==='mob'){
+    document.querySelectorAll('.mob-nav-item').forEach(i=>i.classList.remove('active'))
+  } else {
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'))
+  }
+  if(el) el.classList.add('active')
+
+  renderPage(page)
+}
+
+function renderPage(p){
+  if(p==='dashboard') renderDashboard()
+  else if(p==='habitos') renderHabitos()
+  else if(p==='tarefas') renderTarefas()
+  else if(p==='compras') renderCompras()
+  else if(p==='financas') renderFinancas()
+  else if(p==='projetos') renderProjetos()
+  else if(p==='cerebro') renderCerebro()
+}
+
+// ══════════════════════════════════════════
+//  DATE
+// ══════════════════════════════════════════
+function initDate(){
+  const d = new Date()
+  const ds = d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'short',year:'numeric'})
+  document.getElementById('topDate').textContent = ds
+}
+function today(){return new Date().toISOString().split('T')[0]}
+
+// ══════════════════════════════════════════
+//  HÁBITOS
+// ══════════════════════════════════════════
+function addHabito(){
+  const nome = cleanInput(document.getElementById('hb-input').value, 100)
+  const tipo = document.getElementById('hb-tipo').value
+  if(!nome) return
+  const list = S.get('habitos')
+  list.push({id:Date.now(),nome,tipo,done:[],createdAt:today()})
+  S.set('habitos',list)
+  document.getElementById('hb-input').value=''
+  renderHabitos()
+  updateStats()
+}
+
+function toggleHabito(id){
+  const list = S.get('habitos')
+  const h = list.find(x=>x.id==id)
+  if(!h) return
+  const t = today()
+  if(h.done.includes(t)) h.done = h.done.filter(d=>d!==t)
+  else h.done.push(t)
+  S.set('habitos',list)
+  renderHabitos()
+  renderDashboard()
+  updateStats()
+}
+
+function deleteHabito(id){
+  S.set('habitos',S.get('habitos').filter(h=>h.id!=id))
+  renderHabitos()
+  updateStats()
+}
+
+function renderHabitos(){
+  const list = S.get('habitos')
+  const t = today()
+  const rec = list.filter(h=>h.tipo==='rec')
+  const occ = list.filter(h=>h.tipo==='occ')
+
+  function makeItem(h){
+    const done = h.done.includes(t)
+    return `<div class="habit-item">
+      <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id})"></div>
+      <div class="habit-name ${done?'done':''}">${h.nome}</div>
+      <span class="hbadge ${h.tipo==='rec'?'hb-rec':'hb-occ'}">${h.tipo==='rec'?'recorrente':'ocasional'}</span>
+      <button class="wd-btn btn-danger btn-sm" style="margin-left:6px" onclick="deleteHabito(${h.id})">✕</button>
+    </div>`
+  }
+
+  const recEl = document.getElementById('hb-rec-list')
+  const occEl = document.getElementById('hb-occ-list')
+  if(recEl) recEl.innerHTML = rec.length ? rec.map(makeItem).join('') : '<div class="empty">Nenhum hábito recorrente ainda</div>'
+  if(occEl) occEl.innerHTML = occ.length ? occ.map(makeItem).join('') : '<div class="empty">Nenhum hábito ocasional ainda</div>'
+
+  // streak
+  const days = ['D','S','T','Q','Q','S','S']
+  const today_d = new Date()
+  let streak = ''
+  for(let i=6;i>=0;i--){
+    const dd = new Date(today_d); dd.setDate(dd.getDate()-i)
+    const ds = dd.toISOString().split('T')[0]
+    const dayName = days[dd.getDay()]
+    const isToday = i===0
+    const anyDone = list.some(h=>h.done.includes(ds))
+    const cls = isToday?'sd-today':anyDone?'sd-ok':'sd-no'
+    streak+=`<div class="sday ${cls}" title="${ds}">${dayName}</div>`
+  }
+  const sEl = document.getElementById('streak-full')
+  if(sEl) sEl.innerHTML = streak
+}
+
+// ══════════════════════════════════════════
+//  TAREFAS
+// ══════════════════════════════════════════
+const prioColors = {alta:'var(--accent4)',media:'var(--accent3)',baixa:'var(--accent2)'}
+
+function addTarefa(){
+  const nome = document.getElementById('tk-input').value.trim()
+  const prio = document.getElementById('tk-prio').value
+  const prazo = document.getElementById('tk-prazo').value
+  if(!nome) return
+  const list = S.get('tarefas')
+  list.push({id:Date.now(),nome,prio,prazo,done:false,createdAt:today()})
+  S.set('tarefas',list)
+  document.getElementById('tk-input').value=''
+  document.getElementById('tk-prazo').value=''
+  renderTarefas()
+  updateStats()
+}
+
+function toggleTarefa(id){
+  const list = S.get('tarefas')
+  const t = list.find(x=>x.id==id)
+  if(t) t.done = !t.done
+  S.set('tarefas',list)
+  renderTarefas()
+  renderDashboard()
+  updateStats()
+}
+
+function deleteTarefa(id){
+  S.set('tarefas',S.get('tarefas').filter(t=>t.id!=id))
+  renderTarefas()
+  updateStats()
+}
+
+function renderTarefas(){
+  const list = S.get('tarefas')
+  const pend = list.filter(t=>!t.done)
+  const done = list.filter(t=>t.done)
+
+  function makeItem(t){
+    return `<div class="task-item">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id})"></div>
+      <div class="task-prio" style="background:${prioColors[t.prio]}"></div>
+      <div class="task-body">
+        <div class="task-name ${t.done?'done':''}">${t.nome}</div>
+        <div class="task-meta">${t.prio} ${t.prazo?'· '+formatDate(t.prazo):''}</div>
+      </div>
+      <button class="wd-btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">✕</button>
+    </div>`
+  }
+
+  const pEl = document.getElementById('tk-list')
+  const dEl = document.getElementById('tk-done-list')
+  if(pEl) pEl.innerHTML = pend.length ? pend.map(makeItem).join('') : '<div class="empty">Nenhuma tarefa pendente 🎉</div>'
+  if(dEl) dEl.innerHTML = done.length ? done.map(makeItem).join('') : '<div class="empty">Nenhuma concluída ainda</div>'
+}
+
+function formatDate(d){
+  if(!d) return ''
+  const [y,m,dd] = d.split('-')
+  return `${dd}/${m}/${y}`
+}
+
+// ══════════════════════════════════════════
+//  COMPRAS
+// ══════════════════════════════════════════
+const cpColors = {trabalho:'var(--accent)',pessoal:'var(--accent2)',casa:'var(--accent3)',roupa:'#e879f9',mercado:'var(--accent5)',outro:'var(--text2)'}
+
+function addCompra(){
+  const nome = document.getElementById('cp-input').value.trim()
+  const cat = document.getElementById('cp-cat').value
+  if(!nome) return
+  const list = S.get('compras')
+  list.push({id:Date.now(),nome,cat,bought:false})
+  S.set('compras',list)
+  document.getElementById('cp-input').value=''
+  renderCompras()
+}
+
+function toggleCompra(id){
+  const list = S.get('compras')
+  const c = list.find(x=>x.id==id)
+  if(c) c.bought = !c.bought
+  S.set('compras',list)
+  renderCompras()
+}
+
+function deleteCompra(id){
+  S.set('compras',S.get('compras').filter(c=>c.id!=id))
+  renderCompras()
+}
+
+function renderCompras(){
+  const list = S.get('compras')
+  const trab = list.filter(c=>c.cat==='trabalho')
+  const outros = list.filter(c=>c.cat!=='trabalho')
+
+  function makeTag(c){
+    return `<span class="shop-tag ${c.bought?'bought':''}" onclick="toggleCompra(${c.id})">
+      <span class="shop-dot" style="background:${cpColors[c.cat]||'var(--text2)'}"></span>
+      ${c.nome}
+      <span onclick="event.stopPropagation();deleteCompra(${c.id})" style="margin-left:4px;color:var(--text3);font-size:13px">✕</span>
+    </span>`
+  }
+
+  const tEl = document.getElementById('cp-trabalho')
+  const pEl = document.getElementById('cp-pessoal')
+  if(tEl) tEl.innerHTML = trab.length ? trab.map(makeTag).join('') : '<div class="empty">Nenhuma ferramenta na lista</div>'
+  if(pEl) pEl.innerHTML = outros.length ? outros.map(makeTag).join('') : '<div class="empty">Nenhum item pessoal na lista</div>'
+}
+
+// ══════════════════════════════════════════
+//  FINANÇAS
+// ══════════════════════════════════════════
+const catColors = {
+  'trabalho':['#1a2810','var(--accent2)'],
+  'despesa-fixa':['#1a1835','var(--accent)'],
+  'lazer':['#1a1020','#e879f9'],
+  'alimentacao':['#2a1e10','var(--accent3)'],
+  'saude':['#101a2a','var(--accent5)'],
+  'investimento':['#0f2318','var(--accent2)'],
+  'outro':['#1a1a1a','var(--text2)']
+}
+
+function addFinanca(){
+  const desc = document.getElementById('fn-desc').value.trim()
+  const val = parseFloat(document.getElementById('fn-val').value)
+  const tipo = document.getElementById('fn-tipo').value
+  const cat = document.getElementById('fn-cat').value
+  if(!desc || isNaN(val) || val<=0) return
+  const list = S.get('financas')
+  list.push({id:Date.now(),desc,val,tipo,cat,date:today()})
+  S.set('financas',list)
+  document.getElementById('fn-desc').value=''
+  document.getElementById('fn-val').value=''
+  renderFinancas()
+  updateStats()
+}
+
+function deleteFinanca(id){
+  S.set('financas',S.get('financas').filter(f=>f.id!=id))
+  renderFinancas()
+  updateStats()
+}
+
+function renderFinancas(){
+  const list = S.get('financas')
+  const totalIn = list.filter(f=>f.tipo==='entrada').reduce((a,f)=>a+f.val,0)
+  const totalOut = list.filter(f=>f.tipo==='saida').reduce((a,f)=>a+f.val,0)
+  const saldo = totalIn - totalOut
+
+  const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
+
+  const tiEl = document.getElementById('fn-total-in')
+  const toEl = document.getElementById('fn-total-out')
+  const fsEl = document.getElementById('fn-saldo')
+  if(tiEl) tiEl.textContent = fmtBRL(totalIn)
+  if(toEl) toEl.textContent = fmtBRL(totalOut)
+  if(fsEl){
+    fsEl.textContent = fmtBRL(saldo)
+    fsEl.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
+  }
+
+  const lEl = document.getElementById('fn-list')
+  if(!lEl) return
+  if(!list.length){lEl.innerHTML='<div class="empty">Nenhum lançamento ainda</div>';return}
+
+  lEl.innerHTML = [...list].reverse().map(f=>{
+    const [bg,fg] = catColors[f.cat]||catColors.outro
+    return `<div class="fin-item">
+      <div class="fin-info">
+        <div class="fin-origin">${f.desc}</div>
+        <span class="fin-cat-badge" style="background:${bg};color:${fg}">${f.cat}</span>
+        <span style="font-size:13px;color:var(--text3);margin-left:6px">${formatDate(f.date)}</span>
+      </div>
+      <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2).replace('.',',')}</div>
+      <button class="wd-btn btn-danger btn-sm" style="margin-left:8px" onclick="deleteFinanca(${f.id})">✕</button>
+    </div>`
+  }).join('')
+}
+
+// ══════════════════════════════════════════
+//  PROJETOS
+// ══════════════════════════════════════════
+const projColors = {trabalho:'var(--accent)',pessoal:'var(--accent2)',estudo:'var(--accent3)',financeiro:'var(--accent5)'}
+
+function addProjeto(){
+  const nome = document.getElementById('pj-nome').value.trim()
+  const desc = document.getElementById('pj-desc').value.trim()
+  const cat = document.getElementById('pj-cat').value
+  const pct = parseInt(document.getElementById('pj-pct').value)
+  if(!nome) return
+  const list = S.get('projetos')
+  list.push({id:Date.now(),nome,desc,cat,pct,createdAt:today()})
+  S.set('projetos',list)
+  document.getElementById('pj-nome').value=''
+  document.getElementById('pj-desc').value=''
+  document.getElementById('pj-pct').value=0
+  document.getElementById('pj-pct-lbl').textContent='0%'
+  closeModal('modal-proj')
+  renderProjetos()
+}
+
+function openEditProg(id,pct){
+  document.getElementById('prog-id').value=id
+  document.getElementById('prog-pct').value=pct
+  document.getElementById('prog-pct-lbl').textContent=pct+'%'
+  openModal('modal-prog')
+}
+
+function saveProgresso(){
+  const id = parseInt(document.getElementById('prog-id').value)
+  const pct = parseInt(document.getElementById('prog-pct').value)
+  const list = S.get('projetos')
+  const p = list.find(x=>x.id==id)
+  if(p) p.pct=pct
+  S.set('projetos',list)
+  closeModal('modal-prog')
+  renderProjetos()
+}
+
+function deleteProjeto(id){
+  S.set('projetos',S.get('projetos').filter(p=>p.id!=id))
+  renderProjetos()
+}
+
+function renderProjetos(){
+  const list = S.get('projetos')
+  const el = document.getElementById('proj-list-full')
+  if(!el) return
+  if(!list.length){el.innerHTML='<div class="empty" style="padding:60px">Nenhum projeto ainda. Clique em "+ Novo Projeto" para começar.</div>';return}
+
+  el.innerHTML = list.map(p=>{
+    const color = projColors[p.cat]||'var(--accent)'
+    return `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text1)">${p.nome}</div>
+          ${p.desc?`<div style="font-size:15px;color:var(--text3);margin-top:4px">${p.desc}</div>`:''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="ptag">${p.cat}</span>
+          <button class="wd-btn btn-ghost btn-sm" onclick="openEditProg(${p.id},${p.pct})">Atualizar</button>
+          <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="prog-bar" style="flex:1">
+          <div class="prog-fill" style="width:${p.pct}%;background:${color}"></div>
+        </div>
+        <div style="font-size:17px;font-weight:600;color:${color};min-width:40px;text-align:right">${p.pct}%</div>
+      </div>
+      <div style="font-size:13px;color:var(--text3);margin-top:6px">Criado em ${formatDate(p.createdAt)}</div>
+    </div>`
+  }).join('')
+}
+
+// ══════════════════════════════════════════
+//  SEGUNDO CÉREBRO
+// ══════════════════════════════════════════
+const tagColors = {
+  ideia:['#1e1a10','var(--accent3)'],
+  projeto:['#1a1835','var(--accent)'],
+  aprendizado:['#101a2a','var(--accent5)'],
+  reflexao:['#18102a','#c084fc'],
+  referencia:['#0f2318','var(--accent2)'],
+  outro:['#1a1a1a','var(--text2)']
+}
+const tagIcons = {ideia:'💡',projeto:'🚀',aprendizado:'📚',reflexao:'🔮',referencia:'🔗',outro:'📌'}
+
+function addNota(){
+  const texto = document.getElementById('br-input').value.trim()
+  const tag = document.getElementById('br-tag').value
+  if(!texto) return
+  const list = S.get('brain')
+  list.push({id:Date.now(),texto,tag,date:today()})
+  S.set('brain',list)
+  document.getElementById('br-input').value=''
+  renderCerebro()
+}
+
+function deleteNota(id){
+  S.set('brain',S.get('brain').filter(n=>n.id!=id))
+  renderCerebro()
+}
+
+function renderCerebro(){
+  const list = S.get('brain')
+  const el = document.getElementById('brain-list')
+  if(!el) return
+  if(!list.length){el.innerHTML='<div class="empty">Jogue sua primeira ideia aqui 💡</div>';return}
+
+  el.innerHTML = [...list].reverse().map(n=>{
+    const [bg,fg] = tagColors[n.tag]||tagColors.outro
+    return `<div class="brain-note">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="fin-cat-badge" style="background:${bg};color:${fg}">${tagIcons[n.tag]} ${n.tag}</span>
+        <button class="wd-btn btn-danger btn-sm" onclick="deleteNota(${n.id})">✕</button>
+      </div>
+      <div class="brain-note-text">${n.texto.replace(/\n/g,'<br>')}</div>
+      <div class="brain-note-date">${formatDate(n.date)}</div>
+    </div>`
+  }).join('')
+}
+
+// ══════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════
+function renderDashboard(){
+  const t = today()
+  const habitos = S.get('habitos')
+  const tarefas = S.get('tarefas')
+  const financas = S.get('financas')
+  const projetos = S.get('projetos')
+
+  // hábitos mini
+  const dhEl = document.getElementById('dash-habitos-list')
+  if(dhEl){
+    if(!habitos.length){dhEl.innerHTML='<div class="empty">Nenhum hábito</div>'}
+    else {
+      dhEl.innerHTML = habitos.slice(0,5).map(h=>{
+        const done = h.done.includes(t)
+        return `<div class="habit-item">
+          <div class="hcheck ${done?'done':''}" onclick="toggleHabito(${h.id});renderDashboard()"></div>
+          <div class="habit-name ${done?'done':''}">${h.nome}</div>
+        </div>`
+      }).join('')
+    }
+  }
+
+  // tarefas mini
+  const dtEl = document.getElementById('dash-tarefas-list')
+  if(dtEl){
+    const pend = tarefas.filter(t=>!t.done).slice(0,5)
+    if(!pend.length){dtEl.innerHTML='<div class="empty">Nenhuma tarefa pendente 🎉</div>'}
+    else {
+      dtEl.innerHTML = pend.map(t=>`<div class="task-item">
+        <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id})"></div>
+        <div class="task-prio" style="background:${prioColors[t.prio]}"></div>
+        <div class="task-body">
+          <div class="task-name">${t.nome}</div>
+          <div class="task-meta">${t.prio}${t.prazo?' · '+formatDate(t.prazo):''}</div>
+        </div>
+      </div>`).join('')
+    }
+  }
+
+  // projetos mini
+  const dpEl = document.getElementById('dash-proj-list')
+  if(dpEl){
+    if(!projetos.length){dpEl.innerHTML='<div class="empty">Nenhum projeto</div>'}
+    else{
+      dpEl.innerHTML = projetos.slice(0,4).map(p=>{
+        const color = projColors[p.cat]||'var(--accent)'
+        return `<div class="proj-item">
+          <div class="proj-header"><div class="proj-name">${p.nome}</div><div class="proj-pct" style="color:${color}">${p.pct}%</div></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${p.pct}%;background:${color}"></div></div>
+        </div>`
+      }).join('')
+    }
+  }
+
+  // finanças mini
+  const dfEl = document.getElementById('dash-fin-list')
+  if(dfEl){
+    if(!financas.length){dfEl.innerHTML='<div class="empty">Nenhum lançamento</div>'}
+    else{
+      dfEl.innerHTML = [...financas].reverse().slice(0,4).map(f=>{
+        return `<div class="fin-item">
+          <div class="fin-info"><div class="fin-origin" style="font-size:15px">${f.desc}</div></div>
+          <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}" style="font-size:15px">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2)}</div>
+        </div>`
+      }).join('')
+    }
+  }
+
+  updateStats()
+}
+
+function updateStats(){
+  const t = today()
+  const habitos = S.get('habitos')
+  const tarefas = S.get('tarefas')
+  const financas = S.get('financas')
+
+  const total = habitos.length
+  const done = habitos.filter(h=>h.done.includes(t)).length
+  const totalIn = financas.filter(f=>f.tipo==='entrada').reduce((a,f)=>a+f.val,0)
+  const totalOut = financas.filter(f=>f.tipo==='saida').reduce((a,f)=>a+f.val,0)
+  const saldo = totalIn - totalOut
+  const pendentes = tarefas.filter(t=>!t.done).length
+
+  const dsh = document.getElementById('ds-habitos')
+  const dst = document.getElementById('ds-tarefas')
+  const dss = document.getElementById('ds-saldo')
+  const thl = document.getElementById('todayHabitsLabel')
+
+  if(dsh) dsh.textContent = `${done}/${total}`
+  if(dst) dst.textContent = pendentes
+  if(dss){
+    dss.textContent = 'R$'+saldo.toLocaleString('pt-BR',{minimumFractionDigits:0})
+    dss.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
+  }
+  if(thl) thl.textContent = `${done}/${total} hábitos hoje`
+}
+
+// ══════════════════════════════════════════
+//  MODAIS
+// ══════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})
+})
+
+// ══════════════════════════════════════════
+//  GOOGLE AGENDA
+// ══════════════════════════════════════════
+function saveGcal(){
+  const url = document.getElementById('gcal-url').value.trim()
+  if(!url){document.getElementById('gcal-status').textContent='Cole o link primeiro!';return}
+  localStorage.setItem('wd_gcal_url',url)
+  document.getElementById('gcal-status').style.color='var(--accent2)'
+  document.getElementById('gcal-status').textContent='✓ Link salvo! Use o botão abaixo para abrir sua agenda.'
+}
+function openGcal(){
+  const url = localStorage.getItem('wd_gcal_url')
+  if(url) window.open(url,'_blank')
+  else window.open('https://calendar.google.com','_blank')
+}
+function loadGcalUrl(){
+  const url = localStorage.getItem('wd_gcal_url')
+  if(url && document.getElementById('gcal-url')){
+    document.getElementById('gcal-url').value=url
+    document.getElementById('gcal-status').textContent='Link já salvo ✓'
+    document.getElementById('gcal-status').style.color='var(--accent2)'
+  }
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  DEV MODE — localhost pula login
+// ══════════════════════════════════════════
+const IS_DEV = ['localhost','127.0.0.1'].includes(window.location.hostname)
+
+async function init(){
+  if(IS_DEV){
+    // Modo preview local: usa localStorage, sem login
+    currentUser={id:'local-dev',user_metadata:{full_name:'Preview Local',avatar_url:''}}
+    // Reverte S para localStorage em modo dev
+    S.get = k=>{try{return JSON.parse(localStorage.getItem('wd_'+k))||[]}catch{return[]}}
+    S.set = (k,v)=>{localStorage.setItem('wd_'+k,JSON.stringify(v))}
+    S.getSingle = (k,d)=>{try{return JSON.parse(localStorage.getItem('wd_'+k))||d}catch{return d}}
+    // Badge visual indicando modo dev
+    const badge=document.createElement('span')
+    badge.textContent='⚡ DEV LOCAL'
+    badge.style.cssText='font-size:13px;padding:3px 10px;border-radius:20px;background:#1a1420;color:#c084fc;font-weight:700;letter-spacing:.08em'
+    document.querySelector('.topbar-right').prepend(badge)
+  } else {
+    const {data:{session}}=await db.auth.getSession()
+    if(!session){window.location.href='/';return}
+    currentUser=session.user
+    try{await loadAllData()}catch(e){console.error('Load error',e)}
+  }
+  initDate()
+  renderDashboard()
+  loadGcalUrl()
+  showUserInfo()
+}
+init()
