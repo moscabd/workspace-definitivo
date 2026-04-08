@@ -301,8 +301,14 @@
             <strong style="color:var(--accent3)">⚠️ Limitação atual:</strong> <span style="color:var(--text3)">Por segurança do navegador, a leitura automática do Google Agenda exige um pequeno servidor. Mas com o link salvo, você já pode acessar sua agenda clicando no botão abaixo. Em breve posso adicionar um servidor local simples para sincronização automática.</span>
           </div>
 
-          <div style="margin-top:14px;display:flex;gap:10px">
-            <button class="wd-btn btn-ghost" onclick="openGcal()">📅 Abrir Google Agenda</button>
+          <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+            <button class="wd-btn btn-primary" onclick="openGcal()">📅 Abrir Google Agenda</button>
+            <button class="wd-btn btn-ghost" onclick="toggleGcalEmbed()" id="btn-embedGcal" style="display:none">👀 Ver dentro do App</button>
+          </div>
+
+          <!-- Container do iframe (escondido por padrão) -->
+          <div id="gcal-embed-container" style="margin-top: 20px; display: none; height: 500px; border-radius: var(--r2); overflow: hidden; border: 1px solid var(--border);">
+            <iframe id="gcal-iframe" style="border: 0; width: 100%; height: 100%;" frameborder="0" scrolling="no"></iframe>
           </div>
         </div>
       </div>
