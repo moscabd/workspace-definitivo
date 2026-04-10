@@ -4,7 +4,7 @@
 -- ================================================
 
 -- HÁBITOS
-create table public.habitos (
+CREATE TABLE IF NOT EXISTS public.habitos (
   id bigint not null,
   user_id uuid not null references auth.users(id) on delete cascade,
   nome text not null,
@@ -13,12 +13,13 @@ create table public.habitos (
   created_at text,
   primary key (id, user_id)
 );
-alter table public.habitos enable row level security;
-create policy "habitos_policy" on public.habitos
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ALTER TABLE public.habitos ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "habitos_policy" ON public.habitos;
+CREATE POLICY "habitos_policy" ON public.habitos
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- TAREFAS
-create table public.tarefas (
+CREATE TABLE IF NOT EXISTS public.tarefas (
   id bigint not null,
   user_id uuid not null references auth.users(id) on delete cascade,
   nome text not null,
@@ -28,12 +29,13 @@ create table public.tarefas (
   created_at text,
   primary key (id, user_id)
 );
-alter table public.tarefas enable row level security;
-create policy "tarefas_policy" on public.tarefas
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ALTER TABLE public.tarefas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tarefas_policy" ON public.tarefas;
+CREATE POLICY "tarefas_policy" ON public.tarefas
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- COMPRAS
-create table public.compras (
+CREATE TABLE IF NOT EXISTS public.compras (
   id bigint not null,
   user_id uuid not null references auth.users(id) on delete cascade,
   nome text not null,
@@ -41,12 +43,13 @@ create table public.compras (
   bought boolean not null default false,
   primary key (id, user_id)
 );
-alter table public.compras enable row level security;
-create policy "compras_policy" on public.compras
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ALTER TABLE public.compras ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "compras_policy" ON public.compras;
+CREATE POLICY "compras_policy" ON public.compras
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- FINANÇAS
-create table public.financas (
+CREATE TABLE IF NOT EXISTS public.financas (
   id bigint not null,
   user_id uuid not null references auth.users(id) on delete cascade,
   descricao text not null,
@@ -56,27 +59,31 @@ create table public.financas (
   date text,
   primary key (id, user_id)
 );
-alter table public.financas enable row level security;
-create policy "financas_policy" on public.financas
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ALTER TABLE public.financas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "financas_policy" ON public.financas;
+CREATE POLICY "financas_policy" ON public.financas
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
--- PROJETOS
-create table public.projetos (
+-- PROJETOS (com notas e todo)
+CREATE TABLE IF NOT EXISTS public.projetos (
   id bigint not null,
   user_id uuid not null references auth.users(id) on delete cascade,
   nome text not null,
   descricao text,
   cat text not null default 'trabalho',
   pct integer not null default 0,
+  notas text DEFAULT '',
+  todo jsonb DEFAULT '[]'::jsonb,
   created_at text,
   primary key (id, user_id)
 );
-alter table public.projetos enable row level security;
-create policy "projetos_policy" on public.projetos
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ALTER TABLE public.projetos ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "projetos_policy" ON public.projetos;
+CREATE POLICY "projetos_policy" ON public.projetos
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- SEGUNDO CÉREBRO
-create table public.brain (
+CREATE TABLE IF NOT EXISTS public.brain (
   id bigint not null,
   user_id uuid not null references auth.users(id) on delete cascade,
   texto text not null,
@@ -84,6 +91,11 @@ create table public.brain (
   date text,
   primary key (id, user_id)
 );
-alter table public.brain enable row level security;
-create policy "brain_policy" on public.brain
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ALTER TABLE public.brain ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "brain_policy" ON public.brain;
+CREATE POLICY "brain_policy" ON public.brain
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- ================================================
+-- SUCESSO! Execute "Run" para criar/atualizar tudo
+-- ================================================
