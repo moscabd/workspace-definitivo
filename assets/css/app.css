@@ -533,3 +533,57 @@ html, body {
   .dash-grid{grid-template-columns:1fr}
   .span2,.span3{grid-column:span 1}
 }
+
+/* ════════════════════════════════════════
+   MELHORIAS PROJETOS (ABAS & DETALHES)
+   ════════════════════════════════════════ */
+.modal-lg { width: 850px; max-width: 95vw; }
+
+.tabs-nav {
+  display: flex;
+  gap: 4px;
+  background: var(--bg3);
+  padding: 4px;
+  border-radius: var(--r2);
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab-btn:hover { color: var(--text2); background: rgba(255,255,255,0.03); }
+.tab-btn.active { background: var(--accent); color: #fff; box-shadow: var(--shadow-sm); }
+
+.tab-content textarea.wd-input {
+  line-height: 1.6;
+  font-size: 15px;
+  padding: 15px;
+  background: var(--bg0);
+  border-color: var(--border2);
+}
+
+#tab-rascunhos textarea {
+  background: #0a0a0f;
+  color: #a0a0c0;
+  border-style: dashed;
+}
+
+#tab-plano textarea {
+  border-left: 4px solid var(--accent);
+}
+
+@media(max-width: 600px) {
+  .tabs-nav { flex-direction: column; }
+  .modal-lg { width: calc(100vw - 20px); }
+}

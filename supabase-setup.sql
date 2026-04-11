@@ -73,6 +73,8 @@ CREATE TABLE IF NOT EXISTS public.projetos (
   cat text not null default 'trabalho',
   pct integer not null default 0,
   notas text DEFAULT '',
+  rascunhos text DEFAULT '',
+  plano text DEFAULT '',
   todo jsonb DEFAULT '[]'::jsonb,
   created_at text,
   primary key (id, user_id)

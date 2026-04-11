@@ -68,6 +68,7 @@
     <div class="topbar-right">
       <span class="topbar-date" id="topDate"></span>
       <span class="tag-pill" style="background:#1a1835;color:var(--accent)" id="todayHabitsLabel">— hábitos hoje</span>
+      <button class="theme-btn" onclick="exportAllData()" title="Backup de todos os dados">📥</button>
       <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Alternar tema">🌙</button>
       <div class="user-chip">
         <img class="user-avatar" id="userAvatar" src="" alt="">
@@ -261,6 +262,9 @@
     <!-- ═══ CÉREBRO ═══ -->
     <div class="page" id="page-cerebro">
       <div style="margin-bottom:20px">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="text" class="wd-input" id="br-search" placeholder="🔍 Buscar notas..." oninput="renderCerebro()">
+        </div>
         <textarea class="wd-input" id="br-input" rows="3" placeholder="Jogue aqui uma ideia, pensamento, insight, referência... qualquer coisa!" style="width:100%;resize:vertical" maxlength="1000"></textarea>
         <div style="display:flex;gap:8px;margin-top:8px">
           <select class="wd-select" id="br-tag">
@@ -438,6 +442,74 @@
   </div>
 </div>
 
+<!-- MODAL DETALHES PROJETO -->
+<div class="modal-overlay" id="modal-detalhes-proj">
+  <div class="modal modal-lg">
+    <div class="modal-title">Detalhes do Projeto</div>
+    <input type="hidden" id="det-id">
+    
+    <div class="tabs-nav">
+      <button class="tab-btn active" data-tab="geral" onclick="switchProjectTab('geral')">Geral</button>
+      <button class="tab-btn" data-tab="rascunhos" onclick="switchProjectTab('rascunhos')">Rascunhos</button>
+      <button class="tab-btn" data-tab="notas" onclick="switchProjectTab('notas')">Informações</button>
+      <button class="tab-btn" data-tab="plano" onclick="switchProjectTab('plano')">Plano de Projeto</button>
+    </div>
+
+    <div class="tab-content" id="tab-geral">
+      <div class="form-group">
+        <label class="form-label">Nome do projeto</label>
+        <input class="wd-input" id="det-nome" style="width:100%">
+      </div>
+      <div class="grid2" style="gap:15px">
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <select class="wd-select" id="det-cat" style="width:100%">
+            <option value="trabalho">Trabalho</option>
+            <option value="pessoal">Pessoal</option>
+            <option value="estudo">Estudo</option>
+            <option value="financeiro">Financeiro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Progresso (%): <span id="det-pct-lbl">0%</span></label>
+          <input type="range" min="0" max="100" value="0" id="det-pct" style="width:100%" oninput="document.getElementById('det-pct-lbl').textContent=this.value+'%'">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição / Objetivo</label>
+        <textarea class="wd-input" id="det-desc" rows="3" style="width:100%;resize:vertical"></textarea>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-rascunhos" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Rascunhos e Ideias Rápidas</label>
+        <textarea class="wd-input" id="det-rascunhos" rows="12" placeholder="Jogue aqui suas ideias temporárias..." style="width:100%;resize:vertical;font-family:monospace"></textarea>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-notas" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Informações Importantes</label>
+        <textarea class="wd-input" id="det-notas" rows="12" placeholder="Dados técnicos, referências fixas, links importantes..." style="width:100%;resize:vertical"></textarea>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-plano" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Plano de Execução</label>
+        <textarea class="wd-input" id="det-plano" rows="12" placeholder="Passo a passo, metas, cronograma..." style="width:100%;resize:vertical"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="wd-btn btn-ghost" onclick="closeModal('modal-detalhes-proj')">Cancelar</button>
+      <button class="wd-btn btn-ghost" onclick="downloadProjectPlan()" title="Baixar Plano em .txt">📄 Exportar TXT</button>
+      <button class="wd-btn btn-primary" onclick="saveProjectDetails()">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL HÁBITO -->
 <div class="modal-overlay" id="modal-habito">
   <div class="modal">
@@ -495,6 +567,16 @@
     <div class="form-group">
       <label class="form-label">Usuário / E-mail</label>
       <input class="wd-input" id="ms-user" placeholder="seu@email.com" style="width:100%" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoria</label>
+      <select class="wd-select" id="ms-cat" style="width:100%">
+        <option value="social">📱 Social</option>
+        <option value="financeiro">💰 Financeiro</option>
+        <option value="trabalho">💼 Trabalho</option>
+        <option value="entretenimento">🎬 Entretenimento</option>
+        <option value="outro">📌 Outro</option>
+      </select>
     </div>
     <div class="form-group">
       <label class="form-label">Senha *</label>

@@ -43,7 +43,17 @@ async function loadAllData(){
   cache.tarefas=(t.data||[]).map(r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,createdAt:r.created_at}))
   cache.compras=(c.data||[]).map(r=>({id:r.id,nome:r.nome,cat:r.cat,bought:r.bought}))
   cache.financas=(f.data||[]).map(r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date}))
-  cache.projetos=(p.data||[]).map(r=>({id:r.id,nome:r.nome,desc:r.descricao,cat:r.cat,pct:r.pct,createdAt:r.created_at}))
+  cache.projetos=(p.data||[]).map(r=>({
+    id:r.id,
+    nome:r.nome,
+    desc:r.descricao,
+    cat:r.cat,
+    pct:r.pct,
+    notas:r.notas||'',
+    rascunhos:r.rascunhos||'',
+    plano:r.plano||'',
+    createdAt:r.created_at
+  }))
   cache.brain=(b.data||[]).map(r=>({id:r.id,texto:r.texto,tag:r.tag,date:r.date}))
 }
 
@@ -52,7 +62,18 @@ const tableMappers = {
   tarefas: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,prio:r.prio,prazo:r.prazo||null,done:r.done||false,created_at:r.createdAt}),
   compras: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,cat:r.cat,bought:r.bought||false}),
   financas: r=>({id:r.id,user_id:currentUser.id,descricao:r.desc,val:r.val,tipo:r.tipo,cat:r.cat,date:r.date}),
-  projetos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,descricao:r.desc||'',cat:r.cat,pct:r.pct||0,created_at:r.createdAt}),
+  projetos: r=>({
+    id:r.id,
+    user_id:currentUser.id,
+    nome:r.nome,
+    descricao:r.desc||'',
+    cat:r.cat,
+    pct:r.pct||0,
+    notas:r.notas||'',
+    rascunhos:r.rascunhos||'',
+    plano:r.plano||'',
+    created_at:r.createdAt
+  }),
   brain: r=>({id:r.id,user_id:currentUser.id,texto:r.texto,tag:r.tag,date:r.date}),
 }
 
@@ -138,6 +159,32 @@ function renderPage(p){
   else if(p==='projetos') renderProjetos()
   else if(p==='cerebro') renderCerebro()
   else if(p==='senhas') renderSenhas()
+}
+
+// ══════════════════════════════════════════
+//  BACKUP TOTAL
+// ══════════════════════════════════════════
+function exportAllData() {
+  const data = {
+    habitos: S.get('habitos'),
+    tarefas: S.get('tarefas'),
+    compras: S.get('compras'),
+    financas: S.get('financas'),
+    projetos: S.get('projetos'),
+    brain: S.get('brain'),
+    vault_conf: S.getSingle('vault_conf', null),
+    senhas_enc: S.getSingle('senhas_enc', null),
+    exportedAt: new Date().toISOString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `workspace_backup_${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  alert('Backup gerado com sucesso! Guarde este arquivo em local seguro.');
 }
 
 // ══════════════════════════════════════════
@@ -648,7 +695,7 @@ function addProjeto(){
   const pct = parseInt(document.getElementById('pj-pct').value)
   if(!nome) return
   const list = S.get('projetos')
-  list.push({id:Date.now(),nome,desc,cat,pct,createdAt:today()})
+  list.push({id:Date.now(),nome,desc,cat,pct,notas:'',rascunhos:'',plano:'',createdAt:today()})
   S.set('projetos',list)
   document.getElementById('pj-nome').value=''
   document.getElementById('pj-desc').value=''
@@ -697,6 +744,7 @@ function renderProjetos(){
         </div>
         <div style="display:flex;gap:6px;align-items:center">
           <span class="ptag">${p.cat}</span>
+          <button class="wd-btn btn-primary btn-sm" onclick="openProjectDetails(${p.id})">🔍 Detalhes</button>
           <button class="wd-btn btn-ghost btn-sm" onclick="openEditProg(${p.id},${p.pct})">Atualizar</button>
           <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})">✕</button>
         </div>
@@ -710,6 +758,53 @@ function renderProjetos(){
       <div style="font-size:13px;color:var(--text3);margin-top:6px">Criado em ${formatDate(p.createdAt)}</div>
     </div>`
   }).join('')
+}
+
+// Detalhes e Edição de Projeto
+function openProjectDetails(id){
+  const p = S.get('projetos').find(x=>x.id==id)
+  if(!p) return
+  
+  document.getElementById('det-id').value = p.id
+  document.getElementById('det-nome').value = p.nome
+  document.getElementById('det-cat').value = p.cat
+  document.getElementById('det-pct').value = p.pct
+  document.getElementById('det-pct-lbl').textContent = p.pct + '%'
+  document.getElementById('det-desc').value = p.desc || ''
+  document.getElementById('det-notas').value = p.notas || ''
+  document.getElementById('det-rascunhos').value = p.rascunhos || ''
+  document.getElementById('det-plano').value = p.plano || ''
+  
+  switchProjectTab('geral')
+  openModal('modal-detalhes-proj')
+}
+
+function switchProjectTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'))
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active')
+  
+  document.querySelectorAll('.tab-content').forEach(c=>c.style.display='none')
+  document.getElementById('tab-'+tab).style.display='block'
+}
+
+function saveProjectDetails(){
+  const id = parseInt(document.getElementById('det-id').value)
+  const list = S.get('projetos')
+  const p = list.find(x=>x.id==id)
+  
+  if(p){
+    p.nome = document.getElementById('det-nome').value.trim()
+    p.cat = document.getElementById('det-cat').value
+    p.pct = parseInt(document.getElementById('det-pct').value)
+    p.desc = document.getElementById('det-desc').value.trim()
+    p.notas = document.getElementById('det-notas').value.trim()
+    p.rascunhos = document.getElementById('det-rascunhos').value.trim()
+    p.plano = document.getElementById('det-plano').value.trim()
+    
+    S.set('projetos', list)
+    closeModal('modal-detalhes-proj')
+    renderProjetos()
+  }
 }
 
 // ══════════════════════════════════════════
@@ -744,17 +839,29 @@ function deleteNota(id){
 function renderCerebro(){
   const list = S.get('brain')
   const el = document.getElementById('brain-list')
+  const search = document.getElementById('br-search')?.value.toLowerCase() || ''
+  
   if(!el) return
   if(!list.length){el.innerHTML='<div class="empty">Jogue sua primeira ideia aqui 💡</div>';return}
 
-  el.innerHTML = [...list].reverse().map(n=>{
+  const filtered = list.filter(n => 
+    n.texto.toLowerCase().includes(search) || 
+    n.tag.toLowerCase().includes(search)
+  );
+
+  function linkify(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color:var(--accent2);text-decoration:underline">${url}</a>`);
+  }
+
+  el.innerHTML = [...filtered].reverse().map(n=>{
     const [bg,fg] = tagColors[n.tag]||tagColors.outro
     return `<div class="brain-note">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span class="fin-cat-badge" style="background:${bg};color:${fg}">${tagIcons[n.tag]} ${n.tag}</span>
         <button class="wd-btn btn-danger btn-sm" onclick="deleteNota(${n.id})">✕</button>
       </div>
-      <div class="brain-note-text">${n.texto.replace(/\n/g,'<br>')}</div>
+      <div class="brain-note-text">${linkify(n.texto).replace(/\n/g,'<br>')}</div>
       <div class="brain-note-date">${formatDate(n.date)}</div>
     </div>`
   }).join('')
@@ -818,9 +925,10 @@ function renderDashboard(){
     else{
       dpEl.innerHTML = projetos.slice(0,4).map(p=>{
         const color = projColors[p.cat]||'var(--accent)'
-        return `<div class="proj-item">
+        return `<div class="proj-item" style="margin-bottom:12px">
           <div class="proj-header"><div class="proj-name">${p.nome}</div><div class="proj-pct" style="color:${color}">${p.pct}%</div></div>
-          <div class="prog-bar"><div class="prog-fill" style="width:${p.pct}%;background:${color}"></div></div>
+          <div class="prog-bar" style="margin-bottom:6px"><div class="prog-fill" style="width:${p.pct}%;background:${color}"></div></div>
+          ${p.rascunhos ? `<div style="font-size:12px;color:var(--text3);font-style:italic;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📝 ${p.rascunhos.substring(0,60)}...</div>` : ''}
         </div>`
       }).join('')
     }
@@ -1031,20 +1139,27 @@ async function renderSenhasList() {
     return;
   }
   
-  listEl.innerHTML = filtered.map(p => `
+  listEl.innerHTML = filtered.map(p => {
+    const iconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${p.url || p.site}`;
+    return `
     <div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:12px;padding:12px 18px">
-      <div style="font-size:24px;width:36px;text-align:center">🌐</div>
+      <div style="width:36px;height:36px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+        <img src="${iconUrl}" style="width:20px;height:20px;object-fit:contain" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.site)}&background=random'">
+      </div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:16px;font-weight:600;color:var(--text1);margin-bottom:2px" class="text-truncate">${esc(p.site)}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="font-size:16px;font-weight:600;color:var(--text1);margin-bottom:2px" class="text-truncate">${esc(p.site)}</div>
+          ${p.cat ? `<span class="fin-cat-badge" style="font-size:10px;padding:1px 6px;margin-top:0;opacity:0.7">${p.cat}</span>` : ''}
+        </div>
         <div style="font-size:13px;color:var(--text3)" class="text-truncate">${esc(p.user)}</div>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="wd-btn btn-ghost btn-sm" onclick="copyToClipboard('${esc(p.pwd)}')">📋 Copiar</button>
+        <button class="wd-btn btn-ghost btn-sm" onclick="copyToClipboard('${esc(p.pwd)}')">📋</button>
         <button class="wd-btn btn-ghost btn-sm" onclick="editSenha(${p.id})">✏️</button>
         <button class="wd-btn btn-danger btn-sm" onclick="deleteSenha(${p.id})">✕</button>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function openSenhaModal() {
@@ -1055,6 +1170,7 @@ function openSenhaModal() {
   document.getElementById('ms-pwd').value = '';
   document.getElementById('ms-url').value = '';
   document.getElementById('ms-nota').value = '';
+  document.getElementById('ms-cat').value = 'outro';
   openModal('modal-senha');
 }
 
@@ -1069,6 +1185,7 @@ async function editSenha(id) {
   document.getElementById('ms-pwd').value = s.pwd;
   document.getElementById('ms-url').value = s.url || '';
   document.getElementById('ms-nota').value = s.nota || '';
+  document.getElementById('ms-cat').value = s.cat || 'outro';
   openModal('modal-senha');
 }
 
@@ -1079,15 +1196,16 @@ async function saveSenha() {
   const pwd = document.getElementById('ms-pwd').value;
   const url = document.getElementById('ms-url').value.trim();
   const nota = document.getElementById('ms-nota').value.trim();
+  const cat = document.getElementById('ms-cat').value;
   
   if(!site || !pwd) return;
   
   const list = await getVaultData();
   if(idStr) {
     const idx = list.findIndex(x => x.id == idStr);
-    if(idx > -1) list[idx] = { ...list[idx], site, user, pwd, url, nota };
+    if(idx > -1) list[idx] = { ...list[idx], site, user, pwd, url, nota, cat };
   } else {
-    list.push({ id: Date.now(), site, user, pwd, url, nota });
+    list.push({ id: Date.now(), site, user, pwd, url, nota, cat });
   }
   
   await saveVaultData(list);
@@ -1106,9 +1224,25 @@ function copyToClipboard(text) {
   navigator.clipboard.writeText(text);
   // feedback visual breve
   const btn = event.currentTarget;
-  const oldText = btn.textContent;
-  btn.textContent = '✔️ Copiado';
-  setTimeout(()=>btn.textContent=oldText, 1500);
+  const oldText = btn.innerHTML;
+  btn.innerHTML = '✔️';
+  setTimeout(()=>btn.innerHTML=oldText, 1500);
+}
+
+function downloadProjectPlan() {
+  const id = parseInt(document.getElementById('det-id').value);
+  const p = S.get('projetos').find(x => x.id === id);
+  if(!p) return;
+  
+  const content = `PROJETO: ${p.nome}\nCATEGORIA: ${p.cat}\nPROGRESSO: ${p.pct}%\nOBJETIVO: ${p.desc}\n\nINFORMAÇÕES:\n${p.notas}\n\nPLANO DE PROJETO:\n${p.plano}\n\nGerado em: ${new Date().toLocaleString('pt-BR')}`;
+  
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `plano_${p.nome.toLowerCase().replace(/\s+/g, '_')}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function toggleMsPwd() {
