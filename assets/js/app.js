@@ -187,6 +187,51 @@ function exportAllData() {
   alert('Backup gerado com sucesso! Guarde este arquivo em local seguro.');
 }
 
+function importAllData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      // Validação básica
+      const requiredKeys = ['habitos', 'tarefas', 'projetos'];
+      const hasKeys = requiredKeys.every(k => k in data);
+      
+      if (!hasKeys) {
+        alert('Erro: O arquivo selecionado não parece ser um backup válido do Workspace.');
+        return;
+      }
+
+      const confirmImport = confirm('⚠️ ATENÇÃO: Importar este backup irá SOBRESCREVER todos os seus dados atuais (Tarefas, Projetos, Notas, etc). Deseja continuar?');
+      
+      if (confirmImport) {
+        // Itera sobre as chaves e restaura
+        for (const key in data) {
+          if (['exportedAt'].includes(key)) continue;
+          
+          if (data[key] !== undefined) {
+             console.log(`Restaurando módulo: ${key}...`);
+             await S.set(key, data[key]);
+          }
+        }
+        
+        alert('🎉 Backup restaurado com sucesso! O sistema será recarregado.');
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error('Erro na importação:', err);
+      alert('Erro crítico ao processar o arquivo de backup. Verifique o console.');
+    } finally {
+      // Limpa o input para permitir selecionar o mesmo arquivo novamente
+      event.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
 // ══════════════════════════════════════════
 //  DATE
 // ══════════════════════════════════════════

@@ -68,7 +68,9 @@
     <div class="topbar-right">
       <span class="topbar-date" id="topDate"></span>
       <span class="tag-pill" style="background:#1a1835;color:var(--accent)" id="todayHabitsLabel">— hábitos hoje</span>
-      <button class="theme-btn" onclick="exportAllData()" title="Backup de todos os dados">📥</button>
+      <button class="theme-btn" onclick="exportAllData()" title="Exportar Backup (Download)">📥</button>
+      <button class="theme-btn" onclick="document.getElementById('importFile').click()" title="Importar Backup (Upload)">📤</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllData(event)">
       <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Alternar tema">🌙</button>
       <div class="user-chip">
         <img class="user-avatar" id="userAvatar" src="" alt="">
