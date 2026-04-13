@@ -157,20 +157,34 @@
     <div class="page" id="page-tarefas">
       <div class="input-row">
         <input class="wd-input" id="tk-input" placeholder="Descreva a tarefa..." maxlength="300">
-        <select class="wd-select" id="tk-prio">
-          <option value="alta">🔴 Alta</option>
-          <option value="media">🟡 Média</option>
-          <option value="baixa">🟢 Baixa</option>
-        </select>
-        <input class="wd-input" id="tk-prazo" type="date" style="flex:0 0 140px">
-        <button class="wd-btn btn-primary" onclick="addTarefa()">+ Adicionar</button>
+        
+        <div class="tk-options-row">
+          <label class="tk-daily-toggle">
+            <input type="checkbox" id="tk-is-daily">
+            <span class="tk-toggle-inner">⭐ Do Dia</span>
+          </label>
+          <select class="wd-select" id="tk-prio">
+            <option value="alta">🔴 Alta</option>
+            <option value="media" selected>🟡 Média</option>
+            <option value="baixa">🟢 Baixa</option>
+          </select>
+          <input class="wd-input" id="tk-prazo" type="date" style="flex:0 0 140px">
+          <button class="wd-btn btn-primary" onclick="addTarefa()">+ Adicionar</button>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-title">Pendentes</div>
+
+      <div class="card" id="tk-daily-card">
+        <div class="card-title" style="color:var(--accent3)">🔥 Foco do Dia</div>
+        <div id="tk-daily-list"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px" id="tk-later-card">
+        <div class="card-title">📦 Para Depois</div>
         <div id="tk-list"></div>
       </div>
+
       <div class="card" style="margin-top:14px">
-        <div class="card-title">Concluídas</div>
+        <div class="card-title">✅ Concluídas</div>
         <div id="tk-done-list"></div>
       </div>
     </div>

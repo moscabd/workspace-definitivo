@@ -39,8 +39,8 @@ async function loadAllData(){
     db.from('projetos').select('*').eq('user_id',uid),
     db.from('brain').select('*').eq('user_id',uid),
   ])
-  cache.habitos=(h.data||[]).map(r=>({id:r.id,nome:r.nome,tipo:r.tipo,done:r.done||[],createdAt:r.created_at}))
-  cache.tarefas=(t.data||[]).map(r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,createdAt:r.created_at}))
+  cache.habitos=(h.data||[]).map(r=>({id:r.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],createdAt:r.created_at}))
+  cache.tarefas=(t.data||[]).map(r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,is_daily:r.is_daily,seq:r.seq||0,createdAt:r.created_at}))
   cache.compras=(c.data||[]).map(r=>({id:r.id,nome:r.nome,cat:r.cat,bought:r.bought}))
   cache.financas=(f.data||[]).map(r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date}))
   cache.projetos=(p.data||[]).map(r=>({
@@ -59,7 +59,7 @@ async function loadAllData(){
 
 const tableMappers = {
   habitos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,tipo:r.tipo,done:r.done||[],created_at:r.createdAt}),
-  tarefas: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,prio:r.prio,prazo:r.prazo||null,done:r.done||false,created_at:r.createdAt}),
+  tarefas: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,prio:r.prio,prazo:r.prazo||null,done:r.done||false,is_daily:r.is_daily||false,seq:r.seq||0,created_at:r.createdAt}),
   compras: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,cat:r.cat,bought:r.bought||false}),
   financas: r=>({id:r.id,user_id:currentUser.id,descricao:r.desc,val:r.val,tipo:r.tipo,cat:r.cat,date:r.date}),
   projetos: r=>({
@@ -436,12 +436,23 @@ function addTarefa(){
   const nome = document.getElementById('tk-input').value.trim()
   const prio = document.getElementById('tk-prio').value
   const prazo = document.getElementById('tk-prazo').value
+  const is_daily = document.getElementById('tk-is-daily').checked
   if(!nome) return
   const list = S.get('tarefas')
-  list.push({id:Date.now(),nome,prio,prazo,done:false,createdAt:today()})
+  
+  let seq = 0
+  if(is_daily){
+    const daily = list.filter(t => t.is_daily && !t.done)
+    seq = daily.length ? Math.max(...daily.map(t => t.seq || 0)) + 1 : 1
+  }
+
+  list.push({id:Date.now(),nome,prio,prazo,done:false,is_daily,seq,createdAt:today()})
   S.set('tarefas',list)
+  
   document.getElementById('tk-input').value=''
   document.getElementById('tk-prazo').value=''
+  document.getElementById('tk-is-daily').checked = false
+  
   renderTarefas()
   updateStats()
 }
@@ -462,12 +473,38 @@ function deleteTarefa(id){
   updateStats()
 }
 
+function reorderTarefa(id, direction){
+  let list = S.get('tarefas')
+  const daily = list.filter(t => t.is_daily && !t.done).sort((a,b) => a.seq - b.seq)
+  const idx = daily.findIndex(t => t.id == id)
+  if(idx === -1) return
+  
+  if(direction === 'up' && idx > 0){
+    const current = daily[idx]
+    const prev = daily[idx-1]
+    const temp = current.seq
+    current.seq = prev.seq
+    prev.seq = temp
+  } else if(direction === 'down' && idx < daily.length - 1){
+    const current = daily[idx]
+    const next = daily[idx+1]
+    const temp = current.seq
+    current.seq = next.seq
+    next.seq = temp
+  }
+  
+  S.set('tarefas', list)
+  renderTarefas()
+}
+
 function renderTarefas(){
   const list = S.get('tarefas')
-  const pend = list.filter(t=>!t.done)
+  
+  const dailyPend = list.filter(t => !t.done && t.is_daily).sort((a,b) => a.seq - b.seq)
+  const laterPend = list.filter(t => !t.done && !t.is_daily).sort((a,b) => (a.prazo||'9999') > (b.prazo||'9999') ? 1 : -1)
   const done = list.filter(t=>t.done)
 
-  function makeItem(t){
+  function makeItem(t, isDaily = false){
     return `<div class="task-item">
       <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id})"></div>
       <div class="task-prio" style="background:${prioColors[t.prio]}"></div>
@@ -475,14 +512,29 @@ function renderTarefas(){
         <div class="task-name ${t.done?'done':''}">${t.nome}</div>
         <div class="task-meta">${t.prio} ${t.prazo?'· '+formatDate(t.prazo):''}</div>
       </div>
-      <button class="wd-btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">✕</button>
+      <div style="display:flex; gap:4px">
+        ${isDaily && !t.done ? `
+          <div class="tk-order-btns">
+            <button class="btn-order" onclick="reorderTarefa(${t.id}, 'up')">▲</button>
+            <button class="btn-order" onclick="reorderTarefa(${t.id}, 'down')">▼</button>
+          </div>
+        ` : ''}
+        <button class="wd-btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">✕</button>
+      </div>
     </div>`
   }
 
-  const pEl = document.getElementById('tk-list')
-  const dEl = document.getElementById('tk-done-list')
-  if(pEl) pEl.innerHTML = pend.length ? pend.map(makeItem).join('') : '<div class="empty">Nenhuma tarefa pendente 🎉</div>'
-  if(dEl) dEl.innerHTML = done.length ? done.map(makeItem).join('') : '<div class="empty">Nenhuma concluída ainda</div>'
+  const dailyEl = document.getElementById('tk-daily-list')
+  const laterEl = document.getElementById('tk-list')
+  const doneEl = document.getElementById('tk-done-list')
+  
+  if(dailyEl) dailyEl.innerHTML = dailyPend.length ? dailyPend.map(t => makeItem(t, true)).join('') : '<div class="empty">Nenhum foco definido para hoje 🎯</div>'
+  if(laterEl) laterEl.innerHTML = laterPend.length ? laterPend.map(t => makeItem(t, false)).join('') : '<div class="empty">Nenhuma tarefa para depois</div>'
+  if(doneEl) doneEl.innerHTML = done.length ? done.map(t => makeItem(t, false)).join('') : '<div class="empty">Nenhuma concluída ainda</div>'
+  
+  // Esconde/mostra cards se vazios (opcional)
+  const dailyCard = document.getElementById('tk-daily-card')
+  if(dailyCard) dailyCard.style.display = dailyPend.length ? 'block' : 'none'
 }
 
 function formatDate(d){
@@ -949,14 +1001,17 @@ function renderDashboard(){
   // tarefas mini
   const dtEl = document.getElementById('dash-tarefas-list')
   if(dtEl){
-    const pend = tarefas.filter(t=>!t.done).slice(0,5)
+    const dailyPend = tarefas.filter(t => !t.done && t.is_daily).sort((a,b) => a.seq - b.seq)
+    const laterPend = tarefas.filter(t => !t.done && !t.is_daily)
+    const pend = [...dailyPend, ...laterPend].slice(0,6)
+    
     if(!pend.length){dtEl.innerHTML='<div class="empty">Nenhuma tarefa pendente 🎉</div>'}
     else {
       dtEl.innerHTML = pend.map(t=>`<div class="task-item">
-        <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id})"></div>
+        <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id});renderDashboard()"></div>
         <div class="task-prio" style="background:${prioColors[t.prio]}"></div>
         <div class="task-body">
-          <div class="task-name">${t.nome}</div>
+          <div class="task-name ${t.done?'done':''}">${t.is_daily?'⭐ ':''}${t.nome}</div>
           <div class="task-meta">${t.prio}${t.prazo?' · '+formatDate(t.prazo):''}</div>
         </div>
       </div>`).join('')

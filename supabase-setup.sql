@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS public.tarefas (
   prio text not null default 'media',
   prazo text,
   done boolean not null default false,
+  is_daily boolean not null default false,
+  seq integer not null default 0,
   created_at text,
   primary key (id, user_id)
 );

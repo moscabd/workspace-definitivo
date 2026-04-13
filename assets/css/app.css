@@ -297,6 +297,23 @@ html, body {
 .task-meta{font-size:13px;color:var(--text3);margin-top:2px}
 .task-prio{width:7px;height:7px;border-radius:50%;margin-top:8px;flex-shrink:0}
 
+/* Novas Melhorias Tarefas */
+.tk-options-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; margin-top: 8px; }
+.tk-daily-toggle {
+  cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none;
+  background: var(--bg2); border: 1px solid var(--border2); padding: 7px 14px; border-radius: var(--r2);
+  font-size: 14px; transition: var(--transition);
+}
+.tk-daily-toggle input { display: none; }
+.tk-daily-toggle:has(input:checked) { background: rgba(245, 166, 35, 0.15); border-color: var(--accent3); color: var(--accent3); }
+.tk-order-btns { display: flex; flex-direction: column; gap: 2px; margin-right: 4px; }
+.btn-order { 
+  background: transparent; border: none; color: var(--text3); cursor: pointer; 
+  font-size: 12px; padding: 2px 4px; border-radius: 4px; transition: var(--transition);
+  line-height: 1;
+}
+.btn-order:hover { background: var(--bg3); color: var(--text1); }
+
 /* ════════════════════════════════════════
    FINANÇAS
 ════════════════════════════════════════ */
