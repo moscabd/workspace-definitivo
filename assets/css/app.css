@@ -354,10 +354,11 @@ html, body {
 /* ════════════════════════════════════════
    LISTA DE COMPRAS
 ════════════════════════════════════════ */
-.shop-tag{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:14px;color:var(--text2);margin:3px;cursor:pointer;transition:var(--transition)}
-.shop-tag:hover{border-color:var(--accent);color:var(--text1)}
+.shop-tag{display:flex;align-items:center;gap:12px;background:var(--bg3);border-bottom:1px solid var(--border);padding:12px 14px;font-size:15px;color:var(--text2);cursor:pointer;transition:var(--transition);width:100%;box-sizing:border-box}
+.shop-tag:last-child{border-bottom:none}
+.shop-tag:hover{background:rgba(255,255,255,0.02);color:var(--text1)}
 .shop-tag.bought{text-decoration:line-through;opacity:.4}
-.shop-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.shop-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* ════════════════════════════════════════
    INPUTS / FORMS

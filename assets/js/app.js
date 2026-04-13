@@ -603,11 +603,11 @@ function renderCompras(){
   const outros = list.filter(c=>c.cat!=='trabalho')
 
   function makeTag(c){
-    return `<span class="shop-tag ${c.bought?'bought':''}" onclick="toggleCompra(${c.id})">
-      <span class="shop-dot" style="background:${cpColors[c.cat]||'var(--text2)'}"></span>
-      ${c.nome}
-      <span onclick="event.stopPropagation();deleteCompra(${c.id})" style="margin-left:4px;color:var(--text3);font-size:13px">✕</span>
-    </span>`
+    return `<div class="shop-tag ${c.bought?'bought':''}" onclick="toggleCompra(${c.id})">
+      <div class="shop-dot" style="background:${cpColors[c.cat]||'var(--text2)'}"></div>
+      <div style="flex:1">${c.nome}</div>
+      <div onclick="event.stopPropagation();deleteCompra(${c.id})" style="padding:4px 8px;color:var(--text3);font-size:16px;cursor:pointer">✕</div>
+    </div>`
   }
 
   const tEl = document.getElementById('cp-trabalho')
