@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS public.habitos (
   user_id uuid not null references auth.users(id) on delete cascade,
   nome text not null,
   tipo text not null default 'rec',
+  duracao text,
+  hora text,
+  dias integer[] default '{0,1,2,3,4,5,6}',
   done text[] not null default '{}',
   created_at text,
   primary key (id, user_id)

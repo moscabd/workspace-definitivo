@@ -52,13 +52,14 @@ async function loadAllData(){
     notas:r.notas||'',
     rascunhos:r.rascunhos||'',
     plano:r.plano||'',
+    todo:r.todo||[],
     createdAt:r.created_at
   }))
   cache.brain=(b.data||[]).map(r=>({id:r.id,texto:r.texto,tag:r.tag,date:r.date}))
 }
 
 const tableMappers = {
-  habitos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,tipo:r.tipo,done:r.done||[],created_at:r.createdAt}),
+  habitos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],created_at:r.createdAt}),
   tarefas: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,prio:r.prio,prazo:r.prazo||null,done:r.done||false,is_daily:r.is_daily||false,seq:r.seq||0,created_at:r.createdAt}),
   compras: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,cat:r.cat,bought:r.bought||false}),
   financas: r=>({id:r.id,user_id:currentUser.id,descricao:r.desc,val:r.val,tipo:r.tipo,cat:r.cat,date:r.date}),
@@ -72,6 +73,7 @@ const tableMappers = {
     notas:r.notas||'',
     rascunhos:r.rascunhos||'',
     plano:r.plano||'',
+    todo:r.todo||[],
     created_at:r.createdAt
   }),
   brain: r=>({id:r.id,user_id:currentUser.id,texto:r.texto,tag:r.tag,date:r.date}),
@@ -473,6 +475,24 @@ function deleteTarefa(id){
   updateStats()
 }
 
+function toggleDailyTask(id){
+  let list = S.get('tarefas')
+  const t = list.find(x=>x.id==id)
+  if(!t) return
+  
+  t.is_daily = !t.is_daily
+  
+  if(t.is_daily){
+    const daily = list.filter(x => x.is_daily && !x.done)
+    t.seq = daily.length ? Math.max(...daily.map(x => x.seq || 0)) + 1 : 1
+  } else {
+    t.seq = 0
+  }
+  
+  S.set('tarefas', list)
+  renderTarefas()
+}
+
 function reorderTarefa(id, direction){
   let list = S.get('tarefas')
   const daily = list.filter(t => t.is_daily && !t.done).sort((a,b) => a.seq - b.seq)
@@ -513,6 +533,11 @@ function renderTarefas(){
         <div class="task-meta">${t.prio} ${t.prazo?'· '+formatDate(t.prazo):''}</div>
       </div>
       <div style="display:flex; gap:4px">
+        ${!t.done ? `
+          <button class="wd-btn btn-ghost btn-sm" onclick="toggleDailyTask(${t.id})" title="${t.is_daily?'Mover para Depois':'Mover para Hoje'}">
+            ${t.is_daily?'📦':'⭐'}
+          </button>
+        ` : ''}
         ${isDaily && !t.done ? `
           <div class="tk-order-btns">
             <button class="btn-order" onclick="reorderTarefa(${t.id}, 'up')">▲</button>
