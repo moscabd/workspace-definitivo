@@ -241,23 +241,19 @@
       </div>
 
       <div class="fin-summary" style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:10px">
-        <div class="fsum-cell" style="flex:1; min-width:140px">
-          <div class="fsum-label">Saldo Atual</div>
-          <div class="fsum-val" id="fn-saldo" style="color:var(--accent)">R$0,00</div>
+        <div class="fsum-cell" style="flex:1; min-width:130px; background:var(--bg3); border:1px solid var(--border)">
+          <div class="fsum-label">Saldo Bruto Total</div>
+          <div class="fsum-val" id="fn-saldo" style="color:var(--text1)">R$0,00</div>
         </div>
-        <div class="fsum-cell" style="flex:1; min-width:140px">
-          <div class="fsum-label">Total Entradas</div>
-          <div class="fsum-val v-in" id="fn-total-in">R$0,00</div>
+        <div class="fsum-cell" style="flex:1; min-width:130px; background:rgba(63,207,142,0.1); border:1px solid rgba(63,207,142,0.2)">
+          <div class="fsum-label">Poupança / Guardado <span style="cursor:pointer;opacity:0.7" onclick="editPoupanca()" title="Editar Poupança">✏️</span></div>
+          <div class="fsum-val" id="fn-poupanca" style="color:var(--accent2)">R$0,00</div>
         </div>
-        <div class="fsum-cell" style="flex:1; min-width:140px">
-          <div class="fsum-label">Total Saídas</div>
-          <div class="fsum-val v-out" id="fn-total-out">R$0,00</div>
+        <div class="fsum-cell" style="flex:1; min-width:130px; background:var(--bg2); border:1px solid var(--accent)">
+          <div class="fsum-label">Disponível p/ Uso</div>
+          <div class="fsum-val" id="fn-disponivel" style="color:var(--accent)">R$0,00</div>
         </div>
-        <div class="fsum-cell" style="flex:1; min-width:140px; background:var(--bg3); border-color:var(--border)">
-          <div class="fsum-label">A Receber (Pendente)</div>
-          <div class="fsum-val" id="fn-pend-in" style="color:var(--accent2); font-size:18px">R$0,00</div>
-        </div>
-        <div class="fsum-cell" style="flex:1; min-width:140px; background:var(--bg3); border-color:var(--border)">
+        <div class="fsum-cell" style="flex:1; min-width:130px; border-color:var(--border)">
           <div class="fsum-label">A Pagar (Pendente)</div>
           <div class="fsum-val" id="fn-pend-out" style="color:var(--accent4); font-size:18px">R$0,00</div>
         </div>
@@ -273,9 +269,15 @@
         <div id="fn-chart-empty" class="empty" style="display:none;padding:20px">Nenhuma saída registrada ainda</div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Lançamentos</div>
-        <div id="fn-list"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title" style="color:var(--accent4)">📅 Contas Fixas & Assinaturas</div>
+          <div id="fn-fixed-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💸 Lançamentos do Dia a Dia</div>
+          <div id="fn-list"></div>
+        </div>
       </div>
     </div>
 

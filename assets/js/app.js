@@ -741,42 +741,60 @@ function deleteFinanca(id){
   updateStats()
 }
 
+function editPoupanca() {
+  const current = localStorage.getItem('wd_poupanca') || '0';
+  const val = prompt('Qual o valor atual guardado na poupança/investimentos?\n(Apenas números e ponto)', current);
+  if(val !== null) {
+    const num = parseFloat(val.replace(',','.'));
+    if(!isNaN(num)) {
+      localStorage.setItem('wd_poupanca', num.toString());
+      renderFinancas();
+    }
+  }
+}
+
 function renderFinancas(){
   const list = S.get('financas')
   const totalIn = list.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const totalOut = list.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const pendIn = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
   const pendOut = list.filter(f=>f.tipo==='saida' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
-  const saldo = totalIn - totalOut
+  
+  const saldoBruto = totalIn - totalOut
+  const poupanca = parseFloat(localStorage.getItem('wd_poupanca') || '0')
+  const saldoDisponivel = saldoBruto - poupanca
 
   const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
 
-  const tiEl = document.getElementById('fn-total-in')
-  const toEl = document.getElementById('fn-total-out')
-  const fsEl = document.getElementById('fn-saldo')
+  const sEl = document.getElementById('fn-saldo')
+  const pEl = document.getElementById('fn-poupanca')
+  const dEl = document.getElementById('fn-disponivel')
   const piEl = document.getElementById('fn-pend-in')
   const poEl = document.getElementById('fn-pend-out')
 
-  if(tiEl) tiEl.textContent = fmtBRL(totalIn)
-  if(toEl) toEl.textContent = fmtBRL(totalOut)
-  if(fsEl){
-    fsEl.textContent = fmtBRL(saldo)
-    fsEl.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
+  if(sEl) {
+    sEl.textContent = fmtBRL(saldoBruto)
+    sEl.style.color = saldoBruto>=0 ? 'var(--text1)' : 'var(--accent4)'
+  }
+  if(pEl) pEl.textContent = fmtBRL(poupanca)
+  if(dEl) {
+    dEl.textContent = fmtBRL(saldoDisponivel)
+    dEl.style.color = saldoDisponivel>=0 ? 'var(--accent)' : 'var(--accent4)'
   }
   if(piEl) piEl.textContent = fmtBRL(pendIn)
   if(poEl) poEl.textContent = fmtBRL(pendOut)
 
   const lEl = document.getElementById('fn-list')
-  if(!lEl) return
-  if(!list.length){lEl.innerHTML='<div class="empty">Nenhum lançamento ainda</div>';return}
+  const flEl = document.getElementById('fn-fixed-list')
+  if(!lEl || !flEl) return
 
   const sortedList = [...list].sort((a,b) => {
     if(a.status==='pendente' && b.status!=='pendente') return -1;
     if(a.status!=='pendente' && b.status==='pendente') return 1;
-    return b.id - a.id;
+    return new Date(a.date).getTime() - new Date(b.date).getTime() || b.id - a.id;
   })
 
-  lEl.innerHTML = sortedList.map(f=>{
+  const renderItem = f => {
     const [bg,fg] = catColors[f.cat]||catColors.outro
     const isPend = f.status === 'pendente'
     return `<div class="fin-item ${isPend ? 'is-pend' : ''}">
@@ -786,7 +804,7 @@ function renderFinancas(){
           ${isPend ? '<span class="badge-pendente">Pendente</span>' : ''}
         </div>
         <span class="fin-cat-badge" style="background:${bg};color:${fg}">${f.cat}</span>
-        <span style="font-size:13px;color:var(--text3);margin-left:6px">${formatDate(f.date)}</span>
+        <span style="font-size:13px;color:var(--text3);margin-left:6px">🗓️ ${formatDate(f.date)}</span>
       </div>
       <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2).replace('.',',')}</div>
       <button class="wd-btn ${isPend ? 'btn-primary' : 'btn-ghost'} btn-sm" style="margin-left:8px" onclick="toggleFinancaStatus(${f.id})" title="${isPend?'Marcar como pago/recebido':'Voltar para pendente'}">
@@ -795,7 +813,13 @@ function renderFinancas(){
       <button class="wd-btn btn-ghost btn-sm" style="margin-left:4px" onclick="openEditFinanca(${f.id})" title="Editar Lançamento">✏️</button>
       <button class="wd-btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteFinanca(${f.id})">✕</button>
     </div>`
-  }).join('')
+  }
+
+  const fixedItems = sortedList.filter(f => f.cat === 'despesa-fixa')
+  const avulsoItems = sortedList.filter(f => f.cat !== 'despesa-fixa')
+
+  flEl.innerHTML = fixedItems.length ? fixedItems.map(renderItem).join('') : '<div class="empty">Nenhuma conta fixa</div>'
+  lEl.innerHTML = avulsoItems.length ? avulsoItems.map(renderItem).join('') : '<div class="empty">Nenhum lançamento no mês</div>'
 
   renderFinChart(list)
 }
@@ -1203,7 +1227,11 @@ function updateStats(){
   const done = expectedHabits.filter(h=>h.done.includes(t)).length + occDoneToday
   const totalIn = financas.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const totalOut = financas.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
-  const saldo = totalIn - totalOut
+  
+  const saldoBruto = totalIn - totalOut
+  const poupanca = parseFloat(localStorage.getItem('wd_poupanca') || '0')
+  const saldoDisponivel = saldoBruto - poupanca
+  
   const pendentes = tarefas.filter(t=>!t.done).length
 
   const dsh = document.getElementById('ds-habitos')
@@ -1214,8 +1242,9 @@ function updateStats(){
   if(dsh) dsh.textContent = `${done}/${total}`
   if(dst) dst.textContent = pendentes
   if(dss){
-    dss.textContent = 'R$'+saldo.toLocaleString('pt-BR',{minimumFractionDigits:0})
-    dss.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
+    dss.textContent = 'R$'+saldoDisponivel.toLocaleString('pt-BR',{minimumFractionDigits:0})
+    dss.style.color = saldoDisponivel>=0?'var(--accent2)':'var(--accent4)'
+    dss.title = `Bruto: R$ ${saldoBruto.toFixed(2)} | Guardado: R$ ${poupanca.toFixed(2)}`
   }
   if(thl) thl.textContent = `${done}/${total} hábitos hoje`
 }
