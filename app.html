@@ -218,7 +218,7 @@
     <!-- ═══ FINANÇAS ═══ -->
     <div class="page" id="page-financas">
       <div class="input-row">
-        <input class="wd-input" id="fn-desc" placeholder="Descrição / origem..." maxlength="200" oninput="autoPreencherFinanca()">
+        <input class="wd-input" id="fn-desc" placeholder="Descrição / origem..." maxlength="200">
         <input class="wd-input" id="fn-val" type="number" placeholder="Valor R$" style="flex:0 0 120px" min="0" step="0.01">
         <select class="wd-select" id="fn-tipo">
           <option value="entrada">📈 Entrada</option>
@@ -241,23 +241,23 @@
       </div>
 
       <div class="fin-summary" style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:10px">
-        <div class="fsum-cell" style="flex:1; min-width:130px; background:var(--bg2); border:1px solid var(--accent)">
-          <div class="fsum-label">Disponível p/ Uso</div>
-          <div class="fsum-val" id="fn-disponivel" style="color:var(--accent)">R$0,00</div>
+        <div class="fsum-cell" style="flex:1; min-width:140px">
+          <div class="fsum-label">Saldo Atual</div>
+          <div class="fsum-val" id="fn-saldo" style="color:var(--accent)">R$0,00</div>
         </div>
-        <div class="fsum-cell" style="flex:1; min-width:130px; background:var(--bg3); border:1px solid var(--border)">
-          <div class="fsum-label">Saldo Bruto Total</div>
-          <div class="fsum-val" id="fn-saldo" style="color:var(--text1)">R$0,00</div>
+        <div class="fsum-cell" style="flex:1; min-width:140px">
+          <div class="fsum-label">Total Entradas</div>
+          <div class="fsum-val v-in" id="fn-total-in">R$0,00</div>
         </div>
-        <div class="fsum-cell" style="flex:1; min-width:130px; background:rgba(63,207,142,0.1); border:1px solid rgba(63,207,142,0.2)">
-          <div class="fsum-label">Poupança / Guardado <span style="cursor:pointer;opacity:0.7" onclick="toggleEditPoupanca()" title="Editar Poupança">✏️</span></div>
-          <div id="fn-poupanca-view" class="fsum-val" style="color:var(--accent2)">R$0,00</div>
-          <div id="fn-poupanca-edit" style="display:none; align-items:center; gap:6px; margin-top:2px">
-            <input type="text" inputmode="decimal" id="inp-poupanca" class="wd-input" style="width:80px; padding:4px 8px; font-size:14px; height:28px" placeholder="0,00" onkeypress="if(event.key==='Enter') savePoupancaInline()">
-            <button class="wd-btn btn-primary btn-sm" style="padding:4px 8px; height:28px; min-width:30px" onclick="savePoupancaInline()">✓</button>
-          </div>
+        <div class="fsum-cell" style="flex:1; min-width:140px">
+          <div class="fsum-label">Total Saídas</div>
+          <div class="fsum-val v-out" id="fn-total-out">R$0,00</div>
         </div>
-        <div class="fsum-cell" style="flex:1; min-width:130px; border-color:var(--border)">
+        <div class="fsum-cell" style="flex:1; min-width:140px; background:var(--bg3); border-color:var(--border)">
+          <div class="fsum-label">A Receber (Pendente)</div>
+          <div class="fsum-val" id="fn-pend-in" style="color:var(--accent2); font-size:18px">R$0,00</div>
+        </div>
+        <div class="fsum-cell" style="flex:1; min-width:140px; background:var(--bg3); border-color:var(--border)">
           <div class="fsum-label">A Pagar (Pendente)</div>
           <div class="fsum-val" id="fn-pend-out" style="color:var(--accent4); font-size:18px">R$0,00</div>
         </div>
@@ -273,15 +273,9 @@
         <div id="fn-chart-empty" class="empty" style="display:none;padding:20px">Nenhuma saída registrada ainda</div>
       </div>
 
-      <div class="grid2">
-        <div class="card">
-          <div class="card-title" style="color:var(--accent4)">📅 Contas Fixas & Assinaturas</div>
-          <div id="fn-fixed-list"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">💸 Lançamentos do Dia a Dia</div>
-          <div id="fn-list"></div>
-        </div>
+      <div class="card">
+        <div class="card-title">Lançamentos</div>
+        <div id="fn-list"></div>
       </div>
     </div>
 
@@ -635,60 +629,6 @@
   </div>
 </div>
 
-<!-- MODAL EDITAR FINANÇA -->
-<div class="modal-overlay" id="modal-fin-edit">
-  <div class="modal">
-    <div class="modal-title">Editar Lançamento</div>
-    <input type="hidden" id="edit-fn-id">
-    <div class="form-group">
-      <label class="form-label">Descrição / Origem</label>
-      <input class="wd-input" id="edit-fn-desc" style="width:100%" maxlength="200">
-    </div>
-    <div class="grid2">
-      <div class="form-group">
-        <label class="form-label">Valor R$</label>
-        <input class="wd-input" id="edit-fn-val" type="number" style="width:100%" step="0.01">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Data</label>
-        <input class="wd-input" id="edit-fn-date" type="date" style="width:100%">
-      </div>
-    </div>
-    <div class="grid2">
-      <div class="form-group">
-        <label class="form-label">Tipo</label>
-        <select class="wd-select" id="edit-fn-tipo" style="width:100%">
-          <option value="entrada">📈 Entrada</option>
-          <option value="saida">📉 Saída</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Categoria</label>
-        <select class="wd-select" id="edit-fn-cat" style="width:100%">
-          <option value="trabalho">Trabalho</option>
-          <option value="despesa-fixa">Despesa Fixa</option>
-          <option value="lazer">Lazer</option>
-          <option value="alimentacao">Alimentação</option>
-          <option value="saude">Saúde</option>
-          <option value="investimento">Investimento</option>
-          <option value="outro">Outro</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Status</label>
-      <select class="wd-select" id="edit-fn-status" style="width:100%">
-        <option value="pago">✓ Pago/Recebido</option>
-        <option value="pendente">⏳ Pendente</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="wd-btn btn-ghost" onclick="closeModal('modal-fin-edit')">Cancelar</button>
-      <button class="wd-btn btn-primary" onclick="saveEditFinanca()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<script src="assets/js/app.js?v=7"></script>
+<script src="assets/js/app.js?v=8"></script>
 </body>
 </html>

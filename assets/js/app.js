@@ -198,8 +198,8 @@ function importAllData(event) {
     try {
       const data = JSON.parse(e.target.result);
       
-      // Validação básica (suporte a backups antigos)
-      const requiredKeys = ['habitos', 'tarefas'];
+      // Validação básica
+      const requiredKeys = ['habitos', 'tarefas', 'projetos'];
       const hasKeys = requiredKeys.every(k => k in data);
       
       if (!hasKeys) {
@@ -649,89 +649,11 @@ function toggleFinancaStatus(id){
   const list = S.get('financas')
   const f = list.find(x=>x.id==id)
   if(f){
-    const wasPending = f.status === 'pendente'
-    f.status = wasPending ? 'pago' : 'pendente'
-    
-    if(wasPending && f.cat === 'despesa-fixa'){
-      const d = new Date(f.date + 'T12:00:00')
-      d.setMonth(d.getMonth() + 1)
-      const nextDate = d.toISOString().split('T')[0]
-      list.push({
-        id: Date.now(),
-        desc: f.desc,
-        val: f.val,
-        tipo: f.tipo,
-        cat: f.cat,
-        date: nextDate,
-        status: 'pendente'
-      })
-    }
-
+    f.status = f.status === 'pendente' ? 'pago' : 'pendente'
     S.set('financas',list)
     renderFinancas()
     if(typeof updateStats === 'function') updateStats()
     if(typeof renderDashboard === 'function') renderDashboard()
-  }
-}
-
-function autoPreencherFinanca() {
-  const descInput = document.getElementById('fn-desc');
-  if(!descInput) return;
-  const typed = descInput.value.trim().toLowerCase();
-  if(typed.length < 3) return;
-
-  const list = S.get('financas');
-  const match = [...list].reverse().find(f => f.desc.toLowerCase().startsWith(typed));
-  
-  if(match) {
-    const tipoEl = document.getElementById('fn-tipo');
-    const catEl = document.getElementById('fn-cat');
-    if(tipoEl && catEl) {
-      tipoEl.value = match.tipo;
-      catEl.value = match.cat;
-    }
-  }
-}
-
-function openEditFinanca(id) {
-  const list = S.get('financas');
-  const f = list.find(x => x.id == id);
-  if(!f) return;
-  document.getElementById('edit-fn-id').value = f.id;
-  document.getElementById('edit-fn-desc').value = f.desc;
-  document.getElementById('edit-fn-val').value = f.val;
-  document.getElementById('edit-fn-tipo').value = f.tipo;
-  document.getElementById('edit-fn-cat').value = f.cat;
-  document.getElementById('edit-fn-date').value = f.date;
-  document.getElementById('edit-fn-status').value = f.status || 'pago';
-  openModal('modal-fin-edit');
-}
-
-function saveEditFinanca() {
-  const id = parseInt(document.getElementById('edit-fn-id').value);
-  const desc = document.getElementById('edit-fn-desc').value.trim();
-  const val = parseFloat(document.getElementById('edit-fn-val').value);
-  const tipo = document.getElementById('edit-fn-tipo').value;
-  const cat = document.getElementById('edit-fn-cat').value;
-  const date = document.getElementById('edit-fn-date').value;
-  const status = document.getElementById('edit-fn-status').value;
-  
-  if(!desc || isNaN(val) || val <= 0 || !date) return;
-  
-  const list = S.get('financas');
-  const f = list.find(x => x.id == id);
-  if(f) {
-    f.desc = desc;
-    f.val = val;
-    f.tipo = tipo;
-    f.cat = cat;
-    f.date = date;
-    f.status = status;
-    S.set('financas', list);
-    renderFinancas();
-    if(typeof updateStats === 'function') updateStats();
-    if(typeof renderDashboard === 'function') renderDashboard();
-    closeModal('modal-fin-edit');
   }
 }
 
@@ -741,78 +663,42 @@ function deleteFinanca(id){
   updateStats()
 }
 
-function toggleEditPoupanca() {
-  const view = document.getElementById('fn-poupanca-view');
-  const edit = document.getElementById('fn-poupanca-edit');
-  const inp = document.getElementById('inp-poupanca');
-  
-  if (view.style.display === 'none') {
-    view.style.display = 'block';
-    edit.style.display = 'none';
-  } else {
-    view.style.display = 'none';
-    edit.style.display = 'flex';
-    inp.value = localStorage.getItem('wd_poupanca') || '0';
-    inp.focus();
-  }
-}
-
-function savePoupancaInline() {
-  const inp = document.getElementById('inp-poupanca');
-  let raw = inp.value.replace(/[^\d,\.-]/g, ''); // Remove R$, letras e espaços
-  let valStr = raw.replace(/\./g, '').replace(',', '.');
-  let val = parseFloat(valStr);
-  if(isNaN(val)) val = 0;
-  
-  localStorage.setItem('wd_poupanca', val.toString());
-  renderFinancas();
-  if(typeof updateStats === 'function') updateStats();
-  
-  toggleEditPoupanca();
-}
-
 function renderFinancas(){
   const list = S.get('financas')
   const totalIn = list.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const totalOut = list.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const pendIn = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
   const pendOut = list.filter(f=>f.tipo==='saida' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
-  
-  const saldoBruto = totalIn - totalOut
-  const poupanca = parseFloat(localStorage.getItem('wd_poupanca') || '0')
-  const saldoDisponivel = saldoBruto - poupanca
+  const saldo = totalIn - totalOut
 
   const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
 
-  const sEl = document.getElementById('fn-saldo')
-  const pEl = document.getElementById('fn-poupanca-view')
-  const dEl = document.getElementById('fn-disponivel')
+  const tiEl = document.getElementById('fn-total-in')
+  const toEl = document.getElementById('fn-total-out')
+  const fsEl = document.getElementById('fn-saldo')
   const piEl = document.getElementById('fn-pend-in')
   const poEl = document.getElementById('fn-pend-out')
 
-  if(sEl) {
-    sEl.textContent = fmtBRL(saldoBruto)
-    sEl.style.color = saldoBruto>=0 ? 'var(--text1)' : 'var(--accent4)'
-  }
-  if(pEl) pEl.textContent = fmtBRL(poupanca)
-  if(dEl) {
-    dEl.textContent = fmtBRL(saldoDisponivel)
-    dEl.style.color = saldoDisponivel>=0 ? 'var(--accent)' : 'var(--accent4)'
+  if(tiEl) tiEl.textContent = fmtBRL(totalIn)
+  if(toEl) toEl.textContent = fmtBRL(totalOut)
+  if(fsEl){
+    fsEl.textContent = fmtBRL(saldo)
+    fsEl.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
   }
   if(piEl) piEl.textContent = fmtBRL(pendIn)
   if(poEl) poEl.textContent = fmtBRL(pendOut)
 
   const lEl = document.getElementById('fn-list')
-  const flEl = document.getElementById('fn-fixed-list')
-  if(!lEl || !flEl) return
+  if(!lEl) return
+  if(!list.length){lEl.innerHTML='<div class="empty">Nenhum lançamento ainda</div>';return}
 
   const sortedList = [...list].sort((a,b) => {
     if(a.status==='pendente' && b.status!=='pendente') return -1;
     if(a.status!=='pendente' && b.status==='pendente') return 1;
-    return new Date(a.date).getTime() - new Date(b.date).getTime() || b.id - a.id;
+    return b.id - a.id;
   })
 
-  const renderItem = f => {
+  lEl.innerHTML = sortedList.map(f=>{
     const [bg,fg] = catColors[f.cat]||catColors.outro
     const isPend = f.status === 'pendente'
     return `<div class="fin-item ${isPend ? 'is-pend' : ''}">
@@ -822,22 +708,15 @@ function renderFinancas(){
           ${isPend ? '<span class="badge-pendente">Pendente</span>' : ''}
         </div>
         <span class="fin-cat-badge" style="background:${bg};color:${fg}">${f.cat}</span>
-        <span style="font-size:13px;color:var(--text3);margin-left:6px">🗓️ ${formatDate(f.date)}</span>
+        <span style="font-size:13px;color:var(--text3);margin-left:6px">${formatDate(f.date)}</span>
       </div>
       <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2).replace('.',',')}</div>
       <button class="wd-btn ${isPend ? 'btn-primary' : 'btn-ghost'} btn-sm" style="margin-left:8px" onclick="toggleFinancaStatus(${f.id})" title="${isPend?'Marcar como pago/recebido':'Voltar para pendente'}">
         ${isPend ? '✓ Dar Baixa' : '↺'}
       </button>
-      <button class="wd-btn btn-ghost btn-sm" style="margin-left:4px" onclick="openEditFinanca(${f.id})" title="Editar Lançamento">✏️</button>
       <button class="wd-btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteFinanca(${f.id})">✕</button>
     </div>`
-  }
-
-  const fixedItems = sortedList.filter(f => f.cat === 'despesa-fixa')
-  const avulsoItems = sortedList.filter(f => f.cat !== 'despesa-fixa')
-
-  flEl.innerHTML = fixedItems.length ? fixedItems.map(renderItem).join('') : '<div class="empty">Nenhuma conta fixa</div>'
-  lEl.innerHTML = avulsoItems.length ? avulsoItems.map(renderItem).join('') : '<div class="empty">Nenhum lançamento no mês</div>'
+  }).join('')
 
   renderFinChart(list)
 }
@@ -1245,11 +1124,7 @@ function updateStats(){
   const done = expectedHabits.filter(h=>h.done.includes(t)).length + occDoneToday
   const totalIn = financas.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const totalOut = financas.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
-  
-  const saldoBruto = totalIn - totalOut
-  const poupanca = parseFloat(localStorage.getItem('wd_poupanca') || '0')
-  const saldoDisponivel = saldoBruto - poupanca
-  
+  const saldo = totalIn - totalOut
   const pendentes = tarefas.filter(t=>!t.done).length
 
   const dsh = document.getElementById('ds-habitos')
@@ -1260,9 +1135,8 @@ function updateStats(){
   if(dsh) dsh.textContent = `${done}/${total}`
   if(dst) dst.textContent = pendentes
   if(dss){
-    dss.textContent = 'R$'+saldoDisponivel.toLocaleString('pt-BR',{minimumFractionDigits:0})
-    dss.style.color = saldoDisponivel>=0?'var(--accent2)':'var(--accent4)'
-    dss.title = `Bruto: R$ ${saldoBruto.toFixed(2)} | Guardado: R$ ${poupanca.toFixed(2)}`
+    dss.textContent = 'R$'+saldo.toLocaleString('pt-BR',{minimumFractionDigits:0})
+    dss.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
   }
   if(thl) thl.textContent = `${done}/${total} hábitos hoje`
 }
