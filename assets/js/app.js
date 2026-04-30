@@ -759,7 +759,8 @@ function toggleEditPoupanca() {
 
 function savePoupancaInline() {
   const inp = document.getElementById('inp-poupanca');
-  let valStr = inp.value.trim().replace(',', '.');
+  let raw = inp.value.replace(/[^\d,\.-]/g, ''); // Remove R$, letras e espaços
+  let valStr = raw.replace(/\./g, '').replace(',', '.');
   let val = parseFloat(valStr);
   if(isNaN(val)) val = 0;
   
