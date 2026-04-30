@@ -101,13 +101,13 @@ async function syncTable(key,data){
 // ══════════════════════════════════════════
 const S = {
   get(k){return cache[k]||[]},
-  set(k,v){
+  async set(k,v){
     cache[k]=v;
     if(k==='vault_conf' || k==='senhas_enc'){
       localStorage.setItem('wd_local_'+k, JSON.stringify(v));
       return;
     }
-    syncTable(k,v);
+    await syncTable(k,v);
   },
   getSingle(k,d){
     if(k==='vault_conf' || k==='senhas_enc'){
