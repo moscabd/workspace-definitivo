@@ -85,9 +85,15 @@ async function syncTable(key,data){
     await db.from(key).delete().eq('user_id',currentUser.id)
     if(data.length>0){
       const {error}=await db.from(key).insert(data.map(tableMappers[key]))
-      if(error)console.error('Sync['+key+']',error)
+      if(error){
+        console.error('Sync['+key+']',error);
+        alert('Erro ao salvar ' + key + ' no banco de dados: ' + error.message);
+      }
     }
-  }catch(e){console.error('Sync error',e)}
+  }catch(e){
+    console.error('Sync error',e);
+    alert('Erro crítico ao sincronizar ' + key + ': ' + e.message);
+  }
 }
 
 // ══════════════════════════════════════════
