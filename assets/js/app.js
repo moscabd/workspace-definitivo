@@ -759,12 +759,14 @@ function toggleEditPoupanca() {
 
 function savePoupancaInline() {
   const inp = document.getElementById('inp-poupanca');
-  const val = parseFloat(inp.value.replace(',','.'));
-  if(!isNaN(val)) {
-    localStorage.setItem('wd_poupanca', val.toString());
-    renderFinancas();
-    if(typeof updateStats === 'function') updateStats();
-  }
+  let valStr = inp.value.trim().replace(',', '.');
+  let val = parseFloat(valStr);
+  if(isNaN(val)) val = 0;
+  
+  localStorage.setItem('wd_poupanca', val.toString());
+  renderFinancas();
+  if(typeof updateStats === 'function') updateStats();
+  
   toggleEditPoupanca();
 }
 

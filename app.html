@@ -253,7 +253,7 @@
           <div class="fsum-label">Poupança / Guardado <span style="cursor:pointer;opacity:0.7" onclick="toggleEditPoupanca()" title="Editar Poupança">✏️</span></div>
           <div id="fn-poupanca-view" class="fsum-val" style="color:var(--accent2)">R$0,00</div>
           <div id="fn-poupanca-edit" style="display:none; align-items:center; gap:6px; margin-top:2px">
-            <input type="number" id="inp-poupanca" class="wd-input" style="width:80px; padding:4px 8px; font-size:14px; height:28px" step="0.01">
+            <input type="text" inputmode="decimal" id="inp-poupanca" class="wd-input" style="width:80px; padding:4px 8px; font-size:14px; height:28px" placeholder="0,00">
             <button class="wd-btn btn-primary btn-sm" style="padding:4px 8px; height:28px; min-width:30px" onclick="savePoupancaInline()">✓</button>
           </div>
         </div>
@@ -689,6 +689,6 @@
   </div>
 </div>
 
-<script src="assets/js/app.js?v=4"></script>
+<script src="assets/js/app.js?v=5"></script>
 </body>
 </html>
