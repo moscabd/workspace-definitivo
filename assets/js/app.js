@@ -198,8 +198,8 @@ function importAllData(event) {
     try {
       const data = JSON.parse(e.target.result);
       
-      // Validação básica
-      const requiredKeys = ['habitos', 'tarefas', 'projetos'];
+      // Validação básica (suporte a backups antigos)
+      const requiredKeys = ['habitos', 'tarefas'];
       const hasKeys = requiredKeys.every(k => k in data);
       
       if (!hasKeys) {
