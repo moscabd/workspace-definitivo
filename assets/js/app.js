@@ -741,16 +741,31 @@ function deleteFinanca(id){
   updateStats()
 }
 
-function editPoupanca() {
-  const current = localStorage.getItem('wd_poupanca') || '0';
-  const val = prompt('Qual o valor atual guardado na poupança/investimentos?\n(Apenas números e ponto)', current);
-  if(val !== null) {
-    const num = parseFloat(val.replace(',','.'));
-    if(!isNaN(num)) {
-      localStorage.setItem('wd_poupanca', num.toString());
-      renderFinancas();
-    }
+function toggleEditPoupanca() {
+  const view = document.getElementById('fn-poupanca-view');
+  const edit = document.getElementById('fn-poupanca-edit');
+  const inp = document.getElementById('inp-poupanca');
+  
+  if (view.style.display === 'none') {
+    view.style.display = 'block';
+    edit.style.display = 'none';
+  } else {
+    view.style.display = 'none';
+    edit.style.display = 'flex';
+    inp.value = localStorage.getItem('wd_poupanca') || '0';
+    inp.focus();
   }
+}
+
+function savePoupancaInline() {
+  const inp = document.getElementById('inp-poupanca');
+  const val = parseFloat(inp.value.replace(',','.'));
+  if(!isNaN(val)) {
+    localStorage.setItem('wd_poupanca', val.toString());
+    renderFinancas();
+    if(typeof updateStats === 'function') updateStats();
+  }
+  toggleEditPoupanca();
 }
 
 function renderFinancas(){
@@ -767,7 +782,7 @@ function renderFinancas(){
   const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
 
   const sEl = document.getElementById('fn-saldo')
-  const pEl = document.getElementById('fn-poupanca')
+  const pEl = document.getElementById('fn-poupanca-view')
   const dEl = document.getElementById('fn-disponivel')
   const piEl = document.getElementById('fn-pend-in')
   const poEl = document.getElementById('fn-pend-out')

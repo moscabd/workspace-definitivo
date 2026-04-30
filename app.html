@@ -241,17 +241,21 @@
       </div>
 
       <div class="fin-summary" style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:10px">
+        <div class="fsum-cell" style="flex:1; min-width:130px; background:var(--bg2); border:1px solid var(--accent)">
+          <div class="fsum-label">Disponível p/ Uso</div>
+          <div class="fsum-val" id="fn-disponivel" style="color:var(--accent)">R$0,00</div>
+        </div>
         <div class="fsum-cell" style="flex:1; min-width:130px; background:var(--bg3); border:1px solid var(--border)">
           <div class="fsum-label">Saldo Bruto Total</div>
           <div class="fsum-val" id="fn-saldo" style="color:var(--text1)">R$0,00</div>
         </div>
         <div class="fsum-cell" style="flex:1; min-width:130px; background:rgba(63,207,142,0.1); border:1px solid rgba(63,207,142,0.2)">
-          <div class="fsum-label">Poupança / Guardado <span style="cursor:pointer;opacity:0.7" onclick="editPoupanca()" title="Editar Poupança">✏️</span></div>
-          <div class="fsum-val" id="fn-poupanca" style="color:var(--accent2)">R$0,00</div>
-        </div>
-        <div class="fsum-cell" style="flex:1; min-width:130px; background:var(--bg2); border:1px solid var(--accent)">
-          <div class="fsum-label">Disponível p/ Uso</div>
-          <div class="fsum-val" id="fn-disponivel" style="color:var(--accent)">R$0,00</div>
+          <div class="fsum-label">Poupança / Guardado <span style="cursor:pointer;opacity:0.7" onclick="toggleEditPoupanca()" title="Editar Poupança">✏️</span></div>
+          <div id="fn-poupanca-view" class="fsum-val" style="color:var(--accent2)">R$0,00</div>
+          <div id="fn-poupanca-edit" style="display:none; align-items:center; gap:6px; margin-top:2px">
+            <input type="number" id="inp-poupanca" class="wd-input" style="width:80px; padding:4px 8px; font-size:14px; height:28px" step="0.01">
+            <button class="wd-btn btn-primary btn-sm" style="padding:4px 8px; height:28px; min-width:30px" onclick="savePoupancaInline()">✓</button>
+          </div>
         </div>
         <div class="fsum-cell" style="flex:1; min-width:130px; border-color:var(--border)">
           <div class="fsum-label">A Pagar (Pendente)</div>
