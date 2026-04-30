@@ -62,8 +62,10 @@ CREATE TABLE IF NOT EXISTS public.financas (
   tipo text not null default 'saida',
   cat text not null default 'outro',
   date text,
+  status text not null default 'pago',
   primary key (id, user_id)
 );
+ALTER TABLE IF EXISTS public.financas ADD COLUMN IF NOT EXISTS status text not null default 'pago';
 ALTER TABLE public.financas ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "financas_policy" ON public.financas;
 CREATE POLICY "financas_policy" ON public.financas

@@ -42,7 +42,7 @@ async function loadAllData(){
   cache.habitos=(h.data||[]).map(r=>({id:r.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],createdAt:r.created_at}))
   cache.tarefas=(t.data||[]).map(r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,is_daily:r.is_daily,seq:r.seq||0,createdAt:r.created_at}))
   cache.compras=(c.data||[]).map(r=>({id:r.id,nome:r.nome,cat:r.cat,bought:r.bought}))
-  cache.financas=(f.data||[]).map(r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date}))
+  cache.financas=(f.data||[]).map(r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date,status:r.status||'pago'}))
   cache.projetos=(p.data||[]).map(r=>({
     id:r.id,
     nome:r.nome,
@@ -62,7 +62,7 @@ const tableMappers = {
   habitos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],created_at:r.createdAt}),
   tarefas: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,prio:r.prio,prazo:r.prazo||null,done:r.done||false,is_daily:r.is_daily||false,seq:r.seq||0,created_at:r.createdAt}),
   compras: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,cat:r.cat,bought:r.bought||false}),
-  financas: r=>({id:r.id,user_id:currentUser.id,descricao:r.desc,val:r.val,tipo:r.tipo,cat:r.cat,date:r.date}),
+  financas: r=>({id:r.id,user_id:currentUser.id,descricao:r.desc,val:r.val,tipo:r.tipo,cat:r.cat,date:r.date,status:r.status||'pago'}),
   projetos: r=>({
     id:r.id,
     user_id:currentUser.id,
@@ -634,14 +634,27 @@ function addFinanca(){
   const val = parseFloat(document.getElementById('fn-val').value)
   const tipo = document.getElementById('fn-tipo').value
   const cat = document.getElementById('fn-cat').value
+  const status = document.getElementById('fn-status') ? document.getElementById('fn-status').value : 'pago'
   if(!desc || isNaN(val) || val<=0) return
   const list = S.get('financas')
-  list.push({id:Date.now(),desc,val,tipo,cat,date:today()})
+  list.push({id:Date.now(),desc,val,tipo,cat,date:today(),status})
   S.set('financas',list)
   document.getElementById('fn-desc').value=''
   document.getElementById('fn-val').value=''
   renderFinancas()
   updateStats()
+}
+
+function toggleFinancaStatus(id){
+  const list = S.get('financas')
+  const f = list.find(x=>x.id==id)
+  if(f){
+    f.status = f.status === 'pendente' ? 'pago' : 'pendente'
+    S.set('financas',list)
+    renderFinancas()
+    if(typeof updateStats === 'function') updateStats()
+    if(typeof renderDashboard === 'function') renderDashboard()
+  }
 }
 
 function deleteFinanca(id){
@@ -652,8 +665,10 @@ function deleteFinanca(id){
 
 function renderFinancas(){
   const list = S.get('financas')
-  const totalIn = list.filter(f=>f.tipo==='entrada').reduce((a,f)=>a+f.val,0)
-  const totalOut = list.filter(f=>f.tipo==='saida').reduce((a,f)=>a+f.val,0)
+  const totalIn = list.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
+  const totalOut = list.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
+  const pendIn = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
+  const pendOut = list.filter(f=>f.tipo==='saida' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
   const saldo = totalIn - totalOut
 
   const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
@@ -661,27 +676,45 @@ function renderFinancas(){
   const tiEl = document.getElementById('fn-total-in')
   const toEl = document.getElementById('fn-total-out')
   const fsEl = document.getElementById('fn-saldo')
+  const piEl = document.getElementById('fn-pend-in')
+  const poEl = document.getElementById('fn-pend-out')
+
   if(tiEl) tiEl.textContent = fmtBRL(totalIn)
   if(toEl) toEl.textContent = fmtBRL(totalOut)
   if(fsEl){
     fsEl.textContent = fmtBRL(saldo)
     fsEl.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
   }
+  if(piEl) piEl.textContent = fmtBRL(pendIn)
+  if(poEl) poEl.textContent = fmtBRL(pendOut)
 
   const lEl = document.getElementById('fn-list')
   if(!lEl) return
   if(!list.length){lEl.innerHTML='<div class="empty">Nenhum lançamento ainda</div>';return}
 
-  lEl.innerHTML = [...list].reverse().map(f=>{
+  const sortedList = [...list].sort((a,b) => {
+    if(a.status==='pendente' && b.status!=='pendente') return -1;
+    if(a.status!=='pendente' && b.status==='pendente') return 1;
+    return b.id - a.id;
+  })
+
+  lEl.innerHTML = sortedList.map(f=>{
     const [bg,fg] = catColors[f.cat]||catColors.outro
-    return `<div class="fin-item">
+    const isPend = f.status === 'pendente'
+    return `<div class="fin-item ${isPend ? 'is-pend' : ''}">
       <div class="fin-info">
-        <div class="fin-origin">${f.desc}</div>
+        <div class="fin-origin">
+          ${f.desc}
+          ${isPend ? '<span class="badge-pendente">Pendente</span>' : ''}
+        </div>
         <span class="fin-cat-badge" style="background:${bg};color:${fg}">${f.cat}</span>
         <span style="font-size:13px;color:var(--text3);margin-left:6px">${formatDate(f.date)}</span>
       </div>
       <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2).replace('.',',')}</div>
-      <button class="wd-btn btn-danger btn-sm" style="margin-left:8px" onclick="deleteFinanca(${f.id})">✕</button>
+      <button class="wd-btn ${isPend ? 'btn-primary' : 'btn-ghost'} btn-sm" style="margin-left:8px" onclick="toggleFinancaStatus(${f.id})" title="${isPend?'Marcar como pago/recebido':'Voltar para pendente'}">
+        ${isPend ? '✓ Dar Baixa' : '↺'}
+      </button>
+      <button class="wd-btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteFinanca(${f.id})">✕</button>
     </div>`
   }).join('')
 
@@ -1065,9 +1098,10 @@ function renderDashboard(){
     if(!financas.length){dfEl.innerHTML='<div class="empty">Nenhum lançamento</div>'}
     else{
       dfEl.innerHTML = [...financas].reverse().slice(0,4).map(f=>{
-        return `<div class="fin-item">
-          <div class="fin-info"><div class="fin-origin" style="font-size:15px">${f.desc}</div></div>
-          <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}" style="font-size:15px">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2)}</div>
+        const isPend = f.status === 'pendente'
+        return `<div class="fin-item ${isPend ? 'is-pend' : ''}">
+          <div class="fin-info"><div class="fin-origin" style="font-size:15px">${f.desc}${isPend ? ' <span class="badge-pendente">Pend.</span>' : ''}</div></div>
+          <div class="fin-val ${f.tipo==='entrada'?'v-in':'v-out'}" style="font-size:15px">${f.tipo==='entrada'?'+':'-'}R$${f.val.toFixed(2).replace('.',',')}</div>
         </div>`
       }).join('')
     }
@@ -1088,8 +1122,8 @@ function updateStats(){
   
   const total = expectedHabits.length
   const done = expectedHabits.filter(h=>h.done.includes(t)).length + occDoneToday
-  const totalIn = financas.filter(f=>f.tipo==='entrada').reduce((a,f)=>a+f.val,0)
-  const totalOut = financas.filter(f=>f.tipo==='saida').reduce((a,f)=>a+f.val,0)
+  const totalIn = financas.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
+  const totalOut = financas.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const saldo = totalIn - totalOut
   const pendentes = tarefas.filter(t=>!t.done).length
 

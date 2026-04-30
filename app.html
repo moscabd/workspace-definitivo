@@ -233,21 +233,33 @@
           <option value="investimento">Investimento</option>
           <option value="outro">Outro</option>
         </select>
+        <select class="wd-select" id="fn-status">
+          <option value="pago">✓ Pago/Recebido</option>
+          <option value="pendente">⏳ Pendente</option>
+        </select>
         <button class="wd-btn btn-primary" onclick="addFinanca()">+ Lançar</button>
       </div>
 
-      <div class="fin-summary" style="margin-bottom:14px">
-        <div class="fsum-cell">
-          <div class="fsum-label">Total entradas</div>
+      <div class="fin-summary" style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:10px">
+        <div class="fsum-cell" style="flex:1; min-width:140px">
+          <div class="fsum-label">Saldo Atual</div>
+          <div class="fsum-val" id="fn-saldo" style="color:var(--accent)">R$0,00</div>
+        </div>
+        <div class="fsum-cell" style="flex:1; min-width:140px">
+          <div class="fsum-label">Total Entradas</div>
           <div class="fsum-val v-in" id="fn-total-in">R$0,00</div>
         </div>
-        <div class="fsum-cell">
-          <div class="fsum-label">Total saídas</div>
+        <div class="fsum-cell" style="flex:1; min-width:140px">
+          <div class="fsum-label">Total Saídas</div>
           <div class="fsum-val v-out" id="fn-total-out">R$0,00</div>
         </div>
-        <div class="fsum-cell">
-          <div class="fsum-label">Saldo</div>
-          <div class="fsum-val" id="fn-saldo" style="color:var(--accent)">R$0,00</div>
+        <div class="fsum-cell" style="flex:1; min-width:140px; background:var(--bg3); border-color:var(--border)">
+          <div class="fsum-label">A Receber (Pendente)</div>
+          <div class="fsum-val" id="fn-pend-in" style="color:var(--accent2); font-size:18px">R$0,00</div>
+        </div>
+        <div class="fsum-cell" style="flex:1; min-width:140px; background:var(--bg3); border-color:var(--border)">
+          <div class="fsum-label">A Pagar (Pendente)</div>
+          <div class="fsum-val" id="fn-pend-out" style="color:var(--accent4); font-size:18px">R$0,00</div>
         </div>
       </div>
 
