@@ -649,11 +649,89 @@ function toggleFinancaStatus(id){
   const list = S.get('financas')
   const f = list.find(x=>x.id==id)
   if(f){
-    f.status = f.status === 'pendente' ? 'pago' : 'pendente'
+    const wasPending = f.status === 'pendente'
+    f.status = wasPending ? 'pago' : 'pendente'
+    
+    if(wasPending && f.cat === 'despesa-fixa'){
+      const d = new Date(f.date + 'T12:00:00')
+      d.setMonth(d.getMonth() + 1)
+      const nextDate = d.toISOString().split('T')[0]
+      list.push({
+        id: Date.now(),
+        desc: f.desc,
+        val: f.val,
+        tipo: f.tipo,
+        cat: f.cat,
+        date: nextDate,
+        status: 'pendente'
+      })
+    }
+
     S.set('financas',list)
     renderFinancas()
     if(typeof updateStats === 'function') updateStats()
     if(typeof renderDashboard === 'function') renderDashboard()
+  }
+}
+
+function autoPreencherFinanca() {
+  const descInput = document.getElementById('fn-desc');
+  if(!descInput) return;
+  const typed = descInput.value.trim().toLowerCase();
+  if(typed.length < 3) return;
+
+  const list = S.get('financas');
+  const match = [...list].reverse().find(f => f.desc.toLowerCase().startsWith(typed));
+  
+  if(match) {
+    const tipoEl = document.getElementById('fn-tipo');
+    const catEl = document.getElementById('fn-cat');
+    if(tipoEl && catEl) {
+      tipoEl.value = match.tipo;
+      catEl.value = match.cat;
+    }
+  }
+}
+
+function openEditFinanca(id) {
+  const list = S.get('financas');
+  const f = list.find(x => x.id == id);
+  if(!f) return;
+  document.getElementById('edit-fn-id').value = f.id;
+  document.getElementById('edit-fn-desc').value = f.desc;
+  document.getElementById('edit-fn-val').value = f.val;
+  document.getElementById('edit-fn-tipo').value = f.tipo;
+  document.getElementById('edit-fn-cat').value = f.cat;
+  document.getElementById('edit-fn-date').value = f.date;
+  document.getElementById('edit-fn-status').value = f.status || 'pago';
+  openModal('modal-fin-edit');
+}
+
+function saveEditFinanca() {
+  const id = parseInt(document.getElementById('edit-fn-id').value);
+  const desc = document.getElementById('edit-fn-desc').value.trim();
+  const val = parseFloat(document.getElementById('edit-fn-val').value);
+  const tipo = document.getElementById('edit-fn-tipo').value;
+  const cat = document.getElementById('edit-fn-cat').value;
+  const date = document.getElementById('edit-fn-date').value;
+  const status = document.getElementById('edit-fn-status').value;
+  
+  if(!desc || isNaN(val) || val <= 0 || !date) return;
+  
+  const list = S.get('financas');
+  const f = list.find(x => x.id == id);
+  if(f) {
+    f.desc = desc;
+    f.val = val;
+    f.tipo = tipo;
+    f.cat = cat;
+    f.date = date;
+    f.status = status;
+    S.set('financas', list);
+    renderFinancas();
+    if(typeof updateStats === 'function') updateStats();
+    if(typeof renderDashboard === 'function') renderDashboard();
+    closeModal('modal-fin-edit');
   }
 }
 
@@ -714,6 +792,7 @@ function renderFinancas(){
       <button class="wd-btn ${isPend ? 'btn-primary' : 'btn-ghost'} btn-sm" style="margin-left:8px" onclick="toggleFinancaStatus(${f.id})" title="${isPend?'Marcar como pago/recebido':'Voltar para pendente'}">
         ${isPend ? '✓ Dar Baixa' : '↺'}
       </button>
+      <button class="wd-btn btn-ghost btn-sm" style="margin-left:4px" onclick="openEditFinanca(${f.id})" title="Editar Lançamento">✏️</button>
       <button class="wd-btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteFinanca(${f.id})">✕</button>
     </div>`
   }).join('')
