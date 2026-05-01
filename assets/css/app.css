@@ -652,6 +652,43 @@ html, body {
 }
 
 /* ════════════════════════════════════════
+   FINANCE — METAS / BUDGET
+════════════════════════════════════════ */
+.meta-item {
+  margin-bottom: 16px;
+}
+.meta-item:last-child { margin-bottom: 0; }
+.meta-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.meta-info { display: flex; align-items: center; gap: 8px; }
+.meta-dot { width: 8px; height: 8px; border-radius: 50%; }
+.meta-label { font-size: 14px; font-weight: 500; color: var(--text2); }
+.meta-values { font-size: 13px; color: var(--text3); }
+.meta-spent { font-weight: 600; color: var(--text1); }
+.meta-limit-btn {
+  background: none; border: none; padding: 0; margin: 0;
+  color: var(--accent); cursor: pointer; font-size: inherit;
+  font-family: inherit; font-weight: 500;
+  border-bottom: 1px dashed var(--accent);
+}
+.meta-limit-btn:hover { color: var(--text1); border-bottom-color: var(--text1); }
+
+.meta-progress-bg {
+  height: 6px; background: var(--bg3); border-radius: 10px;
+  overflow: hidden;
+}
+.meta-progress-fill {
+  height: 100%; transition: width 0.4s ease;
+}
+
+/* Status variants */
+.meta-warning .meta-spent { color: var(--accent3); }
+.meta-over .meta-spent { color: var(--accent4); }
+.meta-over .meta-progress-fill { background: var(--accent4) !important; }
+
+/* ════════════════════════════════════════
    TOAST NOTIFICATIONS
 ════════════════════════════════════════ */
 #toast-container {

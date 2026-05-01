@@ -912,6 +912,7 @@ function renderFinancas(){
   }).join('')
 
   renderFinChart(list)
+  renderMetasFinanceiras(list)
 }
 
 // ══════════════════════════════════════════
@@ -1029,6 +1030,76 @@ function renderFinChart(list){
       </div>`
   }).join('')
 }
+
+// ══════════════════════════════════════════
+//  METAS FINANCEIRAS
+// ══════════════════════════════════════════
+function renderMetasFinanceiras(list){
+  const el = document.getElementById('fn-metas-list')
+  if(!el) return
+  
+  // Apenas saídas pagas deste período
+  const saidas = list.filter(f=>f.tipo==='saida' && f.status==='pago')
+  const spentByCat = {}
+  saidas.forEach(s => {
+    spentByCat[s.cat] = (spentByCat[s.cat] || 0) + s.val
+  })
+
+  const metas = JSON.parse(localStorage.getItem('wd_fin_metas') || '{}')
+  const cats = Object.keys(catLabels)
+  
+  const fmtBRL = v => 'R$' + v.toLocaleString('pt-BR',{minimumFractionDigits:0})
+
+  el.innerHTML = cats.map(cat => {
+    // Escondemos metas para entradas (trabalho) e investimentos (que são reserva)
+    if(cat === 'trabalho' || cat === 'investimento') return ''; 
+    
+    const spent = spentByCat[cat] || 0
+    const limit = metas[cat] || 0
+    const pct = limit > 0 ? Math.min(100, (spent / limit) * 100) : 0
+    const color = chartPalette[cat] || 'var(--accent)'
+    const label = catLabels[cat]
+    
+    let statusClass = ''
+    if(limit > 0 && spent > limit) statusClass = 'meta-over'
+    else if(limit > 0 && pct > 80) statusClass = 'meta-warning'
+
+    return `
+      <div class="meta-item ${statusClass}">
+        <div class="meta-header">
+          <div class="meta-info">
+            <span class="meta-dot" style="background:${color}"></span>
+            <span class="meta-label">${label}</span>
+          </div>
+          <div class="meta-values">
+            <span class="meta-spent">${fmtBRL(spent)}</span>
+            <span class="meta-sep">/</span>
+            <button class="meta-limit-btn" onclick="promptMeta('${cat}')">${limit > 0 ? fmtBRL(limit) : 'Definir meta'}</button>
+          </div>
+        </div>
+        <div class="meta-progress-bg">
+          <div class="meta-progress-fill" style="width:${pct}%; background:${color}"></div>
+        </div>
+      </div>`
+  }).join('')
+}
+
+function promptMeta(cat){
+  const metas = JSON.parse(localStorage.getItem('wd_fin_metas') || '{}')
+  const current = metas[cat] || ''
+  const val = prompt(`Definir limite mensal para ${catLabels[cat]}:`, current)
+  if(val === null) return
+  const n = parseFloat(val.replace(',','.'))
+  if(isNaN(n) || n < 0){
+    showToast('Valor inválido', 'error')
+    return
+  }
+  metas[cat] = n
+  localStorage.setItem('wd_fin_metas', JSON.stringify(metas))
+  renderFinancas()
+  showToast(`Meta de ${catLabels[cat]} atualizada`, 'success')
+}
+
 
 
 // ══════════════════════════════════════════
