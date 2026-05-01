@@ -619,6 +619,39 @@ html, body {
 }
 
 /* ════════════════════════════════════════
+   FINANCE — SALDO GRID (3 CARDS)
+════════════════════════════════════════ */
+.fin-saldo-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 10px;
+}
+.fsum-disponivel {
+  background: linear-gradient(135deg, rgba(63,207,142,0.12) 0%, rgba(108,99,255,0.08) 100%);
+  border-color: rgba(63,207,142,0.35) !important;
+}
+.fsum-poupanca {
+  background: rgba(56,189,248,0.07);
+  border-color: rgba(56,189,248,0.3) !important;
+}
+.poup-edit-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; padding: 2px 5px; border-radius: 6px;
+  opacity: 0.6; transition: opacity 0.2s;
+  line-height: 1;
+}
+.poup-edit-btn:hover { opacity: 1; }
+
+@media(max-width: 700px){
+  .fin-saldo-grid { grid-template-columns: 1fr 1fr; }
+  .fsum-disponivel { grid-column: 1 / -1; }
+}
+@media(max-width: 440px){
+  .fin-saldo-grid { grid-template-columns: 1fr; }
+  .fsum-disponivel { grid-column: auto; }
+}
+
+/* ════════════════════════════════════════
    TOAST NOTIFICATIONS
 ════════════════════════════════════════ */
 #toast-container {

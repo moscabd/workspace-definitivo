@@ -818,31 +818,68 @@ function deleteFinanca(id){
   updateStats()
 }
 
+// ---- Poupança ----
+function togglePoupancaEdit(){
+  const editEl = document.getElementById('fn-poupanca-edit')
+  const dispEl = document.getElementById('fn-poupanca-display')
+  const input  = document.getElementById('fn-poupanca-input')
+  if(editEl.style.display==='none'){
+    const current = parseFloat(localStorage.getItem('wd_poupanca')||'0')
+    input.value = current > 0 ? current.toFixed(2) : ''
+    editEl.style.display='block'
+    dispEl.style.display='none'
+    input.focus(); input.select()
+  } else {
+    cancelPoupancaEdit()
+  }
+}
+
+function savePoupanca(){
+  const val = parseFloat(document.getElementById('fn-poupanca-input').value)
+  if(isNaN(val)||val<0){ showToast('Valor inválido','error'); return }
+  localStorage.setItem('wd_poupanca', val.toFixed(2))
+  cancelPoupancaEdit()
+  renderFinancas()
+  updateStats()
+  renderDashboard()
+  showToast('Poupança atualizada ✓','success',2000)
+}
+
+function cancelPoupancaEdit(){
+  document.getElementById('fn-poupanca-edit').style.display='none'
+  document.getElementById('fn-poupanca-display').style.display='block'
+}
+
 function renderFinancas(){
   const allList = S.get('financas')
   const list = filterByPeriod(allList)
-  const totalIn = list.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
-  const totalOut = list.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
-  const pendIn = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
-  const pendOut = list.filter(f=>f.tipo==='saida' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
-  const saldo = totalIn - totalOut
+  // Saldo bruto sempre sobre TODOS os lançamentos pagos
+  const allPaid = S.get('financas')
+  const totalIn  = allPaid.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
+  const totalOut = allPaid.filter(f=>f.tipo==='saida'   && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
+  const pendIn   = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
+  const pendOut  = list.filter(f=>f.tipo==='saida'   && f.status==='pendente').reduce((a,f)=>a+f.val,0)
+  const saldo    = totalIn - totalOut
+  const poupanca = parseFloat(localStorage.getItem('wd_poupanca')||'0')
+  const disponivel = saldo - poupanca
 
   const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
 
-  const tiEl = document.getElementById('fn-total-in')
-  const toEl = document.getElementById('fn-total-out')
-  const fsEl = document.getElementById('fn-saldo')
-  const piEl = document.getElementById('fn-pend-in')
-  const poEl = document.getElementById('fn-pend-out')
+  const tiEl   = document.getElementById('fn-total-in')
+  const toEl   = document.getElementById('fn-total-out')
+  const fsEl   = document.getElementById('fn-saldo')
+  const piEl   = document.getElementById('fn-pend-in')
+  const poEl   = document.getElementById('fn-pend-out')
+  const dispEl = document.getElementById('fn-disponivel')
+  const poupEl = document.getElementById('fn-poupanca-display')
 
   if(tiEl) tiEl.textContent = fmtBRL(totalIn)
   if(toEl) toEl.textContent = fmtBRL(totalOut)
-  if(fsEl){
-    fsEl.textContent = fmtBRL(saldo)
-    fsEl.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
-  }
+  if(fsEl){ fsEl.textContent = fmtBRL(saldo); fsEl.style.color = saldo>=0?'var(--accent)':'var(--accent4)' }
   if(piEl) piEl.textContent = fmtBRL(pendIn)
   if(poEl) poEl.textContent = fmtBRL(pendOut)
+  if(dispEl){ dispEl.textContent = fmtBRL(disponivel); dispEl.style.color = disponivel>=0?'var(--accent2)':'var(--accent4)' }
+  if(poupEl) poupEl.textContent = fmtBRL(poupanca)
 
   const lEl = document.getElementById('fn-list')
   if(!lEl) return
@@ -1317,21 +1354,30 @@ function updateStats(){
   const totalIn = financas.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const totalOut = financas.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const saldo = totalIn - totalOut
+  const poupanca = parseFloat(localStorage.getItem('wd_poupanca')||'0')
+  const disponivel = saldo - poupanca
   const pendentes = tarefas.filter(t=>!t.done).length
 
-  const dsh = document.getElementById('ds-habitos')
-  const dst = document.getElementById('ds-tarefas')
-  const dss = document.getElementById('ds-saldo')
-  const thl = document.getElementById('todayHabitsLabel')
+  const dsh   = document.getElementById('ds-habitos')
+  const dst   = document.getElementById('ds-tarefas')
+  const dss   = document.getElementById('ds-saldo')
+  const dssub = document.getElementById('ds-saldo-sub')
+  const thl   = document.getElementById('todayHabitsLabel')
 
   if(dsh) dsh.textContent = `${done}/${total}`
   if(dst) dst.textContent = pendentes
   if(dss){
-    dss.textContent = 'R$'+saldo.toLocaleString('pt-BR',{minimumFractionDigits:0})
-    dss.style.color = saldo>=0?'var(--accent2)':'var(--accent4)'
+    dss.textContent = 'R$'+disponivel.toLocaleString('pt-BR',{minimumFractionDigits:0})
+    dss.style.color = disponivel>=0?'var(--accent2)':'var(--accent4)'
+  }
+  if(dssub){
+    dssub.textContent = poupanca>0
+      ? `Bruto: R$${saldo.toLocaleString('pt-BR',{minimumFractionDigits:0})} · 🐷 R$${poupanca.toLocaleString('pt-BR',{minimumFractionDigits:0})} guardado`
+      : ''
   }
   if(thl) thl.textContent = `${done}/${total} hábitos hoje`
 }
+
 
 // ══════════════════════════════════════════
 //  MODAIS
