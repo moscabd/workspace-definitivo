@@ -7,7 +7,7 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.3.0'
+const APP_VERSION = '1.4.0'
 
 // ══════════════════════════════════════════
 //  SECURITY
