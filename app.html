@@ -9,7 +9,7 @@
 <title>Workspace Definitivo</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="assets/css/app.css?v=10">
+<link rel="stylesheet" href="assets/css/app.css?v=11">
 <link rel="icon" type="image/png" href="assets/img/icon.png">
 <link rel="apple-touch-icon" href="assets/img/icon.png">
 <link rel="manifest" href="manifest.json">
@@ -84,6 +84,16 @@
 
     <!-- ═══ DASHBOARD ═══ -->
     <div class="page active" id="page-dashboard">
+
+      <!-- Greeting bar -->
+      <div class="dash-greeting-bar">
+        <div>
+          <div id="dash-greeting" class="dash-greeting-text">Bom dia 👋</div>
+          <div id="dash-summary" class="dash-summary-text"></div>
+        </div>
+        <div id="dash-score" class="dash-score-box"></div>
+      </div>
+
       <div class="dash-grid">
 
         <!-- Stat chips -->
@@ -132,8 +142,9 @@
 
     <!-- ═══ HÁBITOS ═══ -->
     <div class="page" id="page-habitos">
-      <div style="display:flex;gap:10px;margin-bottom:20px">
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
         <button class="wd-btn btn-primary" onclick="openHabitModal()">+ Novo Hábito</button>
+        <button class="wd-btn btn-ghost" onclick="markAllHabitos()">&#10003; Marcar Todos</button>
       </div>
 
       <div class="grid2">
@@ -156,7 +167,7 @@
     <!-- ═══ TAREFAS ═══ -->
     <div class="page" id="page-tarefas">
       <div class="input-row">
-        <input class="wd-input" id="tk-input" placeholder="Descreva a tarefa..." maxlength="300">
+        <input class="wd-input" id="tk-input" placeholder="Descreva a tarefa..." maxlength="300" onkeydown="if(event.key==='Enter')addTarefa()">
         
         <div class="tk-options-row">
           <label class="tk-daily-toggle">
@@ -238,6 +249,14 @@
           <option value="pendente">⏳ Pendente</option>
         </select>
         <button class="wd-btn btn-primary" onclick="addFinanca()">+ Lançar</button>
+      </div>
+
+      <!-- Filtro de Período -->
+      <div class="fn-period-filter" style="margin-bottom:14px">
+        <button class="fn-period-btn" data-period="hoje" onclick="setFnPeriod('hoje')">Hoje</button>
+        <button class="fn-period-btn" data-period="semana" onclick="setFnPeriod('semana')">Esta Semana</button>
+        <button class="fn-period-btn active" data-period="mes" onclick="setFnPeriod('mes')">Este Mês</button>
+        <button class="fn-period-btn" data-period="tudo" onclick="setFnPeriod('tudo')">Tudo</button>
       </div>
 
       <div class="fin-summary" style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:10px">
@@ -629,6 +648,6 @@
   </div>
 </div>
 
-<script src="assets/js/app.js?v=10"></script>
+<script src="assets/js/app.js?v=11"></script>
 </body>
 </html>

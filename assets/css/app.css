@@ -617,3 +617,105 @@ html, body {
   .tabs-nav { flex-direction: column; }
   .modal-lg { width: calc(100vw - 20px); }
 }
+
+/* ════════════════════════════════════════
+   TOAST NOTIFICATIONS
+════════════════════════════════════════ */
+#toast-container {
+  position: fixed; bottom: 80px; right: 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 9999; pointer-events: none;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px; border-radius: var(--r);
+  font-size: 14px; font-weight: 500;
+  background: var(--bg2); border: 1px solid var(--border2);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  opacity: 0; transform: translateX(30px);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: auto; max-width: 340px;
+}
+.toast.visible { opacity: 1; transform: translateX(0); }
+.toast-success { border-color: var(--accent2); }
+.toast-error   { border-color: var(--accent4); }
+.toast-info    { border-color: var(--accent5); }
+.toast-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.toast-success .toast-icon { background: var(--accent2); color: #fff; }
+.toast-error   .toast-icon { background: var(--accent4); color: #fff; }
+.toast-info    .toast-icon { background: var(--accent5); color: #fff; }
+
+/* ════════════════════════════════════════
+   DASHBOARD — GREETING & SCORE
+════════════════════════════════════════ */
+.dash-greeting-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, rgba(108,99,255,0.12) 0%, rgba(63,207,142,0.08) 100%);
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 18px 22px; margin-bottom: 16px;
+}
+.dash-greeting-text {
+  font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text1);
+}
+.dash-summary-text {
+  font-size: 13px; color: var(--text3); margin-top: 4px;
+}
+.dash-score-box { text-align: center; flex-shrink: 0; }
+
+/* ════════════════════════════════════════
+   STREAK BADGE
+════════════════════════════════════════ */
+.streak-badge {
+  font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 12px;
+  background: rgba(245,166,35,0.15); color: var(--accent3);
+  border: 1px solid rgba(245,166,35,0.3);
+}
+
+/* ════════════════════════════════════════
+   PRAZO COLORS — tarefas
+════════════════════════════════════════ */
+.prazo-late  { color: var(--accent4); font-weight: 600; }
+.prazo-today { color: var(--accent3); font-weight: 600; }
+.prazo-soon  { color: var(--accent5); }
+
+/* ════════════════════════════════════════
+   INLINE EDIT — tarefas
+════════════════════════════════════════ */
+.inline-edit-input {
+  background: var(--bg3); border: 1.5px solid var(--accent);
+  border-radius: 6px; padding: 4px 8px; color: var(--text1);
+  font-size: 16px; font-family: inherit; outline: none;
+  width: 100%; box-shadow: 0 0 0 3px rgba(108,99,255,0.12);
+}
+.task-name { cursor: pointer; }
+.task-name:not(.done):hover { color: var(--accent); }
+
+/* ════════════════════════════════════════
+   FINANCE PERIOD FILTER
+════════════════════════════════════════ */
+.fn-period-filter {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.fn-period-btn {
+  padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border2);
+  background: transparent; color: var(--text3); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: var(--transition); font-family: inherit;
+}
+.fn-period-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fn-period-btn.active {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff; box-shadow: 0 2px 10px rgba(108,99,255,0.35);
+}
+
+@media(max-width:900px){
+  #toast-container { bottom: 85px; right: 12px; left: 12px; }
+  .toast { max-width: 100%; }
+  .dash-greeting-bar { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .dash-greeting-text { font-size: 18px; }
+  .fn-period-filter { gap: 4px; }
+  .fn-period-btn { padding: 6px 12px; font-size: 12px; }
+}

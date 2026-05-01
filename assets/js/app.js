@@ -87,13 +87,54 @@ async function syncTable(key,data){
       const {error}=await db.from(key).insert(data.map(tableMappers[key]))
       if(error){
         console.error('Sync['+key+']',error);
-        alert('Erro ao salvar ' + key + ' no banco de dados: ' + error.message);
+        showToast('Erro ao salvar '+key+': '+error.message,'error')
       }
     }
   }catch(e){
     console.error('Sync error',e);
-    alert('Erro crítico ao sincronizar ' + key + ': ' + e.message);
+    showToast('Erro crítico ao sincronizar '+key+': '+e.message,'error')
   }
+}
+
+// ══════════════════════════════════════════
+//  TOAST NOTIFICATIONS
+// ══════════════════════════════════════════
+function showToast(msg, type='success', duration=3500){
+  let container = document.getElementById('toast-container')
+  if(!container){
+    container = document.createElement('div')
+    container.id = 'toast-container'
+    document.body.appendChild(container)
+  }
+  const toast = document.createElement('div')
+  toast.className = `toast toast-${type}`
+  const icons = {success:'✓',error:'✕',info:'ℹ'}
+  toast.innerHTML = `<span class="toast-icon">${icons[type]||icons.info}</span><span class="toast-msg">${msg}</span>`
+  container.appendChild(toast)
+  requestAnimationFrame(()=>toast.classList.add('visible'))
+  setTimeout(()=>{
+    toast.classList.remove('visible')
+    setTimeout(()=>toast.remove(), 400)
+  }, duration)
+}
+
+function showConfirm(msg){
+  return new Promise(resolve=>{
+    const overlay = document.createElement('div')
+    overlay.className = 'modal-overlay open'
+    overlay.innerHTML = `<div class="modal" style="max-width:420px;text-align:center">
+      <div style="font-size:32px;margin-bottom:12px">⚠️</div>
+      <div style="font-size:16px;color:var(--text2);line-height:1.6;margin-bottom:20px">${msg}</div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="wd-btn btn-ghost" id="conf-no">Cancelar</button>
+        <button class="wd-btn btn-primary" id="conf-yes">Confirmar</button>
+      </div>
+    </div>`
+    document.body.appendChild(overlay)
+    overlay.querySelector('#conf-yes').onclick = ()=>{ overlay.remove(); resolve(true) }
+    overlay.querySelector('#conf-no').onclick  = ()=>{ overlay.remove(); resolve(false) }
+    overlay.onclick = e=>{ if(e.target===overlay){ overlay.remove(); resolve(false) } }
+  })
 }
 
 // ══════════════════════════════════════════
@@ -192,7 +233,7 @@ function exportAllData() {
   a.download = `workspace_backup_${today()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  alert('Backup gerado com sucesso! Guarde este arquivo em local seguro.');
+  showToast('Backup gerado! Guarde o arquivo em local seguro.','success')
 }
 
 function importAllData(event) {
@@ -209,11 +250,11 @@ function importAllData(event) {
       const hasKeys = requiredKeys.every(k => k in data);
       
       if (!hasKeys) {
-        alert('Erro: O arquivo selecionado não parece ser um backup válido do Workspace.');
+        showToast('Arquivo inválido! Não parece ser um backup do Workspace.','error')
         return;
       }
 
-      const confirmImport = confirm('⚠️ ATENÇÃO: Importar este backup irá SOBRESCREVER todos os seus dados atuais (Tarefas, Projetos, Notas, etc). Deseja continuar?');
+      const confirmImport = await showConfirm('⚠️ ATENÇÃO: Importar este backup irá SOBRESCREVER todos os seus dados atuais. Deseja continuar?')
       
       if (confirmImport) {
         // Itera sobre as chaves e restaura
@@ -226,12 +267,12 @@ function importAllData(event) {
           }
         }
         
-        alert('🎉 Backup restaurado com sucesso! O sistema será recarregado.');
-        window.location.reload();
+        showToast('🎉 Backup restaurado! O sistema será recarregado.','success',2000)
+        setTimeout(()=>window.location.reload(), 2000)
       }
     } catch (err) {
       console.error('Erro na importação:', err);
-      alert('Erro crítico ao processar o arquivo de backup. Verifique o console.');
+      showToast('Erro ao processar o backup. Verifique o console.','error')
     } finally {
       // Limpa o input para permitir selecionar o mesmo arquivo novamente
       event.target.value = '';
@@ -380,8 +421,24 @@ function renderHabitos(){
     return `<div class="hb-stats">${h_html}</div>`
   }
 
+  function calcStreak(h){
+    if(h.tipo==='occ') return 0
+    const diasSet = new Set(h.dias||[0,1,2,3,4,5,6])
+    let streak = 0
+    const now = new Date()
+    for(let i=0;i<365;i++){
+      const dd = new Date(now); dd.setDate(dd.getDate()-i)
+      if(!diasSet.has(dd.getDay())) continue
+      const ds = dd.toISOString().split('T')[0]
+      if(h.done.includes(ds)) streak++
+      else break
+    }
+    return streak
+  }
+
   function makeItem(h){
     const done = h.done.includes(t)
+    const streak = calcStreak(h)
     return `<div class="card" style="margin-bottom:14px;display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:10px">
@@ -392,6 +449,7 @@ function renderHabitos(){
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
+          ${streak>1?`<span class="streak-badge">🔥 ${streak}</span>`:''}
           ${h.duracao?`<span class="hb-dur">${h.duracao}</span>`:''}
           <button class="wd-btn btn-ghost btn-sm" onclick="openHabitModal(${h.id})">Editar</button>
           <button class="wd-btn btn-danger btn-sm" onclick="deleteHabito(${h.id})">✕</button>
@@ -433,6 +491,25 @@ function renderHabitos(){
   }
   const sEl = document.getElementById('streak-full')
   if(sEl) sEl.innerHTML = streak
+}
+
+function markAllHabitos(){
+  const list = S.get('habitos')
+  const t = today()
+  const dHoje = new Date().getDay()
+  let count = 0
+  list.forEach(h=>{
+    if(h.tipo==='rec' && (h.dias||[0,1,2,3,4,5,6]).includes(dHoje) && !h.done.includes(t)){
+      h.done.push(t)
+      count++
+    }
+  })
+  if(count===0){ showToast('Todos os hábitos de hoje já foram marcados!','info'); return }
+  S.set('habitos',list)
+  renderHabitos()
+  renderDashboard()
+  updateStats()
+  showToast(`✅ ${count} hábito${count>1?'s':''} marcado${count>1?'s':''}!`,'success')
 }
 
 // ══════════════════════════════════════════
@@ -531,12 +608,14 @@ function renderTarefas(){
   const done = list.filter(t=>t.done)
 
   function makeItem(t, isDaily = false){
+    const prazoStr = t.prazo ? formatDate(t.prazo, true) : ''
+    const prazoClass = t.prazo && !t.done ? getPrazoClass(t.prazo) : ''
     return `<div class="task-item">
       <div class="task-check ${t.done?'done':''}" onclick="toggleTarefa(${t.id})"></div>
       <div class="task-prio" style="background:${prioColors[t.prio]}"></div>
       <div class="task-body">
-        <div class="task-name ${t.done?'done':''}">${t.nome}</div>
-        <div class="task-meta">${t.prio} ${t.prazo?'· '+formatDate(t.prazo):''}</div>
+        <div class="task-name ${t.done?'done':''}" onclick="startInlineEdit(${t.id}, this)" title="Clique para editar">${t.nome}</div>
+        <div class="task-meta">${t.prio}${prazoStr ? ' · <span class="'+prazoClass+'">'+prazoStr+'</span>' : ''}</div>
       </div>
       <div style="display:flex; gap:4px">
         ${!t.done ? `
@@ -568,10 +647,54 @@ function renderTarefas(){
   if(dailyCard) dailyCard.style.display = dailyPend.length ? 'block' : 'none'
 }
 
-function formatDate(d){
+function formatDate(d, relative=false){
   if(!d) return ''
+  if(relative){
+    const today = new Date(); today.setHours(0,0,0,0)
+    const [y,m,dd] = d.split('-').map(Number)
+    const target = new Date(y, m-1, dd)
+    const diff = Math.round((target - today) / 86400000)
+    if(diff === 0) return '🔥 Hoje'
+    if(diff === 1) return '⚡ Amanhã'
+    if(diff === -1) return '⚠️ Ontem'
+    if(diff < -1) return `🔴 Atrasada ${Math.abs(diff)}d`
+    if(diff <= 7) return `📅 ${diff} dias`
+  }
   const [y,m,dd] = d.split('-')
   return `${dd}/${m}/${y}`
+}
+
+function getPrazoClass(prazo){
+  const today = new Date(); today.setHours(0,0,0,0)
+  const [y,m,d] = prazo.split('-').map(Number)
+  const target = new Date(y, m-1, d)
+  const diff = Math.round((target - today) / 86400000)
+  if(diff < 0) return 'prazo-late'
+  if(diff === 0) return 'prazo-today'
+  if(diff <= 2) return 'prazo-soon'
+  return ''
+}
+
+function startInlineEdit(id, el){
+  if(el.querySelector('input')) return
+  const currentText = el.textContent.trim()
+  const safe = currentText.replace(/"/g,'&quot;').replace(/'/g,'&#39;')
+  el.innerHTML = `<input class="inline-edit-input" value="${safe}" onblur="saveInlineEdit(${id}, this)" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){renderTarefas()}">`
+  el.querySelector('input').focus()
+  el.querySelector('input').select()
+}
+
+function saveInlineEdit(id, input){
+  const newName = input.value.trim()
+  if(!newName){ renderTarefas(); return }
+  const list = S.get('tarefas')
+  const t = list.find(x=>x.id==id)
+  if(t && newName !== t.nome){
+    t.nome = newName
+    S.set('tarefas', list)
+    showToast('Tarefa atualizada ✓','success',2000)
+  }
+  renderTarefas()
 }
 
 // ══════════════════════════════════════════
@@ -607,7 +730,6 @@ function renderCompras(){
   const list = S.get('compras')
   const trab = list.filter(c=>c.cat==='trabalho')
   const outros = list.filter(c=>c.cat!=='trabalho')
-
   function makeTag(c){
     return `<div class="shop-tag ${c.bought?'bought':''}" onclick="toggleCompra(${c.id})">
       <div class="shop-dot" style="background:${cpColors[c.cat]||'var(--text2)'}"></div>
@@ -633,6 +755,33 @@ const catColors = {
   'saude':['#101a2a','var(--accent5)'],
   'investimento':['#0f2318','var(--accent2)'],
   'outro':['#1a1a1a','var(--text2)']
+}
+
+let fnPeriod = 'mes' // 'hoje' | 'semana' | 'mes' | 'tudo'
+
+function setFnPeriod(p){
+  fnPeriod = p
+  document.querySelectorAll('.fn-period-btn').forEach(b=>b.classList.toggle('active', b.dataset.period===p))
+  renderFinancas()
+}
+
+function filterByPeriod(list){
+  const now = new Date(); now.setHours(0,0,0,0)
+  if(fnPeriod==='tudo') return list
+  return list.filter(f=>{
+    if(!f.date) return true
+    const [y,m,d] = f.date.split('-').map(Number)
+    const fd = new Date(y,m-1,d)
+    if(fnPeriod==='hoje') return fd.getTime()===now.getTime()
+    if(fnPeriod==='semana'){
+      const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate()-6)
+      return fd>=weekAgo
+    }
+    if(fnPeriod==='mes'){
+      return fd.getMonth()===now.getMonth() && fd.getFullYear()===now.getFullYear()
+    }
+    return true
+  })
 }
 
 function addFinanca(){
@@ -670,7 +819,8 @@ function deleteFinanca(id){
 }
 
 function renderFinancas(){
-  const list = S.get('financas')
+  const allList = S.get('financas')
+  const list = filterByPeriod(allList)
   const totalIn = list.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const totalOut = list.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const pendIn = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
@@ -696,7 +846,7 @@ function renderFinancas(){
 
   const lEl = document.getElementById('fn-list')
   if(!lEl) return
-  if(!list.length){lEl.innerHTML='<div class="empty">Nenhum lançamento ainda</div>';return}
+  if(!list.length){lEl.innerHTML='<div class="empty">Nenhum lançamento neste período</div>';renderFinChart([]);return}
 
   const sortedList = [...list].sort((a,b) => {
     if(a.status==='pendente' && b.status!=='pendente') return -1;
@@ -1037,6 +1187,42 @@ function renderDashboard(){
   const tarefas = S.get('tarefas')
   const financas = S.get('financas')
   const projetos = S.get('projetos')
+  const dHoje = new Date().getDay()
+  const hora = new Date().getHours()
+
+  // Saudação personalizada
+  const greetEl = document.getElementById('dash-greeting')
+  if(greetEl){
+    const saudacao = hora<12?'Bom dia':hora<18?'Boa tarde':'Boa noite'
+    const nome = (currentUser?.user_metadata?.full_name||currentUser?.email||'').split(' ')[0]
+    greetEl.textContent = `${saudacao}${nome ? ', '+nome : ''} 👋`
+  }
+
+  // Score do dia
+  const schedHoje = habitos.filter(h=>h.tipo==='rec'&&(h.dias||[0,1,2,3,4,5,6]).includes(dHoje))
+  const habitsDone = schedHoje.filter(h=>h.done.includes(t)).length
+  const dailyTasks = tarefas.filter(t2=>t2.is_daily)
+  const tasksDone = dailyTasks.filter(t2=>t2.done).length
+  const totalItems = schedHoje.length + dailyTasks.length
+  const score = totalItems>0 ? Math.round(((habitsDone+tasksDone)/totalItems)*100) : 0
+  const scoreEl = document.getElementById('dash-score')
+  if(scoreEl){
+    const scoreColor = score>=80?'var(--accent2)':score>=50?'var(--accent3)':'var(--accent4)'
+    scoreEl.innerHTML = `<div style="font-size:36px;font-weight:700;color:${scoreColor};line-height:1">${score}%</div><div style="font-size:12px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:4px">Score do dia</div>`
+  }
+
+  // Resumo do dia
+  const summaryEl = document.getElementById('dash-summary')
+  if(summaryEl){
+    const pendOut = financas.filter(f=>f.tipo==='saida'&&f.status==='pendente').reduce((a,f)=>a+f.val,0)
+    const pendTarefas = tarefas.filter(t2=>!t2.done&&t2.is_daily).length
+    const pendHabits = schedHoje.length - habitsDone
+    const parts = []
+    if(pendHabits>0) parts.push(`${pendHabits} hábito${pendHabits>1?'s':''}`)
+    if(pendTarefas>0) parts.push(`${pendTarefas} tarefa${pendTarefas>1?'s':''} urgente${pendTarefas>1?'s':''}`)
+    if(pendOut>0) parts.push(`R$${pendOut.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} a pagar`)
+    summaryEl.textContent = parts.length ? 'Hoje: ' + parts.join(' · ') : '🎉 Dia 100%! Tudo em dia.'
+  }
 
   // hábitos mini
   const dhEl = document.getElementById('dash-habitos-list')
@@ -1570,5 +1756,20 @@ async function init(){
   initTheme()
   renderDashboard()
   showUserInfo()
+  // Atalhos de teclado
+  document.addEventListener('keydown', e=>{
+    const tag = document.activeElement?.tagName
+    if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return
+    if(e.metaKey||e.ctrlKey||e.altKey) return
+    const k = e.key.toLowerCase()
+    if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'))
+    if(k==='d') document.querySelector('[onclick*="\'dashboard\'"]')?.click()
+    if(k==='h') document.querySelector('[onclick*="\'habitos\'"]')?.click()
+    if(k==='f') document.querySelector('[onclick*="\'financas\'"]')?.click()
+    if(k==='n'||k==='t'){
+      document.querySelector('[onclick*="\'tarefas\'"]')?.click()
+      setTimeout(()=>document.getElementById('tk-input')?.focus(), 80)
+    }
+  })
 }
-init()
+init()
