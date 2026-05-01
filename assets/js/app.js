@@ -7,6 +7,7 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
+const APP_VERSION = '1.3.0'
 
 // ══════════════════════════════════════════
 //  SECURITY
@@ -1851,6 +1852,14 @@ function initTheme(){
 const IS_DEV = ['localhost','127.0.0.1'].includes(window.location.hostname)
 
 async function init(){
+  // Controle de Versão (Cache Busting)
+  const savedV = localStorage.getItem('wd_app_version')
+  if(savedV !== APP_VERSION){
+    localStorage.setItem('wd_app_version', APP_VERSION)
+    window.location.reload()
+    return
+  }
+
   if(IS_DEV){
     // Modo preview local: usa localStorage, sem login
     currentUser={id:'local-dev',user_metadata:{full_name:'Preview Local',avatar_url:''}}
