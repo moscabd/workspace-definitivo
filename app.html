@@ -50,6 +50,9 @@
   <div class="nav-item" onclick="nav('cerebro',this)">
     <div class="nav-ic">🧠</div> Segundo Cérebro
   </div>
+  <div class="nav-item" onclick="nav('historico',this)">
+    <div class="nav-ic">📈</div> Histórico & Evolução
+  </div>
   <div class="nav-item" onclick="nav('senhas',this)">
     <div class="nav-ic">🔑</div> Cofre de Senhas
   </div>
@@ -466,6 +469,40 @@
       </div>
     </div>
 
+    <!-- ═══ HISTÓRICO ═══ -->
+    <div class="page" id="page-historico">
+      <div class="history-controls" style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap">
+        <button class="fn-period-btn active" data-hper="semana" onclick="setHistoryPeriod('semana')">Semana</button>
+        <button class="fn-period-btn" data-hper="mes" onclick="setHistoryPeriod('mes')">Mês</button>
+        <button class="fn-period-btn" data-hper="trimestre" onclick="setHistoryPeriod('trimestre')">Trimestre</button>
+        <button class="fn-period-btn" data-hper="semestre" onclick="setHistoryPeriod('semestre')">6 Meses</button>
+        <button class="fn-period-btn" data-hper="ano" onclick="setHistoryPeriod('ano')">Ano</button>
+        
+        <button class="wd-btn btn-ghost btn-sm" style="margin-left:auto" onclick="exportForAI()">🤖 Estudo p/ IA (JSON)</button>
+      </div>
+
+      <div class="grid3" id="history-summary-grid" style="margin-bottom:24px"></div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-title">📈 Evolução de Produtividade</div>
+        <div style="height:280px; width:100%; position:relative">
+          <canvas id="history-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">🔥 Consistência de Hábitos</div>
+          <div id="history-habits-detail"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 Resumo Financeiro do Período</div>
+          <div id="history-finance-detail"></div>
+        </div>
+      </div>
+    </div>
+
+
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /app -->
@@ -480,6 +517,7 @@
   <div class="mob-nav-item" onclick="nav('projetos',this,'mob')"><div class="mob-nav-icon">🚀</div>Projetos</div>
   <div class="mob-nav-item" onclick="nav('cerebro',this,'mob')"><div class="mob-nav-icon">🧠</div>Cérebro</div>
   <div class="mob-nav-item" onclick="nav('senhas',this,'mob')"><div class="mob-nav-icon">🔑</div>Senhas</div>
+  <div class="mob-nav-item" onclick="nav('historico',this,'mob')"><div class="mob-nav-icon">📈</div>Histórico</div>
   <div class="mob-nav-item" onclick="nav('agenda',this,'mob')"><div class="mob-nav-icon">📅</div>Agenda</div>
 </div>
 

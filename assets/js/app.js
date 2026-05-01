@@ -183,7 +183,8 @@ async function logout(){
 const pageNames = {
   dashboard:'Painel Geral',habitos:'Hábitos',tarefas:'Tarefas',
   compras:'Lista de Compras',financas:'Finanças',projetos:'Projetos',
-  cerebro:'Segundo Cérebro',senhas:'Cofre de Senhas',agenda:'Google Agenda'
+  cerebro:'Segundo Cérebro',senhas:'Cofre de Senhas',agenda:'Google Agenda',
+  historico:'Histórico & Evolução'
 }
 function nav(page, el, mode){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
@@ -209,6 +210,7 @@ function renderPage(p){
   else if(p==='projetos') renderProjetos()
   else if(p==='cerebro') renderCerebro()
   else if(p==='senhas') renderSenhas()
+  else if(p==='historico') renderHistorico()
 }
 
 // ══════════════════════════════════════════
@@ -1846,6 +1848,190 @@ function initTheme(){
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
+//  HISTÓRICO & EVOLUÇÃO
+// ══════════════════════════════════════════
+let historyPeriod = 'semana'
+
+function setHistoryPeriod(p){
+  historyPeriod = p
+  document.querySelectorAll('[data-hper]').forEach(b => {
+    b.classList.toggle('active', b.dataset.hper === p)
+  })
+  renderHistorico()
+}
+
+function getRangeDates(period){
+  const now = new Date()
+  let start = new Date()
+  if(period==='semana') start.setDate(now.getDate()-7)
+  else if(period==='mes') start.setMonth(now.getMonth()-1)
+  else if(period==='trimestre') start.setMonth(now.getMonth()-3)
+  else if(period==='semestre') start.setMonth(now.getMonth()-6)
+  else if(period==='ano') start.setFullYear(now.getFullYear()-1)
+  return {start, now}
+}
+
+function renderHistorico(){
+  const el = document.getElementById('page-historico')
+  if(!el || !el.classList.contains('active')) return
+
+  const {start, now} = getRangeDates(historyPeriod)
+  const fmtBRL = v => 'R$' + v.toLocaleString('pt-BR',{minimumFractionDigits:2})
+  
+  // 1. Dados Filtrados
+  const habitos = S.get('habitos')
+  const tarefas = S.get('tarefas')
+  const financas = S.get('financas')
+  
+  const startISO = start.toISOString().split('T')[0]
+  
+  // 2. Cálculos de Performance
+  // Hábitos: média de conclusão no período
+  let totalHabitSlots = 0
+  let doneHabitSlots = 0
+  habitos.forEach(h => {
+    h.done.forEach(d => {
+      if(d >= startISO) doneHabitSlots++
+    })
+    // Estimativa simples de slots totais (dias que o hábito deveria ter sido feito)
+    const diffDays = Math.ceil((now - start) / (1000 * 60 * 60 * 24))
+    totalHabitSlots += (h.tipo === 'rec' ? (h.dias.length / 7) * diffDays : 1)
+  })
+  const habitScore = totalHabitSlots > 0 ? Math.round((doneHabitSlots / totalHabitSlots) * 100) : 0
+
+  // Tarefas: Concluídas vs Total criadas no período
+  const tkPeriod = tarefas.filter(t => t.createdAt >= startISO)
+  const tkDone = tkPeriod.filter(t => t.done).length
+  const taskScore = tkPeriod.length > 0 ? Math.round((tkDone / tkPeriod.length) * 100) : 0
+
+  // Finanças
+  const finPeriod = financas.filter(f => f.date >= startISO && f.status === 'pago')
+  const totalIn = finPeriod.filter(f => f.tipo === 'entrada').reduce((a,b)=>a+b.val, 0)
+  const totalOut = finPeriod.filter(f => f.tipo === 'saida').reduce((a,b)=>a+b.val, 0)
+  const balance = totalIn - totalOut
+
+  // 3. Renderizar Summary Grid
+  const grid = document.getElementById('history-summary-grid')
+  grid.innerHTML = `
+    <div class="stat-chip">
+      <div class="sc-label">Score de Hábitos</div>
+      <div class="sc-value" style="color:var(--accent2)">${habitScore}%</div>
+    </div>
+    <div class="stat-chip">
+      <div class="sc-label">Tarefas Entregues</div>
+      <div class="sc-value" style="color:var(--accent)">${tkDone} <small style="font-size:12px;opacity:0.6">de ${tkPeriod.length}</small></div>
+    </div>
+    <div class="stat-chip">
+      <div class="sc-label">Saldo do Período</div>
+      <div class="sc-value" style="color:${balance>=0?'var(--accent2)':'var(--accent4)'}">${fmtBRL(balance)}</div>
+    </div>
+  `
+
+  // 4. Renderizar Detalhes
+  document.getElementById('history-habits-detail').innerHTML = habitos.map(h => {
+    const count = h.done.filter(d => d >= startISO).length
+    return `<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px">
+      <span style="color:var(--text2)">${h.nome}</span>
+      <span style="font-weight:600">${count}x</span>
+    </div>`
+  }).join('')
+
+  document.getElementById('history-finance-detail').innerHTML = `
+    <div style="display:flex; justify-content:space-between; margin-bottom:12px">
+      <span style="color:var(--text3)">Total Recebido</span>
+      <span style="color:var(--accent2); font-weight:600">${fmtBRL(totalIn)}</span>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:12px">
+      <span style="color:var(--text3)">Total Gasto</span>
+      <span style="color:var(--accent4); font-weight:600">${fmtBRL(totalOut)}</span>
+    </div>
+    <div style="border-top:1px solid var(--border); padding-top:12px; display:flex; justify-content:space-between">
+      <span style="font-weight:600">Resultado Líquido</span>
+      <span style="font-weight:700; color:${balance>=0?'var(--accent2)':'var(--accent4)'}">${fmtBRL(balance)}</span>
+    </div>
+  `
+
+  // 5. Gráfico de Evolução (Barras Simples no Canvas)
+  renderHistoryChart(tkPeriod, finPeriod, startISO)
+}
+
+function renderHistoryChart(tasks, finances, startISO){
+  const canvas = document.getElementById('history-chart')
+  if(!canvas) return
+  const ctx = canvas.getContext('2d')
+  const dpr = window.devicePixelRatio || 1
+  const rect = canvas.getBoundingClientRect()
+  canvas.width = rect.width * dpr
+  canvas.height = rect.height * dpr
+  ctx.scale(dpr, dpr)
+
+  const w = rect.width
+  const h = rect.height
+  ctx.clearRect(0,0,w,h)
+
+  // Desenhar 7 barras (exemplo simplificado p/ evolução)
+  const barCount = 7
+  const barW = (w / barCount) - 20
+  const maxH = h - 40
+
+  for(let i=0; i<barCount; i++){
+    const x = i * (w/barCount) + 10
+    const valPct = 0.3 + (Math.random() * 0.6) // Simulando dados reais por enquanto
+    const barH = valPct * maxH
+    
+    // Gradiente
+    const grad = ctx.createLinearGradient(x, h-20, x, h-20-barH)
+    grad.addColorStop(0, 'rgba(108, 99, 255, 0.8)')
+    grad.addColorStop(1, 'rgba(108, 99, 255, 0.2)')
+    
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.roundRect(x, h-20-barH, barW, barH, [8,8,0,0])
+    ctx.fill()
+  }
+}
+
+function exportForAI(){
+  const {start} = getRangeDates(historyPeriod)
+  const startISO = start.toISOString().split('T')[0]
+  
+  const studyData = {
+    periodo: historyPeriod,
+    desde: startISO,
+    metricas: {
+      habitos: S.get('habitos').map(h => ({
+        nome: h.nome,
+        frequencia_no_periodo: h.done.filter(d => d >= startISO).length,
+        tipo: h.tipo
+      })),
+      tarefas: {
+        total_criadas: S.get('tarefas').filter(t => t.createdAt >= startISO).length,
+        concluidas: S.get('tarefas').filter(t => t.createdAt >= startISO && t.done).length,
+        atrasadas: S.get('tarefas').filter(t => t.createdAt >= startISO && !t.done && t.prazo && t.prazo < today()).length
+      },
+      financeiro: {
+        entradas: S.get('financas').filter(f => f.date >= startISO && f.tipo==='entrada' && f.status==='pago').reduce((a,b)=>a+b.val,0),
+        saidas: S.get('financas').filter(f => f.date >= startISO && f.tipo==='saida' && f.status==='pago').reduce((a,b)=>a+b.val,0),
+        maiores_gastos: S.get('financas')
+          .filter(f => f.date >= startISO && f.tipo==='saida')
+          .sort((a,b)=>b.val-a.val)
+          .slice(0,5)
+          .map(f=>({desc:f.desc, valor:f.val, cat:f.cat}))
+      },
+      projetos: S.get('projetos').map(p => ({nome:p.nome, progresso:p.pct, categoria:p.cat}))
+    },
+    instrucao_ia: "Analise estes dados de produtividade e finanças. Identifique padrões de procrastinação, categorias de gasto excessivo e sugira 3 ações concretas para melhorar a performance na próxima semana."
+  }
+
+  const blob = new Blob([JSON.stringify(studyData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `estudo_ia_workspace_${historyPeriod}_${today()}.json`;
+  a.click();
+  showToast('JSON de estudo gerado! Envie para sua IA favorita para análise.', 'success')
+}
+
 // ══════════════════════════════════════════
 //  DEV MODE — localhost pula login
 // ══════════════════════════════════════════
