@@ -37,12 +37,12 @@
 
 /* ── Glow pulses ── */
 @keyframes glowPulse{
-  0%,100%{box-shadow:0 0 12px rgba(124,58,237,.3),0 0 24px rgba(124,58,237,.15)}
-  50%{box-shadow:0 0 20px rgba(124,58,237,.6),0 0 40px rgba(124,58,237,.3)}
+  0%,100%{box-shadow:0 0 12px rgba(245,158,11,.3),0 0 24px rgba(245,158,11,.15)}
+  50%{box-shadow:0 0 20px rgba(245,158,11,.6),0 0 40px rgba(245,158,11,.3)}
 }
 @keyframes cyanGlow{
-  0%,100%{box-shadow:0 0 12px rgba(34,211,238,.25)}
-  50%{box-shadow:0 0 28px rgba(34,211,238,.55)}
+  0%,100%{box-shadow:0 0 12px rgba(59,130,246,.25)}
+  50%{box-shadow:0 0 28px rgba(59,130,246,.55)}
 }
 @keyframes orbFloat{
   0%,100%{transform:translateY(0) scale(1);opacity:.8}
