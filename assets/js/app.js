@@ -1162,7 +1162,6 @@ function renderProjetos(){
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
         <div>
           <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text1)">${p.nome}</div>
-          ${p.desc?`<div style="font-size:15px;color:var(--text3);margin-top:4px">${p.desc}</div>`:''}
         </div>
         <div style="display:flex;gap:6px;align-items:center">
           <span class="ptag">${p.cat}</span>
@@ -1389,7 +1388,6 @@ function renderDashboard(){
         return `<div class="proj-item" style="margin-bottom:12px">
           <div class="proj-header"><div class="proj-name">${p.nome}</div><div class="proj-pct" style="color:${color}">${p.pct}%</div></div>
           <div class="prog-bar" style="margin-bottom:6px"><div class="prog-fill" style="width:${p.pct}%;background:${color}"></div></div>
-          ${p.rascunhos ? `<div style="font-size:12px;color:var(--text3);font-style:italic;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📝 ${p.rascunhos.substring(0,60)}...</div>` : ''}
         </div>`
       }).join('')
     }
