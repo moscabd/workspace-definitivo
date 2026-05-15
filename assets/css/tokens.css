@@ -22,6 +22,8 @@
   --input-bg-focus:var(--glass-3);
   --hover-bg:rgba(255,255,255,.05);
   --overlay-bg:rgba(4,12,28,.75);
+  --tab-active-bg:#E2E8F0;
+  --tab-active-text:#040c1c;
 
   /* ── Borders (Gold tinted) ── */
   --border:rgba(245,158,11,.15);
@@ -117,4 +119,5 @@
   --shadow-sm:0 2px 8px rgba(4,12,28,.06);--shadow-md:0 8px 28px rgba(4,12,28,.08);
   --shadow-lg:0 20px 60px rgba(4,12,28,.1);
   --bg0:var(--bg-0);--bg1:var(--bg-1);--bg2:var(--bg-2);--bg3:var(--bg-3);
+  --tab-active-bg:#040c1c;--tab-active-text:#ffffff;
 }
