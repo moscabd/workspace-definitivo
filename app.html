@@ -756,13 +756,18 @@
     const observer = new MutationObserver((mutations) => {
       let shouldUpdate = false;
       for (let m of mutations) {
-        if (m.addedNodes.length > 0) {
-          shouldUpdate = true;
-          break;
+        for (let node of m.addedNodes) {
+          if (node.nodeType === 1 && (node.hasAttribute('data-lucide') || node.querySelector('[data-lucide]'))) {
+            shouldUpdate = true;
+            break;
+          }
         }
+        if (shouldUpdate) break;
       }
       if (shouldUpdate) {
+        observer.disconnect();
         lucide.createIcons();
+        observer.observe(document.body, { childList: true, subtree: true });
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
