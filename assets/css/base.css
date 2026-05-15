@@ -29,8 +29,8 @@ body::after{width:600px;height:600px;background:radial-gradient(circle,rgba(59,1
 /* ── Grid overlay sutil ── */
 .app::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+    linear-gradient(var(--hover-bg) 1px,transparent 1px),
+    linear-gradient(90deg,var(--hover-bg) 1px,transparent 1px);
   background-size:50px 50px;
   animation:gridPulse 8s ease-in-out infinite;
 }

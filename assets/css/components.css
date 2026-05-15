@@ -33,7 +33,7 @@
   display:inline-flex;align-items:center;gap:7px;letter-spacing:.01em;
   position:relative;overflow:hidden;
 }
-.wd-btn::after{content:'';position:absolute;inset:0;border-radius:inherit;background:rgba(255,255,255,.08);opacity:0;transition:opacity .15s}
+.wd-btn::after{content:'';position:absolute;inset:0;border-radius:inherit;background:var(--hover-bg);opacity:0;transition:opacity .15s}
 .wd-btn:hover::after{opacity:1}
 .wd-btn:active{transform:scale(.98)}
 
@@ -45,7 +45,7 @@
 
 .btn-sm{padding:5px 12px;font-size:12px;border-radius:var(--r-sm)}
 
-.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2)}
+.btn-ghost{background:var(--hover-bg);border:1px solid var(--border);color:var(--text2)}
 .btn-ghost:hover{border-color:var(--primary);color:var(--primary-light);background:var(--primary-subtle);box-shadow:0 0 16px rgba(var(--primary-rgb),.15)}
 
 .btn-danger{background:transparent;border:1px solid rgba(var(--danger-rgb),.2);color:var(--danger)}
@@ -80,7 +80,7 @@
 /* ── Modals ── */
 .modal-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(7,17,31,.8);
+  background:var(--input-bg-focus);
   z-index:1000;align-items:center;justify-content:center;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
@@ -142,8 +142,8 @@
 /* ── Tabs ── */
 .tabs-nav{display:flex;gap:2px;background:rgba(17,24,39,.6);padding:3px;border-radius:var(--r-md);margin-bottom:22px;border:1px solid var(--border)}
 .tab-btn{flex:1;padding:8px 12px;border:none;background:transparent;color:var(--text3);font-size:12.5px;font-weight:600;border-radius:9px;cursor:pointer;transition:var(--transition)}
-.tab-btn:hover{color:var(--text2);background:rgba(255,255,255,.04)}
+.tab-btn:hover{color:var(--text2);background:var(--hover-bg)}
 .tab-btn.active{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:var(--shadow-sm),0 0 12px rgba(var(--primary-rgb),.25)}
 .tab-content textarea.wd-input{line-height:1.7;font-size:14px;padding:14px;background:rgba(7,17,31,.6);border-color:var(--border-2)}
-#tab-rascunhos textarea{background:rgba(7,17,31,.8);color:var(--text2);border-style:dashed}
+#tab-rascunhos textarea{background:var(--input-bg-focus);color:var(--text2);border-style:dashed}
 #tab-plano textarea{border-left:3px solid var(--primary)}

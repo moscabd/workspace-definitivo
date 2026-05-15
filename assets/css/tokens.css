@@ -18,6 +18,10 @@
   --glass-sidebar:rgba(8,20,42,.88);
   --glass-topbar:rgba(4,12,28,.82);
   --glass-modal:rgba(8,20,42,.92);
+  --input-bg:var(--glass-2);
+  --input-bg-focus:var(--glass-3);
+  --hover-bg:rgba(255,255,255,.05);
+  --overlay-bg:rgba(4,12,28,.75);
 
   /* ── Borders (Gold tinted) ── */
   --border:rgba(245,158,11,.15);
