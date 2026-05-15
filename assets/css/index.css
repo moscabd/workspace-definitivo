@@ -1,24 +1,64 @@
-:root{--bg0:#08090b;--bg1:#0d0e11;--bg2:#111318;--bg3:#171920;--border:#1e2028;--border2:#252830;--text1:#e8e9ee;--text2:#8a8d9a;--text3:#454857;--accent:#6c63ff;--accent2:#3fcf8e}
+/* ═══════════════════════════════════════
+   INDEX — Login Page v5 Horizon
+   ═══════════════════════════════════════ */
+:root{
+  --bg0:#07111F;
+  --bg1:#0A1628;
+  --bg2:#111827;
+  --bg3:#172033;
+  --border:rgba(255,255,255,.08);
+  --border2:rgba(255,255,255,.12);
+  --text1:#F8FAFC;
+  --text2:#94A3B8;
+  --text3:#64748B;
+  --primary:#7C3AED;
+  --accent:#22D3EE;
+  --accent2:#10B981;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center}
-.wrap{width:100%;max-width:420px;padding:20px;animation:fadeIn .4s ease}
+html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+/* Background effects */
+html,body::before,html::after{position:fixed;border-radius:50%;pointer-events:none;filter:blur(100px)}
+body::before{content:'';width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,.15) 0%,transparent 60%);top:-150px;left:-150px;animation:nebulaFloat 20s ease-in-out infinite}
+body::after{content:'';width:400px;height:400px;background:radial-gradient(circle,rgba(34,211,238,.1) 0%,transparent 60%);bottom:-100px;right:-100px;animation:nebulaFloat2 24s ease-in-out infinite}
+/* Grid overlay */
+html::before{content:'';width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;position:fixed;inset:0;animation:gridPulse 8s ease-in-out infinite}
+
+.wrap{width:100%;max-width:420px;padding:20px;animation:fadeIn .4s ease;position:relative;z-index:1}
 .brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:44px}
 .dots{display:flex;gap:5px}
-.dot{width:8px;height:8px;border-radius:50%}
-.brand-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:44px 36px;text-align:center}
+.dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 12px currentColor}
+.dots .dot:nth-child(1){background:var(--primary);box-shadow:0 0 12px rgba(124,58,237,.6);animation:orbFloat 3s ease-in-out infinite}
+.dots .dot:nth-child(2){background:var(--accent);box-shadow:0 0 12px rgba(34,211,238,.5);animation:orbFloat 3s ease-in-out 1.5s infinite;opacity:.9}
+.brand-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(90deg,#fff 0%,var(--primary-light) 35%,var(--accent) 65%,#fff 100%);background-size:250% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:brandShimmer 6s linear infinite}
+
+.card{background:rgba(23,32,51,.7);border:1px solid var(--border);border-radius:20px;padding:44px 36px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.04);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,.4),rgba(34,211,238,.3),transparent)}
+
 .title{font-family:'Syne',sans-serif;font-size:25px;font-weight:700;margin-bottom:10px}
 .subtitle{font-size:16px;color:var(--text3);line-height:1.7;margin-bottom:36px}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 20px;background:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:500;color:#1f1f1f;cursor:pointer;transition:all .15s}
-.google-btn:hover{box-shadow:0 4px 20px rgba(108,99,255,.25);transform:translateY(-1px)}
+
+.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 20px;background:#fff;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:500;color:#1f1f1f;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.google-btn::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.04);opacity:0;transition:opacity .2s}
+.google-btn:hover::before{opacity:1}
+.google-btn:hover{box-shadow:0 8px 32px rgba(124,58,237,.3);transform:translateY(-2px)}
 .google-btn:active{transform:translateY(0)}
 .google-btn svg{width:18px;height:18px;flex-shrink:0}
+
 .divider{margin:22px 0;display:flex;align-items:center;gap:10px;color:var(--text3);font-size:14px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
 .status{margin-top:16px;font-size:15px;color:var(--text3);min-height:18px}
-.error{color:#ff5f5f}
-.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:16px auto;display:none}
+.error{color:#F43F5E}
+.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:16px auto;display:none}
+
 .note{margin-top:28px;font-size:14px;color:var(--text3);line-height:1.8;text-align:center}
 .note span{color:var(--accent2)}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.05)}}
+@keyframes nebulaFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-15px) scale(1.04)}66%{transform:translate(-10px,20px) scale(.97)}}
+@keyframes nebulaFloat2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-25px,10px) scale(1.06)}66%{transform:translate(15px,-20px) scale(.96)}}
+@keyframes gridPulse{0%,100%{opacity:.04}50%{opacity:.08}}
+@keyframes brandShimmer{0%{background-position:200% center}100%{background-position:-200% center}}
