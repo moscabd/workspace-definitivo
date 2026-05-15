@@ -60,11 +60,11 @@ body::after{width:600px;height:600px;background:radial-gradient(circle,rgba(59,1
 .brand{display:flex;align-items:center;gap:12px;padding:8px 12px 20px;margin-bottom:8px;border-bottom:1px solid var(--border)}
 .brand-dots{position:relative;width:30px;height:30px;flex-shrink:0}
 .bd{width:12px;height:12px;border-radius:50%;position:absolute}
-.bd:nth-child(1){background:var(--primary);top:0;left:50%;transform:translateX(-50%);animation:orbFloat 3.2s ease-in-out infinite;box-shadow:0 0 12px rgba(var(--primary-rgb),.6)}
-.bd:nth-child(2){background:var(--accent);bottom:0;left:50%;transform:translateX(-50%);animation:orbFloat 3.2s ease-in-out 1.6s infinite;box-shadow:0 0 12px rgba(var(--accent-rgb),.5);opacity:1!important}
+.bd:nth-child(1){background:var(--accent);top:0;left:50%;transform:translateX(-50%);animation:orbFloat 3.2s ease-in-out infinite;box-shadow:0 0 12px rgba(59,130,246,.6)}
+.bd:nth-child(2){background:var(--success);bottom:0;left:50%;transform:translateX(-50%);animation:orbFloat 3.2s ease-in-out 1.6s infinite;box-shadow:0 0 12px rgba(16,185,129,.5);opacity:1!important}
 .brand-name{
   font-family:var(--font-display);font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-  background:linear-gradient(90deg,#fff 0%,var(--primary-light) 35%,var(--accent) 65%,#fff 100%);
+  background:linear-gradient(90deg,var(--text1) 0%,var(--accent) 35%,var(--success) 65%,var(--text1) 100%);
   background-size:250% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   animation:brandShimmer 6s linear infinite;
 }
