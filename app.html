@@ -9,6 +9,7 @@
 <title>Workspace Definitivo</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <link rel="stylesheet" href="assets/css/app.css?v=30">
 <link rel="icon" type="image/png" href="assets/img/icon.png">
 <link rel="apple-touch-icon" href="assets/img/icon.png">
@@ -30,37 +31,37 @@
 
   <div class="nav-group-label">Principal</div>
   <div class="nav-item active" onclick="nav('dashboard',this)">
-    <div class="nav-ic">📊</div> Painel Geral
+    <div class="nav-ic"><i data-lucide="layout-dashboard"></i></div> Painel Geral
   </div>
   <div class="nav-item" onclick="nav('habitos',this)">
-    <div class="nav-ic">✅</div> Hábitos
+    <div class="nav-ic"><i data-lucide="check-circle-2"></i></div> Hábitos
   </div>
   <div class="nav-item" onclick="nav('tarefas',this)">
-    <div class="nav-ic">📋</div> Tarefas
+    <div class="nav-ic"><i data-lucide="list-todo"></i></div> Tarefas
   </div>
   <div class="nav-item" onclick="nav('compras',this)">
-    <div class="nav-ic">🛒</div> Lista de Compras
+    <div class="nav-ic"><i data-lucide="shopping-cart"></i></div> Lista de Compras
   </div>
   <div class="nav-item" onclick="nav('financas',this)">
-    <div class="nav-ic">💰</div> Finanças
+    <div class="nav-ic"><i data-lucide="wallet"></i></div> Finanças
   </div>
   <div class="nav-item" onclick="nav('projetos',this)">
-    <div class="nav-ic">🚀</div> Projetos
+    <div class="nav-ic"><i data-lucide="rocket"></i></div> Projetos
   </div>
   <div class="nav-item" onclick="nav('cerebro',this)">
-    <div class="nav-ic">🧠</div> Segundo Cérebro
+    <div class="nav-ic"><i data-lucide="brain"></i></div> Segundo Cérebro
   </div>
   <div class="nav-item" onclick="nav('historico',this)">
-    <div class="nav-ic">📈</div> Histórico & Evolução
+    <div class="nav-ic"><i data-lucide="trending-up"></i></div> Histórico & Evolução
   </div>
   <div class="nav-item" onclick="nav('senhas',this)">
-    <div class="nav-ic">🔑</div> Cofre de Senhas
+    <div class="nav-ic"><i data-lucide="key-round"></i></div> Cofre de Senhas
   </div>
 
   <div style="flex:1"></div>
   <div class="nav-group-label">Integração</div>
   <div class="nav-item" onclick="nav('agenda',this)">
-    <div class="nav-ic">📅</div> Google Agenda
+    <div class="nav-ic"><i data-lucide="calendar"></i></div> Google Agenda
   </div>
 </div>
 
@@ -71,14 +72,14 @@
     <div class="topbar-right">
       <span class="topbar-date" id="topDate"></span>
       <span class="tag-pill" id="todayHabitsLabel">— hábitos hoje</span>
-      <button class="theme-btn" onclick="exportAllData()" title="Exportar Backup (Download)">📥</button>
-      <button class="theme-btn" onclick="document.getElementById('importFile').click()" title="Importar Backup (Upload)">📤</button>
+      <button class="theme-btn" onclick="exportAllData()" title="Exportar Backup (Download)"><i data-lucide="download"></i></button>
+      <button class="theme-btn" onclick="document.getElementById('importFile').click()" title="Importar Backup (Upload)"><i data-lucide="upload"></i></button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllData(event)">
-      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Alternar tema">🌙</button>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Alternar tema"><i data-lucide="moon"></i></button>
       <div class="user-chip">
         <img class="user-avatar" id="userAvatar" src="" alt="">
         <span class="user-name" id="userName"></span>
-        <button class="wd-btn btn-ghost btn-sm btn-logout" onclick="logout()">Sair</button>
+        <button class="wd-btn btn-ghost btn-sm btn-logout" onclick="logout()"><i data-lucide="log-out" style="width:14px;height:14px"></i> Sair</button>
       </div>
     </div>
   </div>
@@ -91,7 +92,7 @@
       <!-- Greeting bar -->
       <div class="dash-greeting-bar">
         <div>
-          <div id="dash-greeting" class="dash-greeting-text">Bom dia 👋</div>
+          <div id="dash-greeting" class="dash-greeting-text">Bom dia <i data-lucide="sparkles" style="width:18px;height:18px;color:var(--cyan);display:inline-block;vertical-align:middle;margin-left:8px"></i></div>
           <div id="dash-summary" class="dash-summary-text"></div>
         </div>
         <div id="dash-score" class="dash-score-box"></div>
@@ -131,7 +132,7 @@
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border)">
             <div>
-              <div class="sc-label" style="font-size:11px">💵 Disponível p/ Uso</div>
+              <div class="sc-label" style="font-size:11px"><i data-lucide="coins" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Disponível p/ Uso</div>
               <div class="sc-value" id="ds-saldo" style="font-size:26px; color:var(--accent2)">R$0</div>
               <div style="font-size:11px;color:var(--text3);margin-top:2px" id="ds-saldo-sub"></div>
             </div>
@@ -268,7 +269,7 @@
       <div class="fin-saldo-grid" style="margin-bottom:14px">
         <!-- Disponível p/ Uso — destaque principal -->
         <div class="fsum-cell fsum-disponivel">
-          <div class="fsum-label">💵 Disponível p/ Uso</div>
+          <div class="fsum-label"><i data-lucide="coins" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Disponível p/ Uso</div>
           <div class="fsum-val" id="fn-disponivel" style="font-size:28px;color:var(--accent2)">R$0,00</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">Saldo Bruto − Poupança</div>
         </div>
@@ -365,7 +366,7 @@
             <option value="aprendizado">📚 Aprendizado</option>
             <option value="reflexao">🔮 Reflexão</option>
             <option value="referencia">🔗 Referência</option>
-            <option value="outro">📌 Outro</option>
+            <option value="outro"><i data-lucide="paperclip" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Outro</option>
           </select>
           <button class="wd-btn btn-primary" onclick="addNota()">+ Salvar nota</button>
         </div>
@@ -396,13 +397,13 @@
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
           <input class="wd-input" id="pwd-search" placeholder="🔍 Buscar..." style="max-width:240px" oninput="renderSenhasList()">
           <button class="wd-btn btn-primary" onclick="openSenhaModal()">+ Nova Senha</button>
-          <button class="wd-btn btn-ghost" onclick="toggleGenerator()">🔑 Gerador</button>
+          <button class="wd-btn btn-ghost" onclick="toggleGenerator()"><i data-lucide="key" style="width:14px;height:14px"></i> Gerador</button>
           <button class="wd-btn btn-ghost btn-sm" onclick="lockVault()" style="margin-left:auto">🔒 Travar</button>
         </div>
 
         <!-- Gerador (colapsável) -->
         <div class="card" id="pwd-generator" style="margin-bottom:14px;display:none">
-          <div class="card-title">🔑 Gerador de Senha Segura</div>
+          <div class="card-title"><i data-lucide="key" style="width:14px;height:14px"></i> Gerador de Senha Segura</div>
           <div class="pwd-gen-result" id="gen-result">Clique em &quot;Gerar&quot;</div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
             <div class="strength-bar"><div class="strength-fill" id="gen-strength-fill"></div></div>
@@ -496,7 +497,7 @@
           <div id="history-habits-detail"></div>
         </div>
         <div class="card">
-          <div class="card-title">💰 Resumo Financeiro do Período</div>
+          <div class="card-title"><i data-lucide="piggy-bank" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Resumo Financeiro do Período</div>
           <div id="history-finance-detail"></div>
         </div>
       </div>
@@ -513,10 +514,10 @@
   <div class="mob-nav-item" onclick="nav('habitos',this,'mob')"><div class="mob-nav-icon">✅</div>Hábitos</div>
   <div class="mob-nav-item" onclick="nav('tarefas',this,'mob')"><div class="mob-nav-icon">📋</div>Tarefas</div>
   <div class="mob-nav-item" onclick="nav('compras',this,'mob')"><div class="mob-nav-icon">🛒</div>Compras</div>
-  <div class="mob-nav-item" onclick="nav('financas',this,'mob')"><div class="mob-nav-icon">💰</div>Finanças</div>
+  <div class="mob-nav-item" onclick="nav('financas',this,'mob')"><div class="mob-nav-icon"><i data-lucide="piggy-bank" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i></div>Finanças</div>
   <div class="mob-nav-item" onclick="nav('projetos',this,'mob')"><div class="mob-nav-icon">🚀</div>Projetos</div>
   <div class="mob-nav-item" onclick="nav('cerebro',this,'mob')"><div class="mob-nav-icon">🧠</div>Cérebro</div>
-  <div class="mob-nav-item" onclick="nav('senhas',this,'mob')"><div class="mob-nav-icon">🔑</div>Senhas</div>
+  <div class="mob-nav-item" onclick="nav('senhas',this,'mob')"><div class="mob-nav-icon"><i data-lucide="key" style="width:14px;height:14px"></i></div>Senhas</div>
   <div class="mob-nav-item" onclick="nav('historico',this,'mob')"><div class="mob-nav-icon">📈</div>Histórico</div>
   <div class="mob-nav-item" onclick="nav('agenda',this,'mob')"><div class="mob-nav-icon">📅</div>Agenda</div>
 </div>
@@ -698,19 +699,19 @@
     <div class="form-group">
       <label class="form-label">Categoria</label>
       <select class="wd-select" id="ms-cat" style="width:100%">
-        <option value="social">📱 Social</option>
-        <option value="financeiro">💰 Financeiro</option>
-        <option value="trabalho">💼 Trabalho</option>
-        <option value="entretenimento">🎬 Entretenimento</option>
-        <option value="outro">📌 Outro</option>
+        <option value="social"><i data-lucide="smartphone" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Social</option>
+        <option value="financeiro"><i data-lucide="piggy-bank" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Financeiro</option>
+        <option value="trabalho"><i data-lucide="briefcase" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Trabalho</option>
+        <option value="entretenimento"><i data-lucide="clapperboard" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Entretenimento</option>
+        <option value="outro"><i data-lucide="paperclip" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Outro</option>
       </select>
     </div>
     <div class="form-group">
       <label class="form-label">Senha *</label>
       <div style="display:flex;gap:8px">
         <input class="wd-input" id="ms-pwd" type="password" placeholder="••••••••" style="flex:1;font-family:monospace;letter-spacing:2px" autocomplete="new-password">
-        <button class="wd-btn btn-ghost btn-sm" onclick="toggleMsPwd()" title="Mostrar/Ocultar">👁</button>
-        <button class="wd-btn btn-ghost btn-sm" onclick="fillFromGenerator()" title="Usar senha gerada">🔑</button>
+        <button class="wd-btn btn-ghost btn-sm" onclick="toggleMsPwd()" title="Mostrar/Ocultar"><i data-lucide="eye" style="width:14px;height:14px"></i></button>
+        <button class="wd-btn btn-ghost btn-sm" onclick="fillFromGenerator()" title="Usar senha gerada"><i data-lucide="key" style="width:14px;height:14px"></i></button>
       </div>
     </div>
     <div class="form-group">
@@ -728,6 +729,44 @@
   </div>
 </div>
 
-<script src="assets/js/app.js?v=13"></script>
+<!-- MOBILE NAV -->
+<div class="mob-nav">
+  <div class="mob-nav-item active" onclick="nav('dashboard',this)">
+    <div class="mob-nav-icon"><i data-lucide="layout-dashboard"></i></div>Painel
+  </div>
+  <div class="mob-nav-item" onclick="nav('habitos',this)">
+    <div class="mob-nav-icon"><i data-lucide="check-circle-2"></i></div>Hábitos
+  </div>
+  <div class="mob-nav-item" onclick="nav('tarefas',this)">
+    <div class="mob-nav-icon"><i data-lucide="list-todo"></i></div>Tarefas
+  </div>
+  <div class="mob-nav-item" onclick="nav('financas',this)">
+    <div class="mob-nav-icon"><i data-lucide="wallet"></i></div>Finanças
+  </div>
+  <div class="mob-nav-item" onclick="nav('projetos',this)">
+    <div class="mob-nav-icon"><i data-lucide="rocket"></i></div>Projetos
+  </div>
+</div>
+
+<script src="assets/js/app.js?v=30"></script>
+<script>
+  // Initialize Lucide Icons and observe DOM for dynamic updates
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    const observer = new MutationObserver((mutations) => {
+      let shouldUpdate = false;
+      for (let m of mutations) {
+        if (m.addedNodes.length > 0) {
+          shouldUpdate = true;
+          break;
+        }
+      }
+      if (shouldUpdate) {
+        lucide.createIcons();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>
 </body>
 </html>

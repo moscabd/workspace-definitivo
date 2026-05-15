@@ -109,7 +109,7 @@ function showToast(msg, type='success', duration=3500){
   }
   const toast = document.createElement('div')
   toast.className = `toast toast-${type}`
-  const icons = {success:'✓',error:'✕',info:'ℹ'}
+  const icons = {success:'✓',error:'<i data-lucide="x" style="width:14px;height:14px"></i>',info:'ℹ'}
   toast.innerHTML = `<span class="toast-icon">${icons[type]||icons.info}</span><span class="toast-msg">${msg}</span>`
   container.appendChild(toast)
   requestAnimationFrame(()=>toast.classList.add('visible'))
@@ -452,10 +452,10 @@ function renderHabitos(){
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
-          ${streak>1?`<span class="streak-badge">🔥 ${streak}</span>`:''}
+          ${streak>1?`<span class="streak-badge"><i data-lucide="flame" style="width:14px;height:14px;color:var(--warning)"></i> ${streak}</span>`:''}
           ${h.duracao?`<span class="hb-dur">${h.duracao}</span>`:''}
           <button class="wd-btn btn-ghost btn-sm" onclick="openHabitModal(${h.id})">Editar</button>
-          <button class="wd-btn btn-danger btn-sm" onclick="deleteHabito(${h.id})">✕</button>
+          <button class="wd-btn btn-danger btn-sm" onclick="deleteHabito(${h.id})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
         </div>
       </div>
       ${h.tipo==='rec'?getMiniStreakHTML(h):''}
@@ -632,7 +632,7 @@ function renderTarefas(){
             <button class="btn-order" onclick="reorderTarefa(${t.id}, 'down')">▼</button>
           </div>
         ` : ''}
-        <button class="wd-btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">✕</button>
+        <button class="wd-btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
       </div>
     </div>`
   }
@@ -657,7 +657,7 @@ function formatDate(d, relative=false){
     const [y,m,dd] = d.split('-').map(Number)
     const target = new Date(y, m-1, dd)
     const diff = Math.round((target - today) / 86400000)
-    if(diff === 0) return '🔥 Hoje'
+    if(diff === 0) return '<i data-lucide="flame" style="width:14px;height:14px;color:var(--warning)"></i> Hoje'
     if(diff === 1) return '⚡ Amanhã'
     if(diff === -1) return '⚠️ Ontem'
     if(diff < -1) return `🔴 Atrasada ${Math.abs(diff)}d`
@@ -737,7 +737,7 @@ function renderCompras(){
     return `<div class="shop-tag ${c.bought?'bought':''}" onclick="toggleCompra(${c.id})">
       <div class="shop-dot" style="background:${cpColors[c.cat]||'var(--text2)'}"></div>
       <div style="flex:1">${c.nome}</div>
-      <div onclick="event.stopPropagation();deleteCompra(${c.id})" style="padding:4px 8px;color:var(--text3);font-size:16px;cursor:pointer">✕</div>
+      <div onclick="event.stopPropagation();deleteCompra(${c.id})" style="padding:4px 8px;color:var(--text3);font-size:16px;cursor:pointer"><i data-lucide="x" style="width:14px;height:14px"></i></div>
     </div>`
   }
 
@@ -910,7 +910,7 @@ function renderFinancas(){
       <button class="wd-btn ${isPend ? 'btn-primary' : 'btn-ghost'} btn-sm" style="margin-left:8px" onclick="toggleFinancaStatus(${f.id})" title="${isPend?'Marcar como pago/recebido':'Voltar para pendente'}">
         ${isPend ? '✓ Dar Baixa' : '↺'}
       </button>
-      <button class="wd-btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteFinanca(${f.id})">✕</button>
+      <button class="wd-btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteFinanca(${f.id})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`
   }).join('')
 
@@ -1168,7 +1168,7 @@ function renderProjetos(){
           <span class="ptag">${p.cat}</span>
           <button class="wd-btn btn-primary btn-sm" onclick="openProjectDetails(${p.id})">🔍 Detalhes</button>
           <button class="wd-btn btn-ghost btn-sm" onclick="openEditProg(${p.id},${p.pct})">Atualizar</button>
-          <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})">✕</button>
+          <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -1281,7 +1281,7 @@ function renderCerebro(){
     return `<div class="brain-note">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span class="fin-cat-badge" style="background:${bg};color:${fg}">${tagIcons[n.tag]} ${n.tag}</span>
-        <button class="wd-btn btn-danger btn-sm" onclick="deleteNota(${n.id})">✕</button>
+        <button class="wd-btn btn-danger btn-sm" onclick="deleteNota(${n.id})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
       </div>
       <div class="brain-note-text">${linkify(n.texto).replace(/\n/g,'<br>')}</div>
       <div class="brain-note-date">${formatDate(n.date)}</div>
@@ -1625,9 +1625,9 @@ async function renderSenhasList() {
         <div style="font-size:13px;color:var(--text3)" class="text-truncate">${esc(p.user)}</div>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="wd-btn btn-ghost btn-sm" onclick="copyToClipboard('${esc(p.pwd)}')">📋</button>
-        <button class="wd-btn btn-ghost btn-sm" onclick="editSenha(${p.id})">✏️</button>
-        <button class="wd-btn btn-danger btn-sm" onclick="deleteSenha(${p.id})">✕</button>
+        <button class="wd-btn btn-ghost btn-sm" onclick="copyToClipboard('${esc(p.pwd)}')"><i data-lucide="copy" style="width:14px;height:14px"></i></button>
+        <button class="wd-btn btn-ghost btn-sm" onclick="editSenha(${p.id})"><i data-lucide="edit-2" style="width:14px;height:14px"></i></button>
+        <button class="wd-btn btn-danger btn-sm" onclick="deleteSenha(${p.id})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
       </div>
     </div>
   `}).join('');
@@ -1696,7 +1696,7 @@ function copyToClipboard(text) {
   // feedback visual breve
   const btn = event.currentTarget;
   const oldText = btn.innerHTML;
-  btn.innerHTML = '✔️';
+  btn.innerHTML = '<i data-lucide="check" style="width:14px;height:14px"></i>';
   setTimeout(()=>btn.innerHTML=oldText, 1500);
 }
 
