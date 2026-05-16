@@ -783,6 +783,12 @@ function filterByPeriod(list){
     if(fnPeriod==='mes'){
       return fd.getMonth()===now.getMonth() && fd.getFullYear()===now.getFullYear()
     }
+    if(fnPeriod==='ano'){
+      return fd.getFullYear()===now.getFullYear()
+    }
+    if(fnPeriod==='ano'){
+      return fd.getFullYear()===now.getFullYear()
+    }
     return true
   })
 }
@@ -858,11 +864,13 @@ function renderFinancas(){
   const list = filterByPeriod(allList)
   // Saldo bruto sempre sobre TODOS os lançamentos pagos
   const allPaid = S.get('financas')
-  const totalIn  = allPaid.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
-  const totalOut = allPaid.filter(f=>f.tipo==='saida'   && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
+  const globalIn = allPaid.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0);
+  const totalIn  = list.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
+  const globalOut= allPaid.filter(f=>f.tipo==='saida'   && f.status!=='pendente').reduce((a,f)=>a+f.val,0);
+  const totalOut = list.filter(f=>f.tipo==='saida'   && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const pendIn   = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
   const pendOut  = list.filter(f=>f.tipo==='saida'   && f.status==='pendente').reduce((a,f)=>a+f.val,0)
-  const saldo    = totalIn - totalOut
+  const saldo    = globalIn - globalOut
   const poupanca = parseFloat(localStorage.getItem('wd_poupanca')||'0')
   const disponivel = saldo - poupanca
 
