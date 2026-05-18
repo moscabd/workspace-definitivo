@@ -7,7 +7,7 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.0'
+const APP_VERSION = '1.4.1'
 
 // ══════════════════════════════════════════
 //  SECURITY
@@ -828,12 +828,19 @@ function deleteFinanca(id){
 }
 
 // ---- Poupança ----
+function getPoupancaValor() {
+  if (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata && currentUser.user_metadata.wd_poupanca !== undefined) {
+    return parseFloat(currentUser.user_metadata.wd_poupanca);
+  }
+  return parseFloat(localStorage.getItem('wd_poupanca')||'0');
+}
+
 function togglePoupancaEdit(){
   const editEl = document.getElementById('fn-poupanca-edit')
   const dispEl = document.getElementById('fn-poupanca-display')
   const input  = document.getElementById('fn-poupanca-input')
   if(editEl.style.display==='none'){
-    const current = parseFloat(localStorage.getItem('wd_poupanca')||'0')
+    const current = getPoupancaValor()
     input.value = current > 0 ? current.toFixed(2) : ''
     editEl.style.display='block'
     dispEl.style.display='none'
@@ -846,11 +853,23 @@ function togglePoupancaEdit(){
 function savePoupanca(){
   const val = parseFloat(document.getElementById('fn-poupanca-input').value)
   if(isNaN(val)||val<0){ showToast('Valor inválido','error'); return }
+  
   localStorage.setItem('wd_poupanca', val.toFixed(2))
+  
+  if (typeof currentUser !== 'undefined' && currentUser && currentUser.id !== 'local-dev' && typeof db !== 'undefined') {
+    db.auth.updateUser({
+      data: { wd_poupanca: val.toFixed(2) }
+    }).then((res) => {
+      if (res && res.data && res.data.user) {
+        currentUser = res.data.user;
+      }
+    }).catch(e => console.error('Erro ao salvar poupança:', e))
+  }
+
   cancelPoupancaEdit()
   renderFinancas()
-  updateStats()
-  renderDashboard()
+  if(typeof updateStats === 'function') updateStats()
+  if(typeof renderDashboard === 'function') renderDashboard()
   showToast('Poupança atualizada ✓','success',2000)
 }
 
@@ -871,7 +890,7 @@ function renderFinancas(){
   const pendIn   = list.filter(f=>f.tipo==='entrada' && f.status==='pendente').reduce((a,f)=>a+f.val,0)
   const pendOut  = list.filter(f=>f.tipo==='saida'   && f.status==='pendente').reduce((a,f)=>a+f.val,0)
   const saldo    = globalIn - globalOut
-  const poupanca = parseFloat(localStorage.getItem('wd_poupanca')||'0')
+  const poupanca = getPoupancaValor()
   const disponivel = saldo - poupanca
 
   const fmtBRL = v => 'R$'+v.toFixed(2).replace('.',',')
@@ -2090,4 +2109,4 @@ async function init(){
     }
   })
 }
-init()
+init()
