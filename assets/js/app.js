@@ -7,7 +7,7 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.2'
+const APP_VERSION = '1.4.3'
 
 // ══════════════════════════════════════════
 //  SECURITY
@@ -2117,11 +2117,12 @@ async function init(){
     }
   })
 
-  // Sincronização automática em segundo plano ao focar a aba/janela
+  // Sincronização automática em segundo plano ao focar a aba/janela e também a cada 5 segundos
   window.addEventListener('focus', syncUserMetadataInBackground)
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') syncUserMetadataInBackground()
   })
+  setInterval(syncUserMetadataInBackground, 5000)
 }
 
 async function syncUserMetadataInBackground() {
