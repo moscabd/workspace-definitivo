@@ -7,57 +7,10 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.6'
+const APP_VERSION = '1.4.8'
 
-// ══════════════════════════════════════════
-//  SECURITY
-// ══════════════════════════════════════════
-function esc(str){
-  if(typeof str!=='string')return''
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')
-}
-function cleanInput(val,max){
-  if(typeof val!=='string')return''
-  return val.replace(/<[^>]*>/g,'').trim().substring(0,max||200)
-}
-function safeNum(val,min,max){
-  const n=parseFloat(val)
-  if(isNaN(n))return min||0
-  return Math.max(min||0,Math.min(max||Infinity,n))
-}
-if(window.self!==window.top){window.top.location=window.self.location}
-
-// ══════════════════════════════════════════
-//  DATA SYNC — Supabase
-// ══════════════════════════════════════════
-async function loadAllData(){
-  const uid = currentUser.id
-  const [h,t,c,f,p,b] = await Promise.all([
-    db.from('habitos').select('*').eq('user_id',uid),
-    db.from('tarefas').select('*').eq('user_id',uid),
-    db.from('compras').select('*').eq('user_id',uid),
-    db.from('financas').select('*').eq('user_id',uid),
-    db.from('projetos').select('*').eq('user_id',uid),
-    db.from('brain').select('*').eq('user_id',uid),
-  ])
-  cache.habitos=(h.data||[]).map(r=>({id:r.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],createdAt:r.created_at}))
-  cache.tarefas=(t.data||[]).map(r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,is_daily:r.is_daily,seq:r.seq||0,createdAt:r.created_at}))
-  cache.compras=(c.data||[]).map(r=>({id:r.id,nome:r.nome,cat:r.cat,bought:r.bought}))
-  cache.financas=(f.data||[]).map(r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date,status:r.status||'pago'}))
-  cache.projetos=(p.data||[]).map(r=>({
-    id:r.id,
-    nome:r.nome,
-    desc:r.descricao,
-    cat:r.cat,
-    pct:r.pct,
-    notas:r.notas||'',
-    rascunhos:r.rascunhos||'',
-    plano:r.plano||'',
-    todo:r.todo||[],
-    createdAt:r.created_at
-  }))
-  cache.brain=(b.data||[]).map(r=>({id:r.id,texto:r.texto,tag:r.tag,date:r.date}))
-}
+const syncInProgress = {}
+let realtimeChannel = null
 
 const tableMappers = {
   habitos: r=>({id:r.id,user_id:currentUser.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],created_at:r.createdAt}),
@@ -82,35 +35,35 @@ const tableMappers = {
 
 async function syncTable(key,data){
   if(!currentUser||!tableMappers[key])return
+  syncInProgress[key]=true
   try{
     const { data: existing, error: fetchError } = await db.from(key).select('id').eq('user_id',currentUser.id)
-    if(fetchError){ console.error('Sync fetch['+key+']',fetchError); return }
+    if(fetchError){ console.error('Sync fetch['+key+']',fetchError); syncInProgress[key]=false; return }
 
     const existingIds = new Set((existing||[]).map(r=>r.id))
     const cacheIds = new Set(data.map(r=>r.id))
 
-    // SAFETY: never delete server data if cache is empty but server has data
-    // Prevents data loss from race conditions
     if(existingIds.size>0 && cacheIds.size===0){
       console.warn('Sync safety['+key+']: cache is empty but server has '+existingIds.size+' items. Skipping deletion.')
+      syncInProgress[key]=false
       return
     }
 
-    // Delete items removed from cache
     const toDelete = [...existingIds].filter(id=>!cacheIds.has(id))
     if(toDelete.length>0){
       const {error:delErr}=await db.from(key).delete().in('id',toDelete).eq('user_id',currentUser.id)
       if(delErr) console.error('Sync del['+key+']',delErr)
     }
 
-    // Upsert (insert new, update existing)
     if(data.length>0){
-      const {error}=await db.from(key).upsert(data.map(tableMappers[key]),{onConflict:'id'})
+      const {error}=await db.from(key).upsert(data.map(tableMappers[key]))
       if(error) console.error('Sync upsert['+key+']',error)
     }
   }catch(e){
     console.error('Sync error',e);
     showToast('Erro ao sincronizar '+key+': '+e.message,'error')
+  } finally {
+    syncInProgress[key]=false
   }
 }
 
@@ -1470,7 +1423,7 @@ function updateStats(){
   const totalIn = financas.filter(f=>f.tipo==='entrada' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const totalOut = financas.filter(f=>f.tipo==='saida' && f.status!=='pendente').reduce((a,f)=>a+f.val,0)
   const saldo = totalIn - totalOut
-  const poupanca = parseFloat(localStorage.getItem('wd_poupanca')||'0')
+  const poupanca = getPoupancaValor()
   const disponivel = saldo - poupanca
   const pendentes = tarefas.filter(t=>!t.done).length
 
@@ -2113,6 +2066,7 @@ async function init(){
     }
     
     try{await loadAllData()}catch(e){console.error('Load error',e)}
+    setupRealtimeSync()
   }
   initDate()
   initTheme()
@@ -2134,11 +2088,12 @@ async function init(){
     }
   })
 
-  // Sincronização automática em segundo plano ao focar a aba/janela e também a cada 5 segundos
+  // Sincronização: Realtime + fallback periódico e ao focar
   window.addEventListener('focus', syncUserMetadataInBackground)
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') syncUserMetadataInBackground()
   })
+  // Polling de segurança a cada 5s para sincronizar poupança rapidamente
   setInterval(syncUserMetadataInBackground, 5000)
 }
 
@@ -2152,9 +2107,17 @@ async function syncUserMetadataInBackground() {
     if (metaChanged) {
       currentUser = user
       localStorage.setItem('wd_poupanca', parseFloat(user.user_metadata.wd_poupanca || 0).toFixed(2))
+      renderFinancas()
+      if (typeof updateStats === 'function') updateStats()
+      if (typeof renderDashboard === 'function') renderDashboard()
+      showUserInfo()
     }
 
-    await syncAllTablesFromServer(metaChanged)
+    // Fallback: verifica cada tabela sem sobrescrever se houver sync em andamento
+    const tables = ['habitos','tarefas','compras','financas','projetos','brain']
+    for (const table of tables) {
+      if (!syncInProgress[table]) await fetchAndMergeTable(table)
+    }
   } catch(e) {
     console.warn('Erro ao sincronizar em segundo plano:', e)
   }
@@ -2213,6 +2176,69 @@ async function syncAllTablesFromServer(force = false) {
     }
   } catch(e) {
     console.warn('Erro ao recarregar tabelas do servidor:', e)
+  }
+}
+
+const pendingFetches = {}
+
+function setupRealtimeSync(){
+  if (typeof currentUser === 'undefined' || !currentUser || currentUser.id === 'local-dev' || typeof db === 'undefined') return
+  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null }
+
+  const uid = currentUser.id
+  const tables = ['habitos','tarefas','compras','financas','projetos','brain']
+  realtimeChannel = db.channel('ws-sync')
+
+  tables.forEach(table => {
+    realtimeChannel.on('postgres_changes',
+      { event: '*', schema: 'public', table, filter: `user_id=eq.${uid}` },
+      () => {
+        if (pendingFetches[table]) clearTimeout(pendingFetches[table])
+        pendingFetches[table] = setTimeout(() => {
+          delete pendingFetches[table]
+          fetchAndMergeTable(table)
+        }, 300)
+      }
+    )
+  })
+
+  realtimeChannel.subscribe(status => {
+    if (status === 'SUBSCRIBED') console.log('[RT] Conectado')
+    else if (status === 'CHANNEL_ERROR') console.warn('[RT] Erro')
+  })
+}
+
+async function fetchAndMergeTable(table){
+  if (typeof currentUser === 'undefined' || !currentUser || currentUser.id === 'local-dev') return
+  if (syncInProgress[table]) return
+  try {
+    const { data, error } = await db.from(table).select('*').eq('user_id', currentUser.id)
+    if (error || data === null) return
+
+    const mappers = {
+      habitos: r=>({id:r.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],createdAt:r.created_at}),
+      tarefas: r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,is_daily:r.is_daily,seq:r.seq||0,createdAt:r.created_at}),
+      compras: r=>({id:r.id,nome:r.nome,cat:r.cat,bought:r.bought}),
+      financas: r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date,status:r.status||'pago'}),
+      projetos: r=>({id:r.id,nome:r.nome,desc:r.descricao,cat:r.cat,pct:r.pct,notas:r.notas||'',rascunhos:r.rascunhos||'',plano:r.plano||'',todo:r.todo||[],createdAt:r.created_at}),
+      brain: r=>({id:r.id,texto:r.texto,tag:r.tag,date:r.date}),
+    }
+    const mapFn = mappers[table]
+    if (!mapFn) return
+
+    const newData = (data||[]).map(mapFn)
+    const prev = JSON.stringify(cache[table]||[])
+    const curr = JSON.stringify(newData)
+
+    if (prev !== curr) {
+      cache[table] = newData
+      const activePage = document.querySelector('.page.active')?.id?.replace('page-','')
+      if (activePage && typeof renderPage === 'function') renderPage(activePage)
+      if (typeof updateStats === 'function') updateStats()
+      if (typeof renderDashboard === 'function') renderDashboard()
+    }
+  } catch(e) {
+    console.warn('[RT] Erro em '+table, e)
   }
 }
 
