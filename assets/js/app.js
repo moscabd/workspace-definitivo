@@ -7,7 +7,7 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.3'
+const APP_VERSION = '1.4.4'
 
 // ══════════════════════════════════════════
 //  SECURITY
@@ -2129,16 +2129,61 @@ async function syncUserMetadataInBackground() {
   if (typeof currentUser === 'undefined' || !currentUser || currentUser.id === 'local-dev' || typeof db === 'undefined') return
   try {
     const { data: { user } } = await db.auth.getUser()
-    if (user && JSON.stringify(user.user_metadata) !== JSON.stringify(currentUser.user_metadata)) {
+    if (!user) return
+
+    const metaChanged = JSON.stringify(user.user_metadata) !== JSON.stringify(currentUser.user_metadata)
+    if (metaChanged) {
       currentUser = user
       localStorage.setItem('wd_poupanca', parseFloat(user.user_metadata.wd_poupanca || 0).toFixed(2))
-      renderFinancas()
+    }
+
+    await syncAllTablesFromServer(metaChanged)
+  } catch(e) {
+    console.warn('Erro ao sincronizar em segundo plano:', e)
+  }
+}
+
+async function syncAllTablesFromServer(force = false) {
+  if (typeof currentUser === 'undefined' || !currentUser || currentUser.id === 'local-dev') return
+  try {
+    const uid = currentUser.id
+    const [h,t,c,f,p,b] = await Promise.all([
+      db.from('habitos').select('*').eq('user_id',uid),
+      db.from('tarefas').select('*').eq('user_id',uid),
+      db.from('compras').select('*').eq('user_id',uid),
+      db.from('financas').select('*').eq('user_id',uid),
+      db.from('projetos').select('*').eq('user_id',uid),
+      db.from('brain').select('*').eq('user_id',uid),
+    ])
+    const prevHabitos = JSON.stringify(cache.habitos)
+    const prevTarefas = JSON.stringify(cache.tarefas)
+    const prevFinancas = JSON.stringify(cache.financas)
+    const prevProjetos = JSON.stringify(cache.projetos)
+    const prevBrain = JSON.stringify(cache.brain)
+    const prevCompras = JSON.stringify(cache.compras)
+
+    cache.habitos = (h.data||[]).map(r=>({id:r.id,nome:r.nome,tipo:r.tipo,duracao:r.duracao,hora:r.hora,dias:r.dias||[0,1,2,3,4,5,6],done:r.done||[],createdAt:r.created_at}))
+    cache.tarefas = (t.data||[]).map(r=>({id:r.id,nome:r.nome,prio:r.prio,prazo:r.prazo,done:r.done,is_daily:r.is_daily,seq:r.seq||0,createdAt:r.created_at}))
+    cache.compras = (c.data||[]).map(r=>({id:r.id,nome:r.nome,cat:r.cat,bought:r.bought}))
+    cache.financas = (f.data||[]).map(r=>({id:r.id,desc:r.descricao,val:parseFloat(r.val),tipo:r.tipo,cat:r.cat,date:r.date,status:r.status||'pago'}))
+    cache.projetos = (p.data||[]).map(r=>({id:r.id,nome:r.nome,desc:r.descricao,cat:r.cat,pct:r.pct,notas:r.notas||'',rascunhos:r.rascunhos||'',plano:r.plano||'',todo:r.todo||[],createdAt:r.created_at}))
+    cache.brain = (b.data||[]).map(r=>({id:r.id,texto:r.texto,tag:r.tag,date:r.date}))
+
+    const dataChanged = [
+      prevHabitos, prevTarefas, prevFinancas, prevProjetos, prevBrain, prevCompras
+    ].some((prev, i) => {
+      const keys = ['habitos','tarefas','financas','projetos','brain','compras']
+      return prev !== JSON.stringify(cache[keys[i]])
+    })
+
+    if (dataChanged || force) {
+      const activePage = document.querySelector('.page.active')?.id?.replace('page-','')
+      if (activePage && typeof renderPage === 'function') renderPage(activePage)
       if (typeof updateStats === 'function') updateStats()
       if (typeof renderDashboard === 'function') renderDashboard()
-      showUserInfo()
     }
   } catch(e) {
-    console.warn('Erro ao sincronizar metadados em segundo plano:', e)
+    console.warn('Erro ao recarregar tabelas do servidor:', e)
   }
 }
 
