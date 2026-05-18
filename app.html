@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -34,7 +34,7 @@
     <div class="nav-ic"><i data-lucide="layout-dashboard"></i></div> Painel Geral
   </div>
   <div class="nav-item" onclick="nav('habitos',this)">
-    <div class="nav-ic"><i data-lucide="check-circle-2"></i></div> Hábitos
+    <div class="nav-ic"><i data-lucide="check-circle-2"></i></div> H├íbitos
   </div>
   <div class="nav-item" onclick="nav('tarefas',this)">
     <div class="nav-ic"><i data-lucide="list-todo"></i></div> Tarefas
@@ -43,23 +43,23 @@
     <div class="nav-ic"><i data-lucide="shopping-cart"></i></div> Lista de Compras
   </div>
   <div class="nav-item" onclick="nav('financas',this)">
-    <div class="nav-ic"><i data-lucide="wallet"></i></div> Finanças
+    <div class="nav-ic"><i data-lucide="wallet"></i></div> Finan├ºas
   </div>
   <div class="nav-item" onclick="nav('projetos',this)">
     <div class="nav-ic"><i data-lucide="rocket"></i></div> Projetos
   </div>
   <div class="nav-item" onclick="nav('cerebro',this)">
-    <div class="nav-ic"><i data-lucide="brain"></i></div> Segundo Cérebro
+    <div class="nav-ic"><i data-lucide="brain"></i></div> Segundo C├®rebro
   </div>
   <div class="nav-item" onclick="nav('historico',this)">
-    <div class="nav-ic"><i data-lucide="trending-up"></i></div> Histórico & Evolução
+    <div class="nav-ic"><i data-lucide="trending-up"></i></div> Hist├│rico & Evolu├º├úo
   </div>
   <div class="nav-item" onclick="nav('senhas',this)">
     <div class="nav-ic"><i data-lucide="key-round"></i></div> Cofre de Senhas
   </div>
 
   <div style="flex:1"></div>
-  <div class="nav-group-label">Integração</div>
+  <div class="nav-group-label">Integra├º├úo</div>
   <div class="nav-item" onclick="nav('agenda',this)">
     <div class="nav-ic"><i data-lucide="calendar"></i></div> Google Agenda
   </div>
@@ -71,7 +71,7 @@
     <div class="page-title" id="pageTitle">Painel Geral</div>
     <div class="topbar-right">
       <span class="topbar-date" id="topDate"></span>
-      <span class="tag-pill" id="todayHabitsLabel">— hábitos hoje</span>
+      <span class="tag-pill" id="todayHabitsLabel">ÔÇö h├íbitos hoje</span>
       <button class="theme-btn" onclick="exportAllData()" title="Exportar Backup (Download)"><i data-lucide="download"></i></button>
       <button class="theme-btn" onclick="document.getElementById('importFile').click()" title="Importar Backup (Upload)"><i data-lucide="upload"></i></button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllData(event)">
@@ -86,7 +86,7 @@
 
   <div class="content" id="mainContent" style="padding-bottom:70px">
 
-    <!-- ═══ DASHBOARD ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ DASHBOARD ÔòÉÔòÉÔòÉ -->
     <div class="page active" id="page-dashboard">
 
       <!-- Greeting bar -->
@@ -102,7 +102,7 @@
 
         <!-- Stat chips -->
         <div class="stat-chip">
-          <div class="sc-label">Hábitos hoje</div>
+          <div class="sc-label">H├íbitos hoje</div>
           <div class="sc-value" id="ds-habitos" style="color:var(--accent)">0/0</div>
         </div>
         <div class="stat-chip span2">
@@ -110,15 +110,15 @@
           <div class="sc-value" id="ds-tarefas" style="color:var(--accent3)">0</div>
         </div>
 
-        <!-- Hábitos mini -->
+        <!-- H├íbitos mini -->
         <div class="card">
-          <div class="card-title">Hábitos de hoje</div>
+          <div class="card-title">H├íbitos de hoje</div>
           <div id="dash-habitos-list"></div>
         </div>
 
         <!-- Tarefas mini -->
         <div class="card span2">
-          <div class="card-title">Próximas tarefas</div>
+          <div class="card-title">Pr├│ximas tarefas</div>
           <div id="dash-tarefas-list"></div>
         </div>
 
@@ -128,17 +128,17 @@
           <div id="dash-proj-list"></div>
         </div>
 
-        <!-- Finanças mini c/ Saldo -->
+        <!-- Finan├ºas mini c/ Saldo -->
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border)">
             <div>
-              <div class="sc-label" style="font-size:11px"><i data-lucide="coins" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Disponível p/ Uso</div>
+              <div class="sc-label" style="font-size:11px"><i data-lucide="coins" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Dispon├¡vel p/ Uso</div>
               <div class="sc-value" id="ds-saldo" style="font-size:26px; color:var(--accent2)">R$0</div>
               <div style="font-size:11px;color:var(--text3);margin-top:2px" id="ds-saldo-sub"></div>
             </div>
-            <div class="card-title" style="margin-bottom:0">Finanças</div>
+            <div class="card-title" style="margin-bottom:0">Finan├ºas</div>
           </div>
-          <div class="card-title" style="font-size:11px; margin-bottom:10px">Últimos lançamentos</div>
+          <div class="card-title" style="font-size:11px; margin-bottom:10px">├Ültimos lan├ºamentos</div>
           <div id="dash-fin-list"></div>
         </div>
 
@@ -146,10 +146,10 @@
       </div>
     </div>
 
-    <!-- ═══ HÁBITOS ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ H├üBITOS ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-habitos">
       <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
-        <button class="wd-btn btn-primary" onclick="openHabitModal()">+ Novo Hábito</button>
+        <button class="wd-btn btn-primary" onclick="openHabitModal()">+ Novo H├íbito</button>
         <button class="wd-btn btn-ghost" onclick="markAllHabitos()">&#10003; Marcar Todos</button>
       </div>
 
@@ -159,7 +159,7 @@
           <div id="hb-rec-list"></div>
         </div>
         <div class="card">
-          <div class="card-title">Ocasionais / Dia específico</div>
+          <div class="card-title">Ocasionais / Dia espec├¡fico</div>
           <div id="hb-occ-list"></div>
         </div>
       </div>
@@ -170,7 +170,7 @@
       </div>
     </div>
 
-    <!-- ═══ TAREFAS ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ TAREFAS ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-tarefas">
       <div class="input-row">
         <input class="wd-input" id="tk-input" placeholder="Descreva a tarefa..." maxlength="300" onkeydown="if(event.key==='Enter')addTarefa()">
@@ -178,12 +178,12 @@
         <div class="tk-options-row">
           <label class="tk-daily-toggle">
             <input type="checkbox" id="tk-is-daily">
-            <span class="tk-toggle-inner">⭐ Do Dia</span>
+            <span class="tk-toggle-inner">Ô¡É Do Dia</span>
           </label>
           <select class="wd-select" id="tk-prio">
-            <option value="alta">🔴 Alta</option>
-            <option value="media" selected>🟡 Média</option>
-            <option value="baixa">🟢 Baixa</option>
+            <option value="alta">­ƒö┤ Alta</option>
+            <option value="media" selected>­ƒƒí M├®dia</option>
+            <option value="baixa">­ƒƒó Baixa</option>
           </select>
           <input class="wd-input" id="tk-prazo" type="date" style="flex:0 0 140px">
           <button class="wd-btn btn-primary" onclick="addTarefa()">+ Adicionar</button>
@@ -191,22 +191,22 @@
       </div>
 
       <div class="card" id="tk-daily-card">
-        <div class="card-title" style="color:var(--accent3)">🔥 Foco do Dia</div>
+        <div class="card-title" style="color:var(--accent3)">­ƒöÑ Foco do Dia</div>
         <div id="tk-daily-list"></div>
       </div>
 
       <div class="card" style="margin-top:14px" id="tk-later-card">
-        <div class="card-title">📦 Para Depois</div>
+        <div class="card-title">­ƒôª Para Depois</div>
         <div id="tk-list"></div>
       </div>
 
       <div class="card" style="margin-top:14px">
-        <div class="card-title">✅ Concluídas</div>
+        <div class="card-title">Ô£à Conclu├¡das</div>
         <div id="tk-done-list"></div>
       </div>
     </div>
 
-    <!-- ═══ COMPRAS ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ COMPRAS ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-compras">
       <div class="input-row">
         <input class="wd-input" id="cp-input" placeholder="Item para comprar..." maxlength="150">
@@ -214,7 +214,7 @@
           <option value="trabalho">Trabalho / Ferramenta</option>
           <option value="pessoal">Pessoal</option>
           <option value="casa">Casa</option>
-          <option value="roupa">Roupas / Calçados</option>
+          <option value="roupa">Roupas / Cal├ºados</option>
           <option value="mercado">Mercado</option>
           <option value="outro">Outro</option>
         </select>
@@ -232,58 +232,58 @@
       </div>
     </div>
 
-    <!-- ═══ FINANÇAS ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ FINAN├çAS ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-financas">
       <div class="input-row">
-        <input class="wd-input" id="fn-desc" placeholder="Descrição / origem..." maxlength="200">
+        <input class="wd-input" id="fn-desc" placeholder="Descri├º├úo / origem..." maxlength="200">
         <input class="wd-input" id="fn-val" type="number" placeholder="Valor R$" style="flex:0 0 120px" min="0" step="0.01">
         <select class="wd-select" id="fn-tipo">
-          <option value="entrada">📈 Entrada</option>
-          <option value="saida">📉 Saída</option>
+          <option value="entrada">­ƒôê Entrada</option>
+          <option value="saida">­ƒôë Sa├¡da</option>
         </select>
         <select class="wd-select" id="fn-cat">
           <option value="trabalho">Trabalho</option>
           <option value="despesa-fixa">Despesa Fixa</option>
           <option value="lazer">Lazer</option>
-          <option value="alimentacao">Alimentação</option>
-          <option value="saude">Saúde</option>
+          <option value="alimentacao">Alimenta├º├úo</option>
+          <option value="saude">Sa├║de</option>
           <option value="investimento">Investimento</option>
           <option value="outro">Outro</option>
         </select>
         <select class="wd-select" id="fn-status">
-          <option value="pago">✓ Pago/Recebido</option>
-          <option value="pendente">⏳ Pendente</option>
+          <option value="pago">Ô£ô Pago/Recebido</option>
+          <option value="pendente">ÔÅ│ Pendente</option>
         </select>
-        <button class="wd-btn btn-primary" onclick="addFinanca()">+ Lançar</button>
+        <button class="wd-btn btn-primary" onclick="addFinanca()">+ Lan├ºar</button>
       </div>
 
-      <!-- Filtro de Período -->
+      <!-- Filtro de Per├¡odo -->
       <div class="fn-period-filter" style="margin-bottom:14px">
         <button class="fn-period-btn" data-period="hoje" onclick="setFnPeriod('hoje')">Hoje</button>
         <button class="fn-period-btn" data-period="semana" onclick="setFnPeriod('semana')">Esta Semana</button>
-        <button class="fn-period-btn active" data-period="mes" onclick="setFnPeriod('mes')">Este Mês</button>
+        <button class="fn-period-btn active" data-period="mes" onclick="setFnPeriod('mes')">Este M├¬s</button>
         <button class="fn-period-btn" data-period="ano" onclick="setFnPeriod('ano')">Este Ano</button>
         <button class="fn-period-btn" data-period="tudo" onclick="setFnPeriod('tudo')">Tudo</button>
       </div>
 
       <!-- Cards Principais de Saldo -->
       <div class="fin-saldo-grid" style="margin-bottom:14px">
-        <!-- Disponível p/ Uso — destaque principal -->
+        <!-- Dispon├¡vel p/ Uso ÔÇö destaque principal -->
         <div class="fsum-cell fsum-disponivel">
-          <div class="fsum-label"><i data-lucide="coins" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Disponível p/ Uso</div>
+          <div class="fsum-label"><i data-lucide="coins" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Dispon├¡vel p/ Uso</div>
           <div class="fsum-val" id="fn-disponivel" style="font-size:28px;color:var(--accent2)">R$0,00</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">Saldo Bruto − Poupança</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Saldo Bruto ÔêÆ Poupan├ºa</div>
         </div>
         <!-- Saldo Bruto -->
         <div class="fsum-cell">
-          <div class="fsum-label">🏦 Saldo Bruto</div>
+          <div class="fsum-label">­ƒÅª Saldo Bruto</div>
           <div class="fsum-val" id="fn-saldo" style="color:var(--accent)">R$0,00</div>
         </div>
-        <!-- Poupança editável -->
+        <!-- Poupan├ºa edit├ível -->
         <div class="fsum-cell fsum-poupanca">
           <div class="fsum-label" style="display:flex;align-items:center;gap:6px">
-            🐷 Poupança / Guardado
-            <button class="poup-edit-btn" onclick="togglePoupancaEdit()" title="Editar">✏️</button>
+            ­ƒÉÀ Poupan├ºa / Guardado
+            <button class="poup-edit-btn" onclick="togglePoupancaEdit()" title="Editar">Ô£Å´©Å</button>
           </div>
           <div id="fn-poupanca-display" class="fsum-val" style="color:var(--accent5)">R$0,00</div>
           <div id="fn-poupanca-edit" style="display:none;margin-top:8px">
@@ -291,21 +291,21 @@
               <input class="wd-input" id="fn-poupanca-input" type="number" min="0" step="0.01" placeholder="0,00"
                 style="flex:1;padding:7px 10px;font-size:14px"
                 onkeydown="if(event.key==='Enter')savePoupanca();if(event.key==='Escape')cancelPoupancaEdit()">
-              <button class="wd-btn btn-primary btn-sm" onclick="savePoupanca()">✓</button>
-              <button class="wd-btn btn-ghost btn-sm" onclick="cancelPoupancaEdit()">✕</button>
+              <button class="wd-btn btn-primary btn-sm" onclick="savePoupanca()">Ô£ô</button>
+              <button class="wd-btn btn-ghost btn-sm" onclick="cancelPoupancaEdit()">Ô£ò</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Pendentes (linha secundária) -->
+      <!-- Pendentes (linha secund├íria) -->
       <div class="fin-summary" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px">
         <div class="fsum-cell" style="flex:1;min-width:140px">
           <div class="fsum-label">Total Entradas</div>
           <div class="fsum-val v-in" id="fn-total-in">R$0,00</div>
         </div>
         <div class="fsum-cell" style="flex:1;min-width:140px">
-          <div class="fsum-label">Total Saídas</div>
+          <div class="fsum-label">Total Sa├¡das</div>
           <div class="fsum-val v-out" id="fn-total-out">R$0,00</div>
         </div>
         <div class="fsum-cell" style="flex:1;min-width:140px;background:var(--bg3);border-color:var(--border)">
@@ -319,33 +319,33 @@
       </div>
 
 
-      <!-- Gráfico de Gastos por Categoria -->
+      <!-- Gr├ífico de Gastos por Categoria -->
       <div class="card" style="margin-bottom:14px" id="fn-chart-card">
         <div class="card-title">Gastos por Categoria</div>
         <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center">
           <canvas id="fn-chart" style="flex-shrink:0"></canvas>
           <div id="fn-chart-legend" style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:8px"></div>
         </div>
-        <div id="fn-chart-empty" class="empty" style="display:none;padding:20px">Nenhuma saída registrada ainda</div>
+        <div id="fn-chart-empty" class="empty" style="display:none;padding:20px">Nenhuma sa├¡da registrada ainda</div>
       </div>
 
       <!-- Metas por Categoria -->
       <div class="card" style="margin-bottom:14px" id="fn-metas-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div class="card-title" style="margin-bottom:0">🎯 Metas por Categoria</div>
-          <span style="font-size:12px;color:var(--text3)">Este mês</span>
+          <div class="card-title" style="margin-bottom:0">­ƒÄ» Metas por Categoria</div>
+          <span style="font-size:12px;color:var(--text3)">Este m├¬s</span>
         </div>
         <div id="fn-metas-list"></div>
       </div>
 
       <div class="card">
-        <div class="card-title">Lançamentos</div>
+        <div class="card-title">Lan├ºamentos</div>
         <div id="fn-list"></div>
       </div>
     </div>
 
 
-    <!-- ═══ PROJETOS ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ PROJETOS ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-projetos">
       <div style="display:flex;gap:10px;margin-bottom:20px">
         <button class="wd-btn btn-primary" onclick="openModal('modal-proj')">+ Novo Projeto</button>
@@ -353,20 +353,20 @@
       <div id="proj-list-full"></div>
     </div>
 
-    <!-- ═══ CÉREBRO ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ C├ëREBRO ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-cerebro">
       <div style="margin-bottom:20px">
         <div style="display:flex;gap:8px;margin-bottom:12px">
-          <input type="text" class="wd-input" id="br-search" placeholder="🔍 Buscar notas..." oninput="renderCerebro()">
+          <input type="text" class="wd-input" id="br-search" placeholder="­ƒöì Buscar notas..." oninput="renderCerebro()">
         </div>
-        <textarea class="wd-input" id="br-input" rows="3" placeholder="Jogue aqui uma ideia, pensamento, insight, referência... qualquer coisa!" style="width:100%;resize:vertical" maxlength="1000"></textarea>
+        <textarea class="wd-input" id="br-input" rows="3" placeholder="Jogue aqui uma ideia, pensamento, insight, refer├¬ncia... qualquer coisa!" style="width:100%;resize:vertical" maxlength="1000"></textarea>
         <div style="display:flex;gap:8px;margin-top:8px">
           <select class="wd-select" id="br-tag">
-            <option value="ideia">💡 Ideia</option>
-            <option value="projeto">🚀 Projeto</option>
-            <option value="aprendizado">📚 Aprendizado</option>
-            <option value="reflexao">🔮 Reflexão</option>
-            <option value="referencia">🔗 Referência</option>
+            <option value="ideia">­ƒÆí Ideia</option>
+            <option value="projeto">­ƒÜÇ Projeto</option>
+            <option value="aprendizado">­ƒôÜ Aprendizado</option>
+            <option value="reflexao">­ƒö« Reflex├úo</option>
+            <option value="referencia">­ƒöù Refer├¬ncia</option>
             <option value="outro"><i data-lucide="paperclip" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Outro</option>
           </select>
           <button class="wd-btn btn-primary" onclick="addNota()">+ Salvar nota</button>
@@ -375,40 +375,40 @@
       <div id="brain-list"></div>
     </div>
 
-    <!-- ═══ COFRE DE SENHAS ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ COFRE DE SENHAS ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-senhas">
 
       <!-- TELA BLOQUEADA -->
       <div id="vault-locked" style="display:flex;flex-direction:column;align-items:center;gap:14px;max-width:380px;margin:40px auto 0">
-        <div style="font-size:56px;line-height:1">🔐</div>
+        <div style="font-size:56px;line-height:1">­ƒöÉ</div>
         <div id="vault-lock-title" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text1)">Cofre de Senhas</div>
         <div id="vault-lock-sub" style="font-size:14px;color:var(--text3);text-align:center">Digite a senha mestre para acessar seu cofre</div>
         <input type="password" class="wd-input" id="vault-master-input" placeholder="Senha mestre..." style="width:100%;text-align:center;font-size:18px;letter-spacing:4px" onkeydown="if(event.key==='Enter')submitVaultMaster()">
         <div id="vault-lock-error" style="color:var(--accent4);font-size:13px;display:none;text-align:center">Senha incorreta. Tente novamente.</div>
-        <button class="wd-btn btn-primary" style="width:100%;padding:13px" onclick="submitVaultMaster()">🔓 Desbloquear Cofre</button>
+        <button class="wd-btn btn-primary" style="width:100%;padding:13px" onclick="submitVaultMaster()">­ƒöô Desbloquear Cofre</button>
         <div id="vault-create-hint" style="font-size:12px;color:var(--text3);text-align:center;display:none">
-          ⚠️ Esta será sua <strong>senha mestre</strong>. Ela não pode ser recuperada. Guarde bem.
+          ÔÜá´©Å Esta ser├í sua <strong>senha mestre</strong>. Ela n├úo pode ser recuperada. Guarde bem.
         </div>
       </div>
 
       <!-- COFRE DESBLOQUEADO -->
       <div id="vault-unlocked" style="display:none">
 
-        <!-- Barra de ações -->
+        <!-- Barra de a├º├Áes -->
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
-          <input class="wd-input" id="pwd-search" placeholder="🔍 Buscar..." style="max-width:240px" oninput="renderSenhasList()">
+          <input class="wd-input" id="pwd-search" placeholder="­ƒöì Buscar..." style="max-width:240px" oninput="renderSenhasList()">
           <button class="wd-btn btn-primary" onclick="openSenhaModal()">+ Nova Senha</button>
           <button class="wd-btn btn-ghost" onclick="toggleGenerator()"><i data-lucide="key" style="width:14px;height:14px"></i> Gerador</button>
-          <button class="wd-btn btn-ghost btn-sm" onclick="lockVault()" style="margin-left:auto">🔒 Travar</button>
+          <button class="wd-btn btn-ghost btn-sm" onclick="lockVault()" style="margin-left:auto">­ƒöÆ Travar</button>
         </div>
 
-        <!-- Gerador (colapsável) -->
+        <!-- Gerador (colaps├ível) -->
         <div class="card" id="pwd-generator" style="margin-bottom:14px;display:none">
           <div class="card-title"><i data-lucide="key" style="width:14px;height:14px"></i> Gerador de Senha Segura</div>
           <div class="pwd-gen-result" id="gen-result">Clique em &quot;Gerar&quot;</div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
             <div class="strength-bar"><div class="strength-fill" id="gen-strength-fill"></div></div>
-            <span class="strength-label" id="gen-strength-label" style="font-size:13px;color:var(--text3);min-width:80px">—</span>
+            <span class="strength-label" id="gen-strength-label" style="font-size:13px;color:var(--text3);min-width:80px">ÔÇö</span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
             <div>
@@ -416,15 +416,15 @@
               <input type="range" min="8" max="64" value="16" id="gen-len" style="width:100%;accent-color:var(--accent)" oninput="document.getElementById('gen-len-label').textContent=this.value;generatePassword()">
             </div>
             <div style="display:flex;flex-direction:column;gap:6px;padding-top:4px">
-              <label class="gen-check"><input type="checkbox" id="gen-upper" checked onchange="generatePassword()"> Maiúsculas A–Z</label>
-              <label class="gen-check"><input type="checkbox" id="gen-lower" checked onchange="generatePassword()"> Minúsculas a–z</label>
-              <label class="gen-check"><input type="checkbox" id="gen-nums" checked onchange="generatePassword()"> Números 0–9</label>
-              <label class="gen-check"><input type="checkbox" id="gen-syms" checked onchange="generatePassword()"> Símbolos !@#...</label>
+              <label class="gen-check"><input type="checkbox" id="gen-upper" checked onchange="generatePassword()"> Mai├║sculas AÔÇôZ</label>
+              <label class="gen-check"><input type="checkbox" id="gen-lower" checked onchange="generatePassword()"> Min├║sculas aÔÇôz</label>
+              <label class="gen-check"><input type="checkbox" id="gen-nums" checked onchange="generatePassword()"> N├║meros 0ÔÇô9</label>
+              <label class="gen-check"><input type="checkbox" id="gen-syms" checked onchange="generatePassword()"> S├¡mbolos !@#...</label>
             </div>
           </div>
           <div style="display:flex;gap:8px">
-            <button class="wd-btn btn-primary" style="flex:1" onclick="generatePassword()">⟳ Gerar Nova</button>
-            <button class="wd-btn btn-ghost" onclick="copyGenerated()">📋 Copiar</button>
+            <button class="wd-btn btn-primary" style="flex:1" onclick="generatePassword()">Ôƒ│ Gerar Nova</button>
+            <button class="wd-btn btn-ghost" onclick="copyGenerated()">­ƒôï Copiar</button>
           </div>
         </div>
 
@@ -433,60 +433,60 @@
       </div>
     </div>
 
-    <!-- ═══ GOOGLE AGENDA ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ GOOGLE AGENDA ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-agenda">
       <div class="agenda-banner" style="margin-bottom: 20px">
-        <div style="font-size:35px;margin-bottom:12px">📅</div>
-        <div style="font-size:18px;color:var(--text2);font-weight:500;margin-bottom:10px">Integração com Google Agenda</div>
+        <div style="font-size:35px;margin-bottom:12px">­ƒôà</div>
+        <div style="font-size:18px;color:var(--text2);font-weight:500;margin-bottom:10px">Integra├º├úo com Google Agenda</div>
         <div style="color:var(--text3);line-height:1.9;max-width:500px;margin:0 auto">
           Seus compromissos e agenda sincronizados e exibidos diretamente no seu Workspace.
         </div>
       </div>
 
-      <!-- Versão Desktop: iframe -->
+      <!-- Vers├úo Desktop: iframe -->
       <div class="card gcal-card">
         <iframe src="https://calendar.google.com/calendar/embed?src=otsuguarede%40gmail.com&ctz=America%2FSao_Paulo" style="border:0;width:100%;height:100%;" frameborder="0" scrolling="no"></iframe>
       </div>
       <div class="action-row">
-        <button class="wd-btn btn-primary" onclick="newCalendarEvent()">✨ + Novo Compromisso</button>
-        <button class="wd-btn btn-ghost" onclick="openCalendar()">🗓 Ver Agenda Completa</button>
+        <button class="wd-btn btn-primary" onclick="newCalendarEvent()">Ô£¿ + Novo Compromisso</button>
+        <button class="wd-btn btn-ghost" onclick="openCalendar()">­ƒùô Ver Agenda Completa</button>
       </div>
 
-      <!-- Versão Mobile: botões de acesso rápido -->
+      <!-- Vers├úo Mobile: bot├Áes de acesso r├ípido -->
       <div class="gcal-mob-cta">
-        <div style="font-size:48px;line-height:1">📅</div>
+        <div style="font-size:48px;line-height:1">­ƒôà</div>
         <div style="font-size:17px;font-weight:600;color:var(--text1)">Google Agenda</div>
         <div style="font-size:14px;color:var(--text3);line-height:1.6;max-width:280px">
           Abra direto no app do Google Agenda no seu celular.
         </div>
         <button class="wd-btn btn-primary" style="width:100%;margin-top:4px;padding:14px" onclick="openCalendar()">
-          📅 Abrir no App Google Agenda
+          ­ƒôà Abrir no App Google Agenda
         </button>
         <button class="wd-btn btn-ghost" style="width:100%;padding:14px" onclick="newCalendarEvent()">
-          ✨ + Novo Compromisso
+          Ô£¿ + Novo Compromisso
         </button>
         <div style="font-size:12px;color:var(--text3);margin-top:6px">
-          💡 Dica: Salve este site na tela inicial para acesso rápido
+          ­ƒÆí Dica: Salve este site na tela inicial para acesso r├ípido
         </div>
       </div>
     </div>
 
-    <!-- ═══ HISTÓRICO ═══ -->
+    <!-- ÔòÉÔòÉÔòÉ HIST├ôRICO ÔòÉÔòÉÔòÉ -->
     <div class="page" id="page-historico">
       <div class="history-controls" style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap">
         <button class="fn-period-btn active" data-hper="semana" onclick="setHistoryPeriod('semana')">Semana</button>
-        <button class="fn-period-btn" data-hper="mes" onclick="setHistoryPeriod('mes')">Mês</button>
+        <button class="fn-period-btn" data-hper="mes" onclick="setHistoryPeriod('mes')">M├¬s</button>
         <button class="fn-period-btn" data-hper="trimestre" onclick="setHistoryPeriod('trimestre')">Trimestre</button>
         <button class="fn-period-btn" data-hper="semestre" onclick="setHistoryPeriod('semestre')">6 Meses</button>
         <button class="fn-period-btn" data-hper="ano" onclick="setHistoryPeriod('ano')">Ano</button>
         
-        <button class="wd-btn btn-ghost btn-sm" style="margin-left:auto" onclick="exportForAI()">🤖 Estudo p/ IA (JSON)</button>
+        <button class="wd-btn btn-ghost btn-sm" style="margin-left:auto" onclick="exportForAI()">­ƒñû Estudo p/ IA (JSON)</button>
       </div>
 
       <div class="grid3" id="history-summary-grid" style="margin-bottom:24px"></div>
 
       <div class="card" style="margin-bottom:24px">
-        <div class="card-title">📈 Evolução de Produtividade</div>
+        <div class="card-title">­ƒôê Evolu├º├úo de Produtividade</div>
         <div style="height:280px; width:100%; position:relative">
           <canvas id="history-chart"></canvas>
         </div>
@@ -494,11 +494,11 @@
 
       <div class="grid2">
         <div class="card">
-          <div class="card-title">🔥 Consistência de Hábitos</div>
+          <div class="card-title">­ƒöÑ Consist├¬ncia de H├íbitos</div>
           <div id="history-habits-detail"></div>
         </div>
         <div class="card">
-          <div class="card-title"><i data-lucide="piggy-bank" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Resumo Financeiro do Período</div>
+          <div class="card-title"><i data-lucide="piggy-bank" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i> Resumo Financeiro do Per├¡odo</div>
           <div id="history-finance-detail"></div>
         </div>
       </div>
@@ -511,16 +511,16 @@
 
 <!-- MOBILE NAV -->
 <div class="mob-nav" id="mobNav">
-  <div class="mob-nav-item active" onclick="nav('dashboard',this,'mob')"><div class="mob-nav-icon">📊</div>Painel</div>
-  <div class="mob-nav-item" onclick="nav('habitos',this,'mob')"><div class="mob-nav-icon">✅</div>Hábitos</div>
-  <div class="mob-nav-item" onclick="nav('tarefas',this,'mob')"><div class="mob-nav-icon">📋</div>Tarefas</div>
-  <div class="mob-nav-item" onclick="nav('compras',this,'mob')"><div class="mob-nav-icon">🛒</div>Compras</div>
-  <div class="mob-nav-item" onclick="nav('financas',this,'mob')"><div class="mob-nav-icon"><i data-lucide="piggy-bank" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i></div>Finanças</div>
-  <div class="mob-nav-item" onclick="nav('projetos',this,'mob')"><div class="mob-nav-icon">🚀</div>Projetos</div>
-  <div class="mob-nav-item" onclick="nav('cerebro',this,'mob')"><div class="mob-nav-icon">🧠</div>Cérebro</div>
+  <div class="mob-nav-item active" onclick="nav('dashboard',this,'mob')"><div class="mob-nav-icon">­ƒôè</div>Painel</div>
+  <div class="mob-nav-item" onclick="nav('habitos',this,'mob')"><div class="mob-nav-icon">Ô£à</div>H├íbitos</div>
+  <div class="mob-nav-item" onclick="nav('tarefas',this,'mob')"><div class="mob-nav-icon">­ƒôï</div>Tarefas</div>
+  <div class="mob-nav-item" onclick="nav('compras',this,'mob')"><div class="mob-nav-icon">­ƒøÆ</div>Compras</div>
+  <div class="mob-nav-item" onclick="nav('financas',this,'mob')"><div class="mob-nav-icon"><i data-lucide="piggy-bank" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i></div>Finan├ºas</div>
+  <div class="mob-nav-item" onclick="nav('projetos',this,'mob')"><div class="mob-nav-icon">­ƒÜÇ</div>Projetos</div>
+  <div class="mob-nav-item" onclick="nav('cerebro',this,'mob')"><div class="mob-nav-icon">­ƒºá</div>C├®rebro</div>
   <div class="mob-nav-item" onclick="nav('senhas',this,'mob')"><div class="mob-nav-icon"><i data-lucide="key" style="width:14px;height:14px"></i></div>Senhas</div>
-  <div class="mob-nav-item" onclick="nav('historico',this,'mob')"><div class="mob-nav-icon">📈</div>Histórico</div>
-  <div class="mob-nav-item" onclick="nav('agenda',this,'mob')"><div class="mob-nav-icon">📅</div>Agenda</div>
+  <div class="mob-nav-item" onclick="nav('historico',this,'mob')"><div class="mob-nav-icon">­ƒôê</div>Hist├│rico</div>
+  <div class="mob-nav-item" onclick="nav('agenda',this,'mob')"><div class="mob-nav-icon">­ƒôà</div>Agenda</div>
 </div>
 
 <!-- MODAL PROJETO -->
@@ -532,8 +532,8 @@
       <input class="wd-input" id="pj-nome" placeholder="Ex: App Desktop Clientes" style="width:100%">
     </div>
     <div class="form-group">
-      <label class="form-label">Descrição / Objetivo</label>
-      <textarea class="wd-input" id="pj-desc" rows="2" placeholder="O que é esse projeto?" style="width:100%;resize:vertical"></textarea>
+      <label class="form-label">Descri├º├úo / Objetivo</label>
+      <textarea class="wd-input" id="pj-desc" rows="2" placeholder="O que ├® esse projeto?" style="width:100%;resize:vertical"></textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Categoria</label>
@@ -580,7 +580,7 @@
     <div class="tabs-nav">
       <button class="tab-btn active" data-tab="geral" onclick="switchProjectTab('geral')">Geral</button>
       <button class="tab-btn" data-tab="rascunhos" onclick="switchProjectTab('rascunhos')">Rascunhos</button>
-      <button class="tab-btn" data-tab="notas" onclick="switchProjectTab('notas')">Informações</button>
+      <button class="tab-btn" data-tab="notas" onclick="switchProjectTab('notas')">Informa├º├Áes</button>
       <button class="tab-btn" data-tab="plano" onclick="switchProjectTab('plano')">Plano de Projeto</button>
     </div>
 
@@ -605,64 +605,64 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Descrição / Objetivo</label>
+        <label class="form-label">Descri├º├úo / Objetivo</label>
         <textarea class="wd-input" id="det-desc" rows="3" style="width:100%;resize:vertical"></textarea>
       </div>
     </div>
 
     <div class="tab-content" id="tab-rascunhos" style="display:none">
       <div class="form-group">
-        <label class="form-label">Rascunhos e Ideias Rápidas</label>
-        <textarea class="wd-input" id="det-rascunhos" rows="12" placeholder="Jogue aqui suas ideias temporárias..." style="width:100%;resize:vertical;font-family:monospace"></textarea>
+        <label class="form-label">Rascunhos e Ideias R├ípidas</label>
+        <textarea class="wd-input" id="det-rascunhos" rows="12" placeholder="Jogue aqui suas ideias tempor├írias..." style="width:100%;resize:vertical;font-family:monospace"></textarea>
       </div>
     </div>
 
     <div class="tab-content" id="tab-notas" style="display:none">
       <div class="form-group">
-        <label class="form-label">Informações Importantes</label>
-        <textarea class="wd-input" id="det-notas" rows="12" placeholder="Dados técnicos, referências fixas, links importantes..." style="width:100%;resize:vertical"></textarea>
+        <label class="form-label">Informa├º├Áes Importantes</label>
+        <textarea class="wd-input" id="det-notas" rows="12" placeholder="Dados t├®cnicos, refer├¬ncias fixas, links importantes..." style="width:100%;resize:vertical"></textarea>
       </div>
     </div>
 
     <div class="tab-content" id="tab-plano" style="display:none">
       <div class="form-group">
-        <label class="form-label">Plano de Execução</label>
+        <label class="form-label">Plano de Execu├º├úo</label>
         <textarea class="wd-input" id="det-plano" rows="12" placeholder="Passo a passo, metas, cronograma..." style="width:100%;resize:vertical"></textarea>
       </div>
     </div>
 
     <div class="modal-actions">
       <button class="wd-btn btn-ghost" onclick="closeModal('modal-detalhes-proj')">Cancelar</button>
-      <button class="wd-btn btn-ghost" onclick="downloadProjectPlan()" title="Baixar Plano em .txt">📄 Exportar TXT</button>
-      <button class="wd-btn btn-primary" onclick="saveProjectDetails()">Salvar Alterações</button>
+      <button class="wd-btn btn-ghost" onclick="downloadProjectPlan()" title="Baixar Plano em .txt">­ƒôä Exportar TXT</button>
+      <button class="wd-btn btn-primary" onclick="saveProjectDetails()">Salvar Altera├º├Áes</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL HÁBITO -->
+<!-- MODAL H├üBITO -->
 <div class="modal-overlay" id="modal-habito">
   <div class="modal">
-    <div class="modal-title" id="mh-title">Novo Hábito</div>
+    <div class="modal-title" id="mh-title">Novo H├íbito</div>
     <input type="hidden" id="bh-id">
     <div class="form-group">
-      <label class="form-label">Nome do hábito</label>
-      <input class="wd-input" id="bh-nome" placeholder="Ex: Academia, Leitura, Meditação" style="width:100%">
+      <label class="form-label">Nome do h├íbito</label>
+      <input class="wd-input" id="bh-nome" placeholder="Ex: Academia, Leitura, Medita├º├úo" style="width:100%">
     </div>
     <div style="display:flex;gap:10px">
       <div class="form-group" style="flex:1">
-        <label class="form-label">Duração / Meta</label>
+        <label class="form-label">Dura├º├úo / Meta</label>
         <input class="wd-input" id="bh-duracao" placeholder="Ex: 1 hora e meia, 12 min" style="width:100%">
       </div>
       <div class="form-group" style="flex:1">
-        <label class="form-label">Horário (Opcional)</label>
+        <label class="form-label">Hor├írio (Opcional)</label>
         <input class="wd-input" id="bh-hora" type="time" style="width:100%">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Tipo</label>
       <select class="wd-select" id="bh-tipo" style="width:100%" onchange="document.getElementById('bh-dias-wrap').style.display=this.value==='rec'?'block':'none'">
-        <option value="rec">Recorrente (Dias específicos)</option>
-        <option value="occ">Ocasional / Flexível</option>
+        <option value="rec">Recorrente (Dias espec├¡ficos)</option>
+        <option value="occ">Ocasional / Flex├¡vel</option>
       </select>
     </div>
     <div class="form-group" id="bh-dias-wrap">
@@ -679,7 +679,7 @@
     </div>
     <div class="modal-actions">
       <button class="wd-btn btn-ghost" onclick="closeModal('modal-habito')">Cancelar</button>
-      <button class="wd-btn btn-primary" onclick="saveHabito()" id="mh-btn">Criar Hábito</button>
+      <button class="wd-btn btn-primary" onclick="saveHabito()" id="mh-btn">Criar H├íbito</button>
     </div>
   </div>
 </div>
@@ -694,7 +694,7 @@
       <input class="wd-input" id="ms-site" placeholder="Ex: Google, Instagram, Nubank" style="width:100%">
     </div>
     <div class="form-group">
-      <label class="form-label">Usuário / E-mail</label>
+      <label class="form-label">Usu├írio / E-mail</label>
       <input class="wd-input" id="ms-user" placeholder="seu@email.com" style="width:100%" autocomplete="off">
     </div>
     <div class="form-group">
@@ -710,7 +710,7 @@
     <div class="form-group">
       <label class="form-label">Senha *</label>
       <div style="display:flex;gap:8px">
-        <input class="wd-input" id="ms-pwd" type="password" placeholder="••••••••" style="flex:1;font-family:monospace;letter-spacing:2px" autocomplete="new-password">
+        <input class="wd-input" id="ms-pwd" type="password" placeholder="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó" style="flex:1;font-family:monospace;letter-spacing:2px" autocomplete="new-password">
         <button class="wd-btn btn-ghost btn-sm" onclick="toggleMsPwd()" title="Mostrar/Ocultar"><i data-lucide="eye" style="width:14px;height:14px"></i></button>
         <button class="wd-btn btn-ghost btn-sm" onclick="fillFromGenerator()" title="Usar senha gerada"><i data-lucide="key" style="width:14px;height:14px"></i></button>
       </div>
@@ -721,7 +721,7 @@
     </div>
     <div class="form-group">
       <label class="form-label">Notas (opcional)</label>
-      <textarea class="wd-input" id="ms-nota" rows="2" placeholder="Observações..." style="width:100%;resize:vertical"></textarea>
+      <textarea class="wd-input" id="ms-nota" rows="2" placeholder="Observa├º├Áes..." style="width:100%;resize:vertical"></textarea>
     </div>
     <div class="modal-actions">
       <button class="wd-btn btn-ghost" onclick="closeModal('modal-senha')">Cancelar</button>
@@ -736,13 +736,13 @@
     <div class="mob-nav-icon"><i data-lucide="layout-dashboard"></i></div>Painel
   </div>
   <div class="mob-nav-item" onclick="nav('habitos',this)">
-    <div class="mob-nav-icon"><i data-lucide="check-circle-2"></i></div>Hábitos
+    <div class="mob-nav-icon"><i data-lucide="check-circle-2"></i></div>H├íbitos
   </div>
   <div class="mob-nav-item" onclick="nav('tarefas',this)">
     <div class="mob-nav-icon"><i data-lucide="list-todo"></i></div>Tarefas
   </div>
   <div class="mob-nav-item" onclick="nav('financas',this)">
-    <div class="mob-nav-icon"><i data-lucide="wallet"></i></div>Finanças
+    <div class="mob-nav-icon"><i data-lucide="wallet"></i></div>Finan├ºas
   </div>
   <div class="mob-nav-item" onclick="nav('projetos',this)">
     <div class="mob-nav-icon"><i data-lucide="rocket"></i></div>Projetos
