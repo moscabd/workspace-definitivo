@@ -7,7 +7,7 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.8'
+const APP_VERSION = '1.4.9'
 
 const syncInProgress = {}
 let realtimeChannel = null
@@ -2088,13 +2088,36 @@ async function init(){
     }
   })
 
-  // Sincronização: Realtime + fallback periódico e ao focar
-  window.addEventListener('focus', syncUserMetadataInBackground)
+  // Sincronização inteligente e ultra-rápida (tempo real dinâmico)
+  let metadataSyncInterval = null
+  function startMetadataSync() {
+    if (metadataSyncInterval) clearInterval(metadataSyncInterval)
+    syncUserMetadataInBackground()
+    metadataSyncInterval = setInterval(syncUserMetadataInBackground, 1500)
+  }
+  function stopMetadataSync() {
+    if (metadataSyncInterval) { clearInterval(metadataSyncInterval); metadataSyncInterval = null }
+  }
+
+  // Monitora visibilidade para poupar recursos e bateria
+  window.addEventListener('focus', startMetadataSync)
+  window.addEventListener('blur', stopMetadataSync)
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') syncUserMetadataInBackground()
+    if (document.visibilityState === 'visible') startMetadataSync()
+    else stopMetadataSync()
   })
-  // Polling de segurança a cada 5s para sincronizar poupança rapidamente
-  setInterval(syncUserMetadataInBackground, 5000)
+
+  // Sincroniza instantaneamente ao tocar/clicar na tela
+  document.addEventListener('pointerdown', () => {
+    const now = Date.now()
+    if (!window._lastClickSync || now - window._lastClickSync > 1500) {
+      window._lastClickSync = now
+      syncUserMetadataInBackground()
+    }
+  })
+
+  // Inicia o sincronizador ultra-rápido ativo
+  startMetadataSync()
 }
 
 async function syncUserMetadataInBackground() {
