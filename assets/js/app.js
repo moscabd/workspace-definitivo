@@ -7,7 +7,7 @@ const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.1'
+const APP_VERSION = '1.4.2'
 
 // ══════════════════════════════════════════
 //  SECURITY
@@ -2086,7 +2086,15 @@ async function init(){
   } else {
     const {data:{session}}=await db.auth.getSession()
     if(!session){window.location.href='/';return}
-    currentUser=session.user
+    
+    // Obter dados atualizados do servidor para evitar sessão cacheada e obsoleta
+    try {
+      const {data:{user}} = await db.auth.getUser()
+      currentUser = user || session.user
+    } catch(e) {
+      currentUser = session.user
+    }
+    
     try{await loadAllData()}catch(e){console.error('Load error',e)}
   }
   initDate()
@@ -2108,5 +2116,29 @@ async function init(){
       setTimeout(()=>document.getElementById('tk-input')?.focus(), 80)
     }
   })
+
+  // Sincronização automática em segundo plano ao focar a aba/janela
+  window.addEventListener('focus', syncUserMetadataInBackground)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncUserMetadataInBackground()
+  })
 }
+
+async function syncUserMetadataInBackground() {
+  if (typeof currentUser === 'undefined' || !currentUser || currentUser.id === 'local-dev' || typeof db === 'undefined') return
+  try {
+    const { data: { user } } = await db.auth.getUser()
+    if (user && JSON.stringify(user.user_metadata) !== JSON.stringify(currentUser.user_metadata)) {
+      currentUser = user
+      localStorage.setItem('wd_poupanca', parseFloat(user.user_metadata.wd_poupanca || 0).toFixed(2))
+      renderFinancas()
+      if (typeof updateStats === 'function') updateStats()
+      if (typeof renderDashboard === 'function') renderDashboard()
+      showUserInfo()
+    }
+  } catch(e) {
+    console.warn('Erro ao sincronizar metadados em segundo plano:', e)
+  }
+}
+
 init()
