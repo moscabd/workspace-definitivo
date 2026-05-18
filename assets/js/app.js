@@ -4,10 +4,17 @@
 const SUPABASE_URL = 'https://dpuqurchrhmibkzmskdr.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwdXF1cmNocmhtaWJrem1za2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTM4NTcsImV4cCI6MjA5MTIyOTg1N30.we9ui-K1_cXXD5UYYjtrc-Hrr1U2qKQwaO1qgUF-WX4'
 const { createClient } = supabase
-const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  global: {
+    fetch: async (url, options) => {
+      const sep = url.includes('?') ? '&' : '?'
+      return fetch(url + sep + '_cb=' + Date.now(), { ...options, cache: 'no-store' })
+    }
+  }
+})
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.4'
+const APP_VERSION = '1.4.5'
 
 // ══════════════════════════════════════════
 //  SECURITY
@@ -2147,6 +2154,8 @@ async function syncAllTablesFromServer(force = false) {
   if (typeof currentUser === 'undefined' || !currentUser || currentUser.id === 'local-dev') return
   try {
     const uid = currentUser.id
+    const ts = Date.now()
+    const noCache = { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }
     const [h,t,c,f,p,b] = await Promise.all([
       db.from('habitos').select('*').eq('user_id',uid),
       db.from('tarefas').select('*').eq('user_id',uid),
@@ -2181,6 +2190,7 @@ async function syncAllTablesFromServer(force = false) {
       if (activePage && typeof renderPage === 'function') renderPage(activePage)
       if (typeof updateStats === 'function') updateStats()
       if (typeof renderDashboard === 'function') renderDashboard()
+      console.log('[Sync] Dados atualizados do servidor em', ((Date.now()-ts)/1000).toFixed(1)+'s')
     }
   } catch(e) {
     console.warn('Erro ao recarregar tabelas do servidor:', e)
