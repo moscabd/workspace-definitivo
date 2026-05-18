@@ -4,17 +4,10 @@
 const SUPABASE_URL = 'https://dpuqurchrhmibkzmskdr.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwdXF1cmNocmhtaWJrem1za2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTM4NTcsImV4cCI6MjA5MTIyOTg1N30.we9ui-K1_cXXD5UYYjtrc-Hrr1U2qKQwaO1qgUF-WX4'
 const { createClient } = supabase
-const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  global: {
-    fetch: async (url, options) => {
-      const sep = url.includes('?') ? '&' : '?'
-      return fetch(url + sep + '_cb=' + Date.now(), { ...options, cache: 'no-store' })
-    }
-  }
-})
+const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 const cache = {}
-const APP_VERSION = '1.4.5'
+const APP_VERSION = '1.4.6'
 
 // ══════════════════════════════════════════
 //  SECURITY
@@ -90,17 +83,34 @@ const tableMappers = {
 async function syncTable(key,data){
   if(!currentUser||!tableMappers[key])return
   try{
-    await db.from(key).delete().eq('user_id',currentUser.id)
+    const { data: existing, error: fetchError } = await db.from(key).select('id').eq('user_id',currentUser.id)
+    if(fetchError){ console.error('Sync fetch['+key+']',fetchError); return }
+
+    const existingIds = new Set((existing||[]).map(r=>r.id))
+    const cacheIds = new Set(data.map(r=>r.id))
+
+    // SAFETY: never delete server data if cache is empty but server has data
+    // Prevents data loss from race conditions
+    if(existingIds.size>0 && cacheIds.size===0){
+      console.warn('Sync safety['+key+']: cache is empty but server has '+existingIds.size+' items. Skipping deletion.')
+      return
+    }
+
+    // Delete items removed from cache
+    const toDelete = [...existingIds].filter(id=>!cacheIds.has(id))
+    if(toDelete.length>0){
+      const {error:delErr}=await db.from(key).delete().in('id',toDelete).eq('user_id',currentUser.id)
+      if(delErr) console.error('Sync del['+key+']',delErr)
+    }
+
+    // Upsert (insert new, update existing)
     if(data.length>0){
-      const {error}=await db.from(key).insert(data.map(tableMappers[key]))
-      if(error){
-        console.error('Sync['+key+']',error);
-        showToast('Erro ao salvar '+key+': '+error.message,'error')
-      }
+      const {error}=await db.from(key).upsert(data.map(tableMappers[key]),{onConflict:'id'})
+      if(error) console.error('Sync upsert['+key+']',error)
     }
   }catch(e){
     console.error('Sync error',e);
-    showToast('Erro crítico ao sincronizar '+key+': '+e.message,'error')
+    showToast('Erro ao sincronizar '+key+': '+e.message,'error')
   }
 }
 
@@ -2154,8 +2164,6 @@ async function syncAllTablesFromServer(force = false) {
   if (typeof currentUser === 'undefined' || !currentUser || currentUser.id === 'local-dev') return
   try {
     const uid = currentUser.id
-    const ts = Date.now()
-    const noCache = { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }
     const [h,t,c,f,p,b] = await Promise.all([
       db.from('habitos').select('*').eq('user_id',uid),
       db.from('tarefas').select('*').eq('user_id',uid),
@@ -2164,6 +2172,18 @@ async function syncAllTablesFromServer(force = false) {
       db.from('projetos').select('*').eq('user_id',uid),
       db.from('brain').select('*').eq('user_id',uid),
     ])
+
+    // SAFETY: skip update if any query returned an error (network issue, etc.)
+    if(h.error||t.error||c.error||f.error||p.error||b.error){
+      console.warn('[Sync] Server error, skipping cache update')
+      return
+    }
+    // SAFETY: skip update if server returned null (shouldn't happen, but just in case)
+    if(h.data===null||t.data===null||c.data===null||f.data===null||p.data===null||b.data===null){
+      console.warn('[Sync] Null response, skipping cache update')
+      return
+    }
+
     const prevHabitos = JSON.stringify(cache.habitos)
     const prevTarefas = JSON.stringify(cache.tarefas)
     const prevFinancas = JSON.stringify(cache.financas)
@@ -2190,7 +2210,6 @@ async function syncAllTablesFromServer(force = false) {
       if (activePage && typeof renderPage === 'function') renderPage(activePage)
       if (typeof updateStats === 'function') updateStats()
       if (typeof renderDashboard === 'function') renderDashboard()
-      console.log('[Sync] Dados atualizados do servidor em', ((Date.now()-ts)/1000).toFixed(1)+'s')
     }
   } catch(e) {
     console.warn('Erro ao recarregar tabelas do servidor:', e)
