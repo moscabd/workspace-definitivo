@@ -721,13 +721,13 @@ function renderCompras(){
 //  FINANÇAS
 // ══════════════════════════════════════════
 const catColors = {
-  'trabalho':['#1a2810','var(--accent2)'],
-  'despesa-fixa':['#070f2b','var(--accent)'],
-  'lazer':['#2a1510','var(--cyan)'],
-  'alimentacao':['#2a1e10','var(--accent3)'],
-  'saude':['#101a2a','var(--accent5)'],
-  'investimento':['#0f2318','var(--accent2)'],
-  'outro':['#1a1a1a','var(--text2)']
+  'trabalho':['rgba(124,58,237,.12)','var(--primary-light)'],
+  'despesa-fixa':['rgba(239,68,68,.1)','#fca5a5'],
+  'lazer':['rgba(59,130,246,.1)','#93c5fd'],
+  'alimentacao':['rgba(245,158,11,.1)','var(--warning)'],
+  'saude':['rgba(16,185,129,.1)','var(--success)'],
+  'investimento':['rgba(6,182,212,.1)','var(--info)'],
+  'outro':['rgba(255,255,255,.05)','var(--text2)']
 }
 
 let fnPeriod = 'mes' // 'hoje' | 'semana' | 'mes' | 'tudo'
@@ -919,13 +919,13 @@ function renderFinancas(){
 //  GRÁFICO FINANCEIRO — Donut por Categoria
 // ══════════════════════════════════════════
 const chartPalette = {
-  'trabalho':    '#3b82f6',
-  'despesa-fixa':'#ff6c00',
-  'lazer':       '#ffee00',
-  'alimentacao': '#d97706',
+  'trabalho':    '#7c3aed',
+  'despesa-fixa':'#ef4444',
+  'lazer':       '#3b82f6',
+  'alimentacao': '#f59e0b',
   'saude':       '#10b981',
-  'investimento':'#059669',
-  'outro':       '#64748b'
+  'investimento':'#06b6d4',
+  'outro':       '#71717a'
 }
 const catLabels = {
   'trabalho':'Trabalho','despesa-fixa':'Despesa Fixa',
@@ -976,8 +976,8 @@ function renderFinChart(list){
 
   // Detecta tema claro
   const isLight = document.documentElement.getAttribute('data-theme') === 'light'
-  const textColor    = isLight ? '#1a1d2e' : '#e8e9ee'
-  const subtextColor = isLight ? '#8a90ad' : '#454857'
+  const textColor    = isLight ? '#09090b' : '#f4f4f5'
+  const subtextColor = isLight ? '#71717a' : '#71717a'
 
   // Sombra geral do canvas
   ctx.shadowColor   = 'rgba(0,0,0,0.25)'
@@ -1002,7 +1002,7 @@ function renderFinChart(list){
   ctx.shadowBlur = 0
   ctx.beginPath()
   ctx.arc(cx, cy, innerR - 1, 0, 2*Math.PI)
-  ctx.fillStyle = isLight ? '#ffffff' : '#070f2b'
+  ctx.fillStyle = isLight ? '#ffffff' : '#0f0f17'
   ctx.fill()
 
   // Texto central
@@ -1349,12 +1349,12 @@ function saveProjectDetails(){
 //  SEGUNDO CÉREBRO
 // ══════════════════════════════════════════
 const tagColors = {
-  ideia:['#1e1a10','var(--accent3)'],
-  projeto:['#070f2b','var(--accent)'],
-  aprendizado:['#101a2a','var(--accent5)'],
-  reflexao:['#2a1510','var(--cyan)'],
-  referencia:['#0f2318','var(--accent2)'],
-  outro:['#1a1a1a','var(--text2)']
+  ideia:['rgba(245,158,11,.1)','#fbbf24'],
+  projeto:['rgba(124,58,237,.12)','var(--primary-light)'],
+  aprendizado:['rgba(59,130,246,.1)','#93c5fd'],
+  reflexao:['rgba(99,102,241,.12)','#a5b4fc'],
+  referencia:['rgba(16,185,129,.1)','var(--success)'],
+  outro:['rgba(255,255,255,.05)','var(--text2)']
 }
 const tagIcons = {ideia:'💡',projeto:'🚀',aprendizado:'📚',reflexao:'🔮',referencia:'🔗',outro:'📌'}
 
