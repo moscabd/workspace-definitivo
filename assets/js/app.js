@@ -1148,34 +1148,154 @@ function deleteProjeto(id){
 }
 
 function renderProjetos(){
-  const list = S.get('projetos')
-  const el = document.getElementById('proj-list-full')
-  if(!el) return
-  if(!list.length){el.innerHTML='<div class="empty" style="padding:60px">Nenhum projeto ainda. Clique em "+ Novo Projeto" para começar.</div>';return}
+  const list = S.get('projetos') || [];
+  const el = document.getElementById('proj-list-full');
+  if(!el) return;
 
-  el.innerHTML = list.map(p=>{
-    const color = projColors[p.cat]||'var(--accent)'
-    return `<div class="card" style="margin-bottom:14px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
-        <div>
-          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text1)">${p.nome}</div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span class="ptag">${p.cat}</span>
-          <button class="wd-btn btn-primary btn-sm" onclick="openProjectDetails(${p.id})">🔍 Detalhes</button>
-          <button class="wd-btn btn-ghost btn-sm" onclick="openEditProg(${p.id},${p.pct})">Atualizar</button>
-          <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
-        </div>
+  if(!list.length){
+    el.innerHTML=`
+      <div class="proj-empty-card">
+        <div class="proj-empty-icon">🚀</div>
+        <p style="font-weight: 600; color: var(--text2); font-size: 16px; margin-bottom: 6px;">Nenhum projeto registrado</p>
+        <p style="color: var(--text3); font-size: 13px;">Clique em "+ Novo Projeto" para planejar e acompanhar seus objetivos.</p>
+      </div>`;
+    return;
+  }
+
+  // Categoria badge formatting map
+  const catLabels = {
+    trabalho: '💼 Trabalho',
+    pessoal: '👤 Pessoal',
+    estudo: '📚 Estudo',
+    financeiro: '💰 Financeiro'
+  };
+
+  const ativos = list.filter(p => p.pct < 100);
+  const concluidos = list.filter(p => p.pct === 100);
+
+  // Sorting: newest first
+  ativos.sort((a,b) => b.id - a.id);
+  concluidos.sort((a,b) => b.id - a.id);
+
+  let htmlContent = '';
+
+  // 1. Seção de Projetos em Andamento
+  htmlContent += `
+    <div class="proj-section-title active-title">
+      <i data-lucide="rocket" style="width:20px;height:20px"></i>
+      Projetos em Andamento (${ativos.length})
+    </div>
+    <div class="proj-grid">
+  `;
+
+  if (ativos.length === 0) {
+    htmlContent += `
+      <div class="proj-empty-card">
+        <div class="proj-empty-icon">💡</div>
+        <p style="font-weight: 500; color: var(--text3); font-size: 14px; margin: 0;">Nenhum projeto em andamento no momento.</p>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="prog-bar" style="flex:1">
-          <div class="prog-fill" style="width:${p.pct}%;background:${color}"></div>
+    `;
+  } else {
+    htmlContent += ativos.map(p => {
+      const color = projColors[p.cat] || 'var(--accent)';
+      const catLabel = catLabels[p.cat] || p.cat;
+      const desc = p.desc ? `<div class="proj-card-desc">${p.desc}</div>` : `<div class="proj-card-desc" style="color:var(--text3); font-style:italic;">Sem descrição cadastrada.</div>`;
+      
+      return `
+        <div class="proj-card active-card">
+          <div class="proj-card-header">
+            <div class="proj-card-title-area">
+              <div class="proj-card-title" title="${p.nome}">${p.nome}</div>
+            </div>
+            <span class="ptag" style="border-color:${color}44; color:${color}; background:${color}11;">${catLabel}</span>
+          </div>
+          ${desc}
+          <div class="proj-card-prog-section">
+            <div class="proj-card-prog-header">
+              <span style="font-size:12px; font-weight:600; color:var(--text2)">Progresso</span>
+              <span class="proj-card-prog-pct" style="color:${color}">${p.pct}%</span>
+            </div>
+            <div class="proj-card-prog-bar">
+              <div class="proj-card-prog-fill" style="width:${p.pct}%; background:linear-gradient(90deg, var(--primary-light), ${color}); box-shadow: 0 0 10px ${color}44;"></div>
+            </div>
+          </div>
+          <div class="proj-card-footer">
+            <div class="proj-card-date">Criado em ${formatDate(p.createdAt)}</div>
+            <div class="proj-card-actions">
+              <button class="wd-btn btn-ghost btn-sm" onclick="openProjectDetails(${p.id})" title="Ver Detalhes">🔍 Detalhes</button>
+              <button class="wd-btn btn-ghost btn-sm" onclick="openEditProg(${p.id},${p.pct})" title="Atualizar Progresso">Atualizar</button>
+              <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})" title="Excluir Projeto"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+            </div>
+          </div>
         </div>
-        <div style="font-size:17px;font-weight:600;color:${color};min-width:40px;text-align:right">${p.pct}%</div>
+      `;
+    }).join('');
+  }
+
+  htmlContent += `</div>`; // Fechar proj-grid ativos
+
+  // 2. Seção de Projetos Concluídos
+  htmlContent += `
+    <div class="proj-section-title completed-title" style="margin-top: 36px;">
+      <i data-lucide="check-circle-2" style="width:20px;height:20px"></i>
+      Projetos Concluídos (${concluidos.length})
+    </div>
+    <div class="proj-grid">
+  `;
+
+  if (concluidos.length === 0) {
+    htmlContent += `
+      <div class="proj-empty-card" style="border-color: rgba(16, 185, 129, 0.15)">
+        <div class="proj-empty-icon" style="font-size: 26px;">🎯</div>
+        <p style="font-weight: 500; color: var(--text3); font-size: 14px; margin: 0;">Seus projetos concluídos (100%) aparecerão aqui!</p>
       </div>
-      <div style="font-size:13px;color:var(--text3);margin-top:6px">Criado em ${formatDate(p.createdAt)}</div>
-    </div>`
-  }).join('')
+    `;
+  } else {
+    htmlContent += concluidos.map(p => {
+      const color = 'var(--success)';
+      const catLabel = catLabels[p.cat] || p.cat;
+      const desc = p.desc ? `<div class="proj-card-desc" style="opacity: 0.8;">${p.desc}</div>` : `<div class="proj-card-desc" style="color:var(--text3); font-style:italic;">Sem descrição cadastrada.</div>`;
+      
+      return `
+        <div class="proj-card completed-card">
+          <div class="proj-card-header">
+            <div class="proj-card-title-area" style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size: 18px; line-height: 1;">🏆</span>
+              <div class="proj-card-title" title="${p.nome}">${p.nome}</div>
+            </div>
+            <span class="ptag" style="border-color:rgba(16, 185, 129, 0.3); color:${color}; background:rgba(16, 185, 129, 0.1);">${catLabel}</span>
+          </div>
+          ${desc}
+          <div class="proj-card-prog-section">
+            <div class="proj-card-prog-header">
+              <span style="font-size:12px; font-weight:600; color:var(--success)">Concluído!</span>
+              <span class="proj-card-prog-pct" style="color:${color}">100%</span>
+            </div>
+            <div class="proj-card-prog-bar" style="border-color:rgba(16, 185, 129, 0.2)">
+              <div class="proj-card-prog-fill" style="width:100%; background:linear-gradient(90deg, #10b981, #059669); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);"></div>
+            </div>
+          </div>
+          <div class="proj-card-footer">
+            <div class="proj-card-date">Criado em ${formatDate(p.createdAt)}</div>
+            <div class="proj-card-actions">
+              <button class="wd-btn btn-ghost btn-sm" onclick="openProjectDetails(${p.id})" title="Ver Detalhes">🔍 Detalhes</button>
+              <button class="wd-btn btn-ghost btn-sm" onclick="openEditProg(${p.id},100)" title="Atualizar Progresso">Atualizar</button>
+              <button class="wd-btn btn-danger btn-sm" onclick="deleteProjeto(${p.id})" title="Excluir Projeto"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  htmlContent += `</div>`; // Fechar proj-grid concluídos
+
+  el.innerHTML = htmlContent;
+  
+  // Re-inicializa ícones Lucide no conteúdo dinamicamente gerado
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    lucide.createIcons();
+  }
 }
 
 // Detalhes e Edição de Projeto
@@ -1378,9 +1498,10 @@ function renderDashboard(){
   // projetos mini
   const dpEl = document.getElementById('dash-proj-list')
   if(dpEl){
-    if(!projetos.length){dpEl.innerHTML='<div class="empty">Nenhum projeto</div>'}
+    const activeProjs = projetos.filter(p => p.pct < 100);
+    if(!activeProjs.length){dpEl.innerHTML='<div class="empty">Nenhum projeto em andamento</div>'}
     else{
-      dpEl.innerHTML = projetos.slice(0,4).map(p=>{
+      dpEl.innerHTML = activeProjs.slice(0,4).map(p=>{
         const color = projColors[p.cat]||'var(--accent)'
         return `<div class="proj-item" style="margin-bottom:12px">
           <div class="proj-header"><div class="proj-name">${p.nome}</div><div class="proj-pct" style="color:${color}">${p.pct}%</div></div>
