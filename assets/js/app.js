@@ -721,7 +721,7 @@ function renderCompras(){
 //  FINANÇAS
 // ══════════════════════════════════════════
 const catColors = {
-  'trabalho':['rgba(124,58,237,.12)','var(--primary-light)'],
+  'trabalho':['rgba(37,99,235,.12)','var(--primary-light)'],
   'despesa-fixa':['rgba(239,68,68,.1)','#fca5a5'],
   'lazer':['rgba(59,130,246,.1)','#93c5fd'],
   'alimentacao':['rgba(245,158,11,.1)','var(--warning)'],
@@ -919,7 +919,7 @@ function renderFinancas(){
 //  GRÁFICO FINANCEIRO — Donut por Categoria
 // ══════════════════════════════════════════
 const chartPalette = {
-  'trabalho':    '#7c3aed',
+  'trabalho':    '#2563eb',
   'despesa-fixa':'#ef4444',
   'lazer':       '#3b82f6',
   'alimentacao': '#f59e0b',
@@ -1350,9 +1350,9 @@ function saveProjectDetails(){
 // ══════════════════════════════════════════
 const tagColors = {
   ideia:['rgba(245,158,11,.1)','#fbbf24'],
-  projeto:['rgba(124,58,237,.12)','var(--primary-light)'],
+  projeto:['rgba(37,99,235,.12)','var(--primary-light)'],
   aprendizado:['rgba(59,130,246,.1)','#93c5fd'],
-  reflexao:['rgba(99,102,241,.12)','#a5b4fc'],
+  reflexao:['rgba(217,119,6,.12)','var(--cyan)'],
   referencia:['rgba(16,185,129,.1)','var(--success)'],
   outro:['rgba(255,255,255,.05)','var(--text2)']
 }

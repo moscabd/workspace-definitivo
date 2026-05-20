@@ -1,63 +1,63 @@
 /* ═══════════════════════════════════════════════════
    DESIGN SYSTEM — Workspace Definitivo "Enterprise"
-   Inspired by: Stripe, Linear, Vercel, Figma
+   Inspired by: Stripe, Linear, Vercel, Figma (Blue/Green/Gold Theme)
    ═══════════════════════════════════════════════════ */
 :root {
   /* ── Backgrounds — Rich Obsidian Dark ── */
-  --bg-0:#0a0a0f;
-  --bg-1:#0f0f17;
-  --bg-2:#14141e;
-  --bg-3:#1a1a27;
-  --bg-4:#222235;
-  --bg-5:#2a2a43;
+  --bg-0:#080b11; /* Deep navy obsidian */
+  --bg-1:#0d111a;
+  --bg-2:#121824;
+  --bg-3:#182030;
+  --bg-4:#202b40;
+  --bg-5:#283650;
 
   /* ── Surfaces / Glass ── */
-  --glass-1:rgba(20,20,30,.8);
-  --glass-2:rgba(26,26,39,.7);
-  --glass-3:rgba(34,34,53,.6);
-  --glass-card:rgba(15,15,23,.6);
-  --glass-sidebar:rgba(10,10,15,.92);
-  --glass-topbar:rgba(10,10,15,.85);
-  --glass-modal:rgba(12,12,20,.97);
-  --input-bg:rgba(20,20,30,.7);
-  --input-bg-focus:rgba(26,26,39,.8);
-  --hover-bg:rgba(255,255,255,.04);
+  --glass-1:rgba(13,17,26,.8);
+  --glass-2:rgba(18,24,36,.75);
+  --glass-3:rgba(24,32,48,.65);
+  --glass-card:rgba(13,17,26,.6);
+  --glass-sidebar:rgba(8,11,17,.92);
+  --glass-topbar:rgba(8,11,17,.85);
+  --glass-modal:rgba(10,13,20,.97);
+  --input-bg:rgba(18,24,36,.7);
+  --input-bg-focus:rgba(24,32,48,.8);
+  --hover-bg:rgba(255,255,255,.03);
   --overlay-bg:rgba(0,0,0,.6);
   --tab-active-bg:#ffffff;
-  --tab-active-text:#0a0a0f;
+  --tab-active-text:#080b11;
 
-  /* ── Borders — Translucent White ── */
-  --border:rgba(255,255,255,.08);
-  --border-2:rgba(255,255,255,.14);
-  --border-3:rgba(255,255,255,.22);
+  /* ── Borders — Translucent Corporate ── */
+  --border:rgba(255,255,255,.07);
+  --border-2:rgba(255,255,255,.13);
+  --border-3:rgba(255,255,255,.2);
   --border-subtle:rgba(255,255,255,.04);
-  --border-glow:rgba(124,58,237,.6);
+  --border-glow:rgba(37,99,235,.6);
 
-  /* ── Text — Clean White Scale ── */
-  --text1:#f4f4f5;
-  --text2:#a1a1aa;
-  --text3:#52525b;
-  --text4:#0a0a0f;
+  /* ── Text — Clean Off-White Scale ── */
+  --text1:#f8fafc;
+  --text2:#94a3b8;
+  --text3:#475569;
+  --text4:#080b11;
 
-  /* ── Primary — Deep Violet / Indigo (Stripe-esque) ── */
-  --primary:#7c3aed;
-  --primary-dark:#6d28d9;
-  --primary-light:#a78bfa;
-  --primary-rgb:124,58,237;
-  --primary-subtle:rgba(124,58,237,.12);
-  --primary-glow:rgba(124,58,237,.35);
+  /* ── Primary — Deep Royal Blue (Corporate Excellence) ── */
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --primary-light:#60a5fa;
+  --primary-rgb:37,99,235;
+  --primary-subtle:rgba(37,99,235,.12);
+  --primary-glow:rgba(37,99,235,.35);
 
-  /* ── Accent — Electric Blue (Linear-esque) ── */
-  --cyan:#3b82f6;
-  --cyan-dark:#2563eb;
-  --cyan-rgb:59,130,246;
-  --cyan-subtle:rgba(59,130,246,.12);
-  --cyan-glow:rgba(59,130,246,.3);
+  /* ── Accent — Pure Gold / Amber (Luxury & Prestige) ── */
+  --cyan:#d97706; /* Ouro corporativo / Amber */
+  --cyan-dark:#b45309;
+  --cyan-rgb:217,119,6;
+  --cyan-subtle:rgba(217,119,6,.12);
+  --cyan-glow:rgba(217,119,6,.3);
   --secondary:var(--cyan);
   --secondary-rgb:var(--cyan-rgb);
 
   /* ── Semantic Colors ── */
-  --success:#10b981;
+  --success:#10b981; /* Verde Esmeralda */
   --success-rgb:16,185,129;
   --success-subtle:rgba(16,185,129,.12);
 
@@ -65,19 +65,19 @@
   --danger-rgb:239,68,68;
   --danger-subtle:rgba(239,68,68,.12);
 
-  --warning:#f59e0b;
-  --warning-rgb:245,158,11;
-  --warning-subtle:rgba(245,158,11,.12);
+  --warning:#fbbf24; /* Ouro Brilhante */
+  --warning-rgb:251,191,36;
+  --warning-subtle:rgba(251,191,36,.12);
 
-  --info:#06b6d4;
-  --info-rgb:6,182,212;
+  --info:#0284c7; /* Azul Oceano */
+  --info-rgb:2,132,199;
 
   /* ── Legacy aliases ── */
   --accent:var(--primary);
   --accent2:var(--success);
   --accent3:var(--warning);
   --accent4:var(--danger);
-  --accent5:var(--cyan);
+  --accent5:var(--info);
   --accent-rgb:var(--primary-rgb);
   --bg0:var(--bg-0);--bg1:var(--bg-1);--bg2:var(--bg-2);--bg3:var(--bg-3);
 
@@ -95,9 +95,9 @@
   --shadow-md:0 4px 16px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.3);
   --shadow-lg:0 20px 60px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.4);
   --shadow-card:0 1px 3px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.05);
-  --shadow-violet:0 8px 32px rgba(124,58,237,.25);
-  --shadow-cyan:0 8px 32px rgba(59,130,246,.2);
-  --shadow-glow:0 0 0 1px rgba(124,58,237,.3),0 4px 20px rgba(124,58,237,.2);
+  --shadow-primary:0 8px 32px rgba(37,99,235,.25);
+  --shadow-cyan:0 8px 32px rgba(217,119,6,.2);
+  --shadow-glow:0 0 0 1px rgba(37,99,235,.3),0 4px 20px rgba(37,99,235,.2);
 
   /* ── Transitions ── */
   --ease:cubic-bezier(.16,1,.3,1);
@@ -112,37 +112,44 @@
 
 /* ══ Light Theme — Clean Enterprise ══ */
 [data-theme="light"] {
-  --bg-0:#fafafa;
-  --bg-1:#f4f4f5;
+  --bg-0:#f8fafc;
+  --bg-1:#f1f5f9;
   --bg-2:#ffffff;
-  --bg-3:#e4e4e7;
-  --bg-4:#d4d4d8;
-  --bg-5:#a1a1aa;
+  --bg-3:#e2e8f0;
+  --bg-4:#cbd5e1;
+  --bg-5:#94a3b8;
 
   --glass-card:rgba(255,255,255,.9);
-  --glass-sidebar:rgba(250,250,250,.96);
+  --glass-sidebar:rgba(248,250,252,.96);
   --glass-topbar:rgba(255,255,255,.92);
   --glass-modal:rgba(255,255,255,.99);
   --input-bg:rgba(255,255,255,.9);
   --input-bg-focus:rgba(255,255,255,1);
   --hover-bg:rgba(0,0,0,.03);
 
-  --border:rgba(0,0,0,.08);
-  --border-2:rgba(0,0,0,.12);
-  --border-3:rgba(0,0,0,.2);
-  --border-subtle:rgba(0,0,0,.04);
+  --border:rgba(0,0,0,.06);
+  --border-2:rgba(0,0,0,.1);
+  --border-3:rgba(0,0,0,.16);
+  --border-subtle:rgba(0,0,0,.03);
 
-  --text1:#09090b;
-  --text2:#52525b;
-  --text3:#a1a1aa;
+  --text1:#0f172a;
+  --text2:#475569;
+  --text3:#94a3b8;
   --text4:#ffffff;
 
-  --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
-  --shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.05);
-  --shadow-lg:0 20px 60px rgba(0,0,0,.1),0 8px 24px rgba(0,0,0,.06);
-  --shadow-card:0 1px 3px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.05);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03);
+  --shadow-md:0 4px 16px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.05);
+  --shadow-card:0 1px 3px rgba(0,0,0,.04),0 0 0 1px rgba(0,0,0,.04);
 
   --bg0:var(--bg-0);--bg1:var(--bg-1);--bg2:var(--bg-2);--bg3:var(--bg-3);
-  --tab-active-bg:#09090b;--tab-active-text:#ffffff;
-  --overlay-bg:rgba(0,0,0,.4);
+  --tab-active-bg:#0f172a;--tab-active-text:#ffffff;
+  --overlay-bg:rgba(0,0,0,.35);
+
+  --primary:#1d4ed8;
+  --primary-dark:#1e3a8a;
+  --primary-light:#3b82f6;
+  --primary-rgb:29,78,216;
+  --primary-subtle:rgba(29,78,216,.08);
+  --primary-glow:rgba(29,78,216,.2);
 }

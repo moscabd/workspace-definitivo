@@ -54,7 +54,7 @@
 .wd-btn:active{transform:scale(.98);transition:transform .08s}
 
 .btn-primary{
-  background:linear-gradient(135deg,var(--primary) 0%,#6d28d9 50%,var(--primary-dark) 100%);
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
   color:#fff;
   box-shadow:0 2px 8px rgba(var(--primary-rgb),.3),0 0 0 1px rgba(var(--primary-rgb),.2);
 }
