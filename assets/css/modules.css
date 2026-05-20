@@ -192,7 +192,7 @@
 .proj-card:hover {
   transform: translateY(-4px) scale(1.01);
   border-color: var(--border-2);
-  box-shadow: var(--shadow-lg), 0 0 24px rgba(99, 102, 241, 0.15);
+  box-shadow: var(--shadow-lg), 0 0 24px rgba(var(--primary-rgb), 0.15);
 }
 
 /* Card Concluído */

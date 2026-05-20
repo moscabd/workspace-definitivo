@@ -1,73 +1,73 @@
 /* ════════════════════════════════════════
-   DESIGN SYSTEM — Workspace "Royal Gold & Navy"
+   DESIGN SYSTEM — Workspace "Tron Cyberpunk"
    ════════════════════════════════════════ */
 :root {
-  /* ── Backgrounds (Deep Navy, No Black) ── */
-  --bg-0:#040c1c; /* Very deep blue, replaces black */
-  --bg-1:#08142a;
-  --bg-2:#0c1d3a;
-  --bg-3:#11264b;
-  --bg-4:#17315d;
-  --bg-5:#1d3d72;
+  /* ── Backgrounds (Deepest Cyber Space Navy) ── */
+  --bg-0:#020617; 
+  --bg-1:#070f2b;
+  --bg-2:#0b193c;
+  --bg-3:#102454;
+  --bg-4:#173070;
+  --bg-5:#203d8c;
 
   /* ── Surfaces / Glass ── */
-  --glass-1:rgba(12,29,58,.75);
-  --glass-2:rgba(17,38,75,.65);
-  --glass-3:rgba(23,49,93,.55);
-  --glass-card:rgba(12,29,58,.6);
-  --glass-sidebar:rgba(8,20,42,.88);
-  --glass-topbar:rgba(4,12,28,.82);
-  --glass-modal:rgba(8,20,42,.92);
+  --glass-1:rgba(7,15,43,.75);
+  --glass-2:rgba(11,25,60,.65);
+  --glass-3:rgba(16,36,84,.55);
+  --glass-card:rgba(7,15,43,.5);
+  --glass-sidebar:rgba(2,6,23,.9);
+  --glass-topbar:rgba(2,6,23,.8);
+  --glass-modal:rgba(2,6,23,.95);
   --input-bg:var(--glass-2);
   --input-bg-focus:var(--glass-3);
-  --hover-bg:rgba(255,255,255,.05);
-  --overlay-bg:rgba(4,12,28,.75);
-  --tab-active-bg:#E2E8F0;
-  --tab-active-text:#040c1c;
+  --hover-bg:rgba(255,255,255,.04);
+  --overlay-bg:rgba(2,6,23,.75);
+  --tab-active-bg:#F8FAFC;
+  --tab-active-text:#020617;
 
-  /* ── Borders (Gold tinted) ── */
-  --border:rgba(245,158,11,.15);
-  --border-2:rgba(245,158,11,.25);
-  --border-3:rgba(245,158,11,.4);
-  --border-subtle:rgba(255,255,255,.05);
-  --border-glow:rgba(245,158,11,.5);
+  /* ── Borders (Tron Electric Cyan Neon) ── */
+  --border:rgba(0,240,255,.2);
+  --border-2:rgba(0,240,255,.35);
+  --border-3:rgba(0,240,255,.6);
+  --border-subtle:rgba(255,255,255,.04);
+  --border-glow:rgba(0,240,255,.75);
 
   /* ── Text ── */
-  --text1:#F8FAFC;
-  --text2:#94A3B8;
-  --text3:#4A5568;
-  --text4:#0c1d3a; /* Dark navy for inverse text instead of black */
+  --text1:#ffffff;
+  --text2:#a5b4fc;
+  --text3:#6366f1;
+  --text4:#020617; /* Deep cyber navy for inverse text instead of black */
 
-  /* ── Primary (Polished Gold) ── */
-  --primary:#F59E0B;
-  --primary-dark:#D97706;
-  --primary-light:#FCD34D;
-  --primary-rgb:245,158,11;
-  --primary-subtle:rgba(245,158,11,.15);
-  --primary-glow:rgba(245,158,11,.35);
+  /* ── Primary (Electric Ciano Neon) ── */
+  --primary:#00f0ff;
+  --primary-dark:#00a2e8;
+  --primary-light:#b3f9ff;
+  --primary-rgb:0,240,255;
+  --primary-subtle:rgba(0,240,255,.12);
+  --primary-glow:rgba(0,240,255,.4);
 
-  /* ── Cyan/Accent (Ocean Blue) ── */
-  --cyan:#3B82F6;
-  --cyan-dark:#2563EB;
-  --cyan-rgb:59,130,246;
-  --cyan-subtle:rgba(59,130,246,.15);
-  --cyan-glow:rgba(59,130,246,.3);
+  /* ── Secondary / Cyan Accent (Vibrant Laranja Neon) ── */
+  --cyan:#ff6c00;
+  --cyan-dark:#d84b00;
+  --cyan-rgb:255,108,0;
+  --cyan-subtle:rgba(255,108,0,.12);
+  --cyan-glow:rgba(255,108,0,.4);
 
   /* ── Semantic (Only allowed colors) ── */
-  --success:#10B981; /* Green */
-  --success-rgb:16,185,129;
-  --success-subtle:rgba(16,185,129,.12);
+  --success:#00ff66; /* Verde Neon */
+  --success-rgb:0,255,102;
+  --success-subtle:rgba(0,255,102,.12);
 
-  --danger:#92400E; /* Brown */
+  --danger:#92400E; /* Marrom Profundo / Bronze */
   --danger-rgb:146,64,14;
   --danger-subtle:rgba(146,64,14,.15);
 
-  --warning:#FBBF24; /* Yellow */
-  --warning-rgb:251,191,36;
-  --warning-subtle:rgba(251,191,36,.12);
+  --warning:#ffee00; /* Amarelo Neon */
+  --warning-rgb:255,238,0;
+  --warning-subtle:rgba(255,238,0,.12);
 
-  --info:#60A5FA; /* Light Blue */
-  --info-rgb:96,165,250;
+  --info:#3b82f6; /* Azul Elétrico */
+  --info-rgb:59,130,246;
 
   /* ── Legacy aliases (para JS-generated HTML) ── */
   --accent:var(--primary);
@@ -76,6 +76,8 @@
   --accent4:var(--danger);
   --accent5:var(--info);
   --accent-rgb:var(--primary-rgb);
+  --secondary:var(--cyan);
+  --secondary-rgb:var(--cyan-rgb);
   --bg0:var(--bg-0);--bg1:var(--bg-1);--bg2:var(--bg-2);--bg3:var(--bg-3);
 
   /* ── Typography ── */
@@ -90,9 +92,9 @@
   --r:var(--r-lg);--r2:var(--r-md);
 
   /* ── Shadows ── */
-  --shadow-sm:0 2px 8px rgba(4,12,28,.4);
-  --shadow-md:0 8px 28px rgba(4,12,28,.55);
-  --shadow-lg:0 20px 60px rgba(4,12,28,.7);
+  --shadow-sm:0 2px 8px rgba(2,6,23,.5);
+  --shadow-md:0 8px 28px rgba(2,6,23,.7);
+  --shadow-lg:0 20px 60px rgba(2,6,23,.9);
   --shadow-violet:0 8px 32px rgba(var(--primary-rgb),.3);
   --shadow-cyan:0 8px 32px rgba(var(--cyan-rgb),.2);
   --shadow-glow:0 0 24px rgba(var(--primary-rgb),.35);
@@ -108,16 +110,48 @@
   --sidebar-w:248px;--topbar-h:58px;
 }
 
-/* ── Light theme (Warm Ivory & Navy) ── */
+/* ── Light theme (Ice Tron / Polar Glacial) ── */
 [data-theme="light"]{
-  --bg-0:#f8f4e6;--bg-1:#f2ead3;--bg-2:#ffffff;--bg-3:#e8dec1;--bg-4:#dfd2b0;
-  --glass-card:rgba(255,255,255,.85);--glass-sidebar:rgba(248,244,230,.94);
-  --glass-topbar:rgba(255,255,255,.9);--glass-modal:rgba(255,255,255,.97);
-  --border:rgba(245,158,11,.15);--border-2:rgba(245,158,11,.25);--border-3:rgba(245,158,11,.4);
-  --border-subtle:rgba(4,12,28,.06);
-  --text1:#040c1c;--text2:#11264b;--text3:#1d3d72;--text4:#ffffff;
-  --shadow-sm:0 2px 8px rgba(4,12,28,.06);--shadow-md:0 8px 28px rgba(4,12,28,.08);
-  --shadow-lg:0 20px 60px rgba(4,12,28,.1);
+  --bg-0:#f0f5ff;
+  --bg-1:#e2eeff;
+  --bg-2:#ffffff;
+  --bg-3:#d4e6ff;
+  --bg-4:#c6deff;
+  --bg-5:#a8cdff;
+
+  --glass-card:rgba(255,255,255,.85);
+  --glass-sidebar:rgba(240,245,255,.94);
+  --glass-topbar:rgba(255,255,255,.9);
+  --glass-modal:rgba(255,255,255,.97);
+
+  --border:rgba(0,102,204,.15);
+  --border-2:rgba(0,102,204,.25);
+  --border-3:rgba(0,102,204,.45);
+  --border-subtle:rgba(0,102,204,.06);
+
+  --text1:#020617; /* Absolute black-navy for readability */
+  --text2:#1e293b;
+  --text3:#475569;
+  --text4:#ffffff;
+
+  --shadow-sm:0 2px 8px rgba(0,102,204,.06);
+  --shadow-md:0 8px 28px rgba(0,102,204,.08);
+  --shadow-lg:0 20px 60px rgba(0,102,204,.1);
+
   --bg0:var(--bg-0);--bg1:var(--bg-1);--bg2:var(--bg-2);--bg3:var(--bg-3);
-  --tab-active-bg:#040c1c;--tab-active-text:#ffffff;
+  --tab-active-bg:#020617;--tab-active-text:#ffffff;
+
+  /* Overriding core accents for excellent contrast in light mode */
+  --primary:#0066cc; /* Deep Cyber Blue */
+  --primary-dark:#004499;
+  --primary-light:#47a3ff;
+  --primary-rgb:0,102,204;
+  --primary-subtle:rgba(0,102,204,.08);
+  --primary-glow:rgba(0,102,204,.25);
+
+  --cyan:#d84b00; /* Rich Cyber Orange for contrast */
+  --cyan-dark:#b23c00;
+  --cyan-rgb:216,75,0;
+  --cyan-subtle:rgba(216,75,0,.08);
+  --cyan-glow:rgba(216,75,0,.2);
 }

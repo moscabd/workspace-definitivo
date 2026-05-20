@@ -14,7 +14,7 @@
 }
 /* Card shimmer top edge */
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--primary-rgb),.4),transparent);pointer-events:none;opacity:0;transition:opacity .3s}
-.card:hover{border-color:var(--border-2);box-shadow:var(--shadow-md),0 0 24px rgba(245,158,11,.15);transform:translateY(-2px)}
+.card:hover{border-color:var(--border-2);box-shadow:var(--shadow-md),0 0 24px rgba(var(--primary-rgb),.15);transform:translateY(-2px)}
 .card:hover::before{opacity:1}
 .card-title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .card-title svg{width:13px;height:13px;opacity:.7}
@@ -109,7 +109,7 @@
   transition:var(--transition);position:relative;overflow:hidden;
 }
 .stat-chip::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--primary),var(--accent));opacity:0;transition:opacity .3s}
-.stat-chip:hover{border-color:var(--border-2);transform:translateY(-3px);box-shadow:var(--shadow-md),0 0 20px rgba(245,158,11,.15)}
+.stat-chip:hover{border-color:var(--border-2);transform:translateY(-3px);box-shadow:var(--shadow-md),0 0 20px rgba(var(--primary-rgb),.15)}
 .stat-chip:hover::after{opacity:.8}
 .sc-label{font-size:10px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
 .sc-value{font-size:28px;font-weight:800;line-height:1.2;letter-spacing:-.03em}

@@ -722,8 +722,8 @@ function renderCompras(){
 // ══════════════════════════════════════════
 const catColors = {
   'trabalho':['#1a2810','var(--accent2)'],
-  'despesa-fixa':['#1a1835','var(--accent)'],
-  'lazer':['#1a1020','#e879f9'],
+  'despesa-fixa':['#070f2b','var(--accent)'],
+  'lazer':['#2a1510','var(--cyan)'],
   'alimentacao':['#2a1e10','var(--accent3)'],
   'saude':['#101a2a','var(--accent5)'],
   'investimento':['#0f2318','var(--accent2)'],
@@ -919,12 +919,12 @@ function renderFinancas(){
 //  GRÁFICO FINANCEIRO — Donut por Categoria
 // ══════════════════════════════════════════
 const chartPalette = {
-  'trabalho':    '#6c63ff',
-  'despesa-fixa':'#a78bfa',
-  'lazer':       '#e879f9',
-  'alimentacao': '#f5a623',
-  'saude':       '#38bdf8',
-  'investimento':'#3fcf8e',
+  'trabalho':    '#3b82f6',
+  'despesa-fixa':'#ff6c00',
+  'lazer':       '#ffee00',
+  'alimentacao': '#d97706',
+  'saude':       '#10b981',
+  'investimento':'#059669',
   'outro':       '#64748b'
 }
 const catLabels = {
@@ -1002,7 +1002,7 @@ function renderFinChart(list){
   ctx.shadowBlur = 0
   ctx.beginPath()
   ctx.arc(cx, cy, innerR - 1, 0, 2*Math.PI)
-  ctx.fillStyle = isLight ? '#f8f9fc' : '#111318'
+  ctx.fillStyle = isLight ? '#ffffff' : '#070f2b'
   ctx.fill()
 
   // Texto central
@@ -1350,9 +1350,9 @@ function saveProjectDetails(){
 // ══════════════════════════════════════════
 const tagColors = {
   ideia:['#1e1a10','var(--accent3)'],
-  projeto:['#1a1835','var(--accent)'],
+  projeto:['#070f2b','var(--accent)'],
   aprendizado:['#101a2a','var(--accent5)'],
-  reflexao:['#18102a','#c084fc'],
+  reflexao:['#2a1510','var(--cyan)'],
   referencia:['#0f2318','var(--accent2)'],
   outro:['#1a1a1a','var(--text2)']
 }

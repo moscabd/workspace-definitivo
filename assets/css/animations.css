@@ -1,5 +1,5 @@
 /* ════════════════════════════════
-   ANIMATIONS — Workspace v4 Nebula
+   ANIMATIONS — Workspace v5 Cyber
    ════════════════════════════════ */
 
 /* ── Keyframes ── */
@@ -24,7 +24,7 @@
   66%{transform:translate(15px,-20px) scale(.96)}
 }
 @keyframes gridPulse{
-  0%,100%{opacity:.04}50%{opacity:.08}
+  0%,100%{opacity:.04}50%{opacity:.09}
 }
 @keyframes shimmer{
   0%{background-position:200% center}
@@ -35,18 +35,30 @@
   100%{background-position:-200% center}
 }
 
-/* ── Glow pulses ── */
+/* ── Glow pulses (Dynamic using design system variables) ── */
 @keyframes glowPulse{
-  0%,100%{box-shadow:0 0 12px rgba(245,158,11,.3),0 0 24px rgba(245,158,11,.15)}
-  50%{box-shadow:0 0 20px rgba(245,158,11,.6),0 0 40px rgba(245,158,11,.3)}
+  0%,100%{box-shadow:0 0 12px rgba(var(--primary-rgb),.35),0 0 24px rgba(var(--primary-rgb),.15)}
+  50%{box-shadow:0 0 24px rgba(var(--primary-rgb),.7),0 0 44px rgba(var(--primary-rgb),.35)}
 }
 @keyframes cyanGlow{
-  0%,100%{box-shadow:0 0 12px rgba(59,130,246,.25)}
-  50%{box-shadow:0 0 28px rgba(59,130,246,.55)}
+  0%,100%{box-shadow:0 0 12px rgba(var(--cyan-rgb),.3)}
+  50%{box-shadow:0 0 32px rgba(var(--cyan-rgb),.6)}
 }
 @keyframes orbFloat{
   0%,100%{transform:translateY(0) scale(1);opacity:.8}
   50%{transform:translateY(-8px) scale(1.08);opacity:1}
+}
+
+/* Cyberpunk Neon Flicker */
+@keyframes cyberFlicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+    opacity: 0.99;
+    filter: drop-shadow(0 0 8px rgba(var(--primary-rgb), 0.6));
+  }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+    opacity: 0.4;
+    filter: none;
+  }
 }
 
 /* ── UI Transitions ── */
@@ -75,6 +87,7 @@
 .anim-spin{animation:spin 1s linear infinite}
 .anim-glow{animation:glowPulse 2.5s ease-in-out infinite}
 .anim-orb{animation:orbFloat 4s ease-in-out infinite}
+.anim-flicker{animation:cyberFlicker 3s linear infinite}
 
 /* ── Stagger children ── */
 .stagger>*{animation:fadeInUp var(--dur) var(--ease) both}

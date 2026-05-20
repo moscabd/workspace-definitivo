@@ -24,8 +24,8 @@ a:hover{color:var(--primary-light)}
 
 /* ── Background premium ── */
 body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(100px)}
-body::before{width:700px;height:700px;background:radial-gradient(circle,rgba(245,158,11,.12) 0%,transparent 60%);top:-200px;left:-200px;animation:nebulaFloat 20s ease-in-out infinite}
-body::after{width:600px;height:600px;background:radial-gradient(circle,rgba(59,130,246,.08) 0%,transparent 60%);bottom:-150px;right:-150px;animation:nebulaFloat2 24s ease-in-out infinite}
+body::before{width:700px;height:700px;background:radial-gradient(circle,rgba(var(--primary-rgb),.12) 0%,transparent 60%);top:-200px;left:-200px;animation:nebulaFloat 20s ease-in-out infinite}
+body::after{width:600px;height:600px;background:radial-gradient(circle,rgba(var(--cyan-rgb),.08) 0%,transparent 60%);bottom:-150px;right:-150px;animation:nebulaFloat2 24s ease-in-out infinite}
 
 /* ── Grid overlay sutil ── */
 .app::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
